@@ -1,0 +1,31 @@
+{
+  "name": "Viking-store",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/eslint": "^1.15.2",
+    "@nuxt/image": "^2.0.0",
+    "@nuxt/ui": "^4.8.0",
+    "@nuxtjs/color-mode": "^4.0.0",
+    "@nuxtjs/i18n": "^10.4.0",
+    "@pinia/nuxt": "^0.11.3",
+    "@supabase/supabase-js": "^2.106.1",
+    "@tailwindcss/vite": "^4.3.0",
+    "@vueuse/nuxt": "^14.3.0",
+    "eslint": "^10.4.0",
+    "nuxt": "^4.4.6",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^6.0.3",
+    "vee-validate": "^4.15.1",
+    "vue": "^3.5.34",
+    "vue-router": "^5.0.7",
+    "zod": "^4.4.3"
+  }
+}
