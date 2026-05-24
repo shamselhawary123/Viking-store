@@ -7,7 +7,7 @@
         Premium Combat Equipment
       </p>
       <img
-        src="/image/train-hard.png"
+        src="/train-hard.png"
         alt=""
         class="max-w-4xl mx-auto leading-none md:text-8xl"
       />
