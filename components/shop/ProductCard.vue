@@ -50,15 +50,28 @@
 
       <!-- Button -->
       <button
+        @click.prevent="
+          cartStore.addToCart(
+            props.product.id,
+            props.product.title,
+            props.product.selectedColor || '',
+            1,
+            props.product.selectedImage || '',
+          )
+        "
         class="w-full rounded-2xl border border-white/10 py-3 font-semibold transition hover:border-[#FF4D00] hover:bg-[#FF4D00]"
       >
-        View Product
+        Add To Cart
       </button>
     </div>
   </NuxtLink>
 </template>
+
 <script setup lang="ts">
-defineProps<{
+import { useCartStore } from "../../stores/cart";
+const cartStore = useCartStore();
+
+const props = defineProps<{
   product: {
     id: number;
     title: string;
@@ -68,6 +81,8 @@ defineProps<{
     category: string;
     image: string;
     badge?: string;
+    selectedColor?: string;
+    selectedImage?: string;
   };
 }>();
 </script>

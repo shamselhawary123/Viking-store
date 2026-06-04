@@ -26,16 +26,15 @@ const shopStore = useShopStore();
       <div class="space-y-3">
         <button
           v-for="category in categories"
-          :key="category"
-          @click="shopStore.setCategory(category)"
-          class="block w-full rounded-xl px-4 py-3 text-left transition"
-          :class="
-            shopStore.selectedCategory === category
-              ? 'bg-[#FF4D00] text-white'
-              : 'bg-black hover:bg-white/10'
-          "
+          :key="category.id"
+          @click="shopStore.selectedCategory = category.name"
+          class="flex w-full items-center justify-between rounded-2xl border border-white/10 px-4 py-4 text-left transition hover:border-[#FF4D00]"
         >
-          {{ category }}
+          <span>
+            {{ category.name }}
+          </span>
+
+          <span class="text-xs text-gray-500"> → </span>
         </button>
       </div>
     </div>

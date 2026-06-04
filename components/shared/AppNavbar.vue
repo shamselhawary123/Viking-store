@@ -27,14 +27,15 @@
 
       <!-- Actions -->
       <div class="flex items-center gap-3">
-        <!-- Cart -->
         <button
-          class="relative rounded-xl border border-white/10 p-2 transition hover:border-[#FF4D00]"
+          @click="cartStore.openCart()"
+          class="relative rounded-xl border border-white/10 p-2 hover:border-[#FF4D00]"
         >
           🛒
 
           <span
-            class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#FF4D00] text-xs font-bold text-white"
+            v-if="cartStore.totalItems"
+            class="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#FF4D00] text-xs font-bold"
           >
             {{ cartStore.totalItems }}
           </span>
@@ -46,6 +47,42 @@
         >
           🌙
         </button>
+
+        <!-- User -->
+        <div v-if="authStore.user" class="hidden md:flex">
+          <div class="flex items-center gap-3">
+            <NuxtLink
+              to="/profile"
+              class="rounded-xl border border-white/10 px-4 py-2 transition hover:border-[#FF4D00]"
+            >
+              {{ authStore.user?.fullName }}
+            </NuxtLink>
+
+            <button
+              @click="handleLogout"
+              class="rounded-xl border border-red-500/30 px-4 py-2 text-red-400 transition hover:bg-red-500 hover:text-white"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+
+        <!-- Guest -->
+        <div v-else class="hidden items-center gap-3 md:flex">
+          <NuxtLink
+            to="/auth/login"
+            class="rounded-xl border border-white/10 px-4 py-2 transition hover:border-[#FF4D00]"
+          >
+            Login
+          </NuxtLink>
+
+          <NuxtLink
+            to="/auth/register"
+            class="rounded-xl border border-red-500/30 px-4 py-2 text-red-400 transition hover:bg-red-500 hover:text-white"
+          >
+            Register
+          </NuxtLink>
+        </div>
 
         <!-- Mobile Menu Button -->
         <button
@@ -91,6 +128,36 @@
           >
             Contact
           </NuxtLink>
+          <div class="mt-4 border-t border-white/10 pt-4">
+            <div v-if="authStore.user" class="flex flex-col gap-3">
+              <NuxtLink to="/profile">
+                {{ authStore.user?.fullName }}
+              </NuxtLink>
+
+              <button
+                @click="handleLogout"
+                class="rounded-xl bg-red-500 px-4 py-3 font-bold"
+              >
+                Logout
+              </button>
+            </div>
+
+            <div v-else class="flex flex-col gap-3">
+              <NuxtLink
+                to="/auth/login"
+                class="rounded-xl border border-white/10 px-4 py-3 text-center"
+              >
+                Login
+              </NuxtLink>
+
+              <NuxtLink
+                to="/auth/register"
+                class="rounded-xl bg-[#FF4D00] px-4 py-3 text-center font-bold"
+              >
+                Register
+              </NuxtLink>
+            </div>
+          </div>
         </nav>
       </div>
     </Transition>
@@ -98,12 +165,33 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useCartStore } from "../../stores/cart";
+import { useAuthStore } from "../../stores/auth";
+import { useRouter } from "vue-router";
 
 const cartStore = useCartStore();
+const authStore = useAuthStore();
+const router = useRouter();
+
 const isMenuOpen = ref(false);
+onMounted(async () => {
+  try {
+    await authStore.getUser();
+  } catch (err) {
+    console.log(err);
+  }
+
+  cartStore.loadCart();
+});
+
+const handleLogout = () => {
+  authStore.logout();
+
+  router.push("/");
+};
 </script>
+
 <style scoped>
 .nav-link {
   transition: 0.3s;

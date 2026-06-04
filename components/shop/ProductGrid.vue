@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { products } from "../../data/products";
+
 import { useShopStore } from "../../stores/shop";
+
+const props = defineProps<{
+  products: any[];
+}>();
+
 const shopStore = useShopStore();
 
 const filteredProducts = computed(() => {
-  let result = [...products];
+  let result = [...props.products];
 
   // Category Filter
   if (shopStore.selectedCategory !== "All") {
     result = result.filter(
-      (product) => product.category === shopStore.selectedCategory,
+      (product) =>
+        product.category.toLowerCase() ===
+        shopStore.selectedCategory.toLowerCase(),
     );
   }
 
@@ -48,6 +55,7 @@ const filteredProducts = computed(() => {
       <ShopProductCard
         v-for="product in filteredProducts"
         :key="product.id"
+        :image="product.image"
         :product="product"
       />
     </div>

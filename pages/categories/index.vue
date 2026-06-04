@@ -4,7 +4,7 @@
 
     <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       <ShopCategoryCard
-        v-for="category in typedCategories"
+        v-for="category in categories"
         :key="category.id"
         :name="category.name"
         :image="category.image"
@@ -13,21 +13,7 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { categories } from "../../data/categories";
-
-type Category = {
-  id: number | string;
-  name: string;
-  image: string;
-  slug: string;
-};
-
-// If categories is string[], map it to Category[]
-const typedCategories: Category[] = categories.map((cat, idx) => ({
-  id: idx,
-  name: cat,
-  image: "", // Provide a default or fetch image if available
-  slug: typeof cat === "string" ? cat.toLowerCase().replace(/\s+/g, "-") : "",
-}));
 </script>

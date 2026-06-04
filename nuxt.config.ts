@@ -3,6 +3,13 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
+  runtimeConfig: {
+    public: {
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseKey: process.env.SUPABASE_KEY,
+    },
+  },
+
   modules: [
     "@nuxt/ui",
     "@pinia/nuxt",
@@ -40,11 +47,13 @@ export default defineNuxtConfig({
 
   i18n: {
     defaultLocale: "en",
+
     locales: [
       {
         code: "en",
         name: "English",
       },
+
       {
         code: "ar",
         name: "العربية",
