@@ -56,6 +56,7 @@
                     class="hidden"
                     accept="image/*"
                     @change="handleAvatar"
+                    required
                   />
                 </label>
               </div>
@@ -67,6 +68,7 @@
               type="text"
               placeholder="Full Name"
               class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+              required
             />
 
             <!-- Email -->
@@ -75,6 +77,7 @@
               type="email"
               placeholder="Email Address"
               class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+              required
             />
 
             <!-- Phone + Gender -->
@@ -84,11 +87,13 @@
                 type="text"
                 placeholder="Phone Number"
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                required
               />
 
               <select
                 v-model="form.gender"
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                required
               >
                 <option value="">Select Gender</option>
 
@@ -104,6 +109,7 @@
               type="text"
               placeholder="Address"
               class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+              required
             />
 
             <!-- City Country Postal -->
@@ -113,6 +119,7 @@
                 type="text"
                 placeholder="City"
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                required
               />
 
               <input
@@ -120,6 +127,7 @@
                 type="text"
                 placeholder="Country"
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                required
               />
 
               <input
@@ -145,6 +153,7 @@
                 :type="showPassword ? 'text' : 'password'"
                 placeholder="Password"
                 class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 pr-20 text-white outline-none transition focus:border-[#FF4D00]"
+                required
               />
 
               <button
@@ -154,6 +163,16 @@
               >
                 {{ showPassword ? "Hide" : "Show" }}
               </button>
+            </div>
+            <!-- Confirm Password -->
+            <div class="relative">
+              <input
+                v-model="form.confirmPassword"
+                :type="showPassword ? 'text' : 'password'"
+                placeholder="Confirm Password"
+                class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 pr-20 text-white outline-none transition focus:border-[#FF4D00]"
+                required
+              />
             </div>
             <!-- Error Message -->
             <div
@@ -193,8 +212,10 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
-import { useSupabase } from "../../composables/useSupabase";
 
+definePageMeta({
+  middleware: ["guest"],
+});
 const router = useRouter();
 const authStore = useAuthStore();
 
@@ -219,6 +240,7 @@ const form = ref({
   postalCode: "",
   bio: "",
   password: "",
+  confirmPassword: "",
 });
 
 const handleAvatar = (event: Event) => {
@@ -230,17 +252,99 @@ const handleAvatar = (event: Event) => {
 };
 
 const validate = () => {
-  if (!form.value.fullName || !form.value.email || !form.value.password) {
-    error.value = "Full name, email and password are required";
+  if (!avatarFile.value) {
+    errorMessage.value = "Avatar is required";
     return false;
   }
+
+  if (!form.value.fullName.trim()) {
+    errorMessage.value = "Full Name is required";
+    return false;
+  }
+
+  if (!form.value.email.trim()) {
+    errorMessage.value = "Email is required";
+    return false;
+  }
+
+  if (!form.value.phone.trim()) {
+    errorMessage.value = "Phone Number is required";
+    return false;
+  }
+
+  if (!form.value.gender.trim()) {
+    errorMessage.value = "Gender is required";
+    return false;
+  }
+
+  if (!form.value.address.trim()) {
+    errorMessage.value = "Address is required";
+    return false;
+  }
+
+  if (!form.value.city.trim()) {
+    errorMessage.value = "City is required";
+    return false;
+  }
+
+  if (!form.value.country.trim()) {
+    errorMessage.value = "Country is required";
+    return false;
+  }
+
+  if (!form.value.password.trim()) {
+    errorMessage.value = "Password is required";
+    return false;
+  }
+
+  if (form.value.password.length < 6) {
+    errorMessage.value = "Password must be at least 6 characters";
+
+    return false;
+  }
+
+  if (form.value.password !== form.value.confirmPassword) {
+    errorMessage.value = "Passwords do not match";
+
+    return false;
+  }
+
   return true;
 };
 const handleRegister = async () => {
+  if (!validate()) return;
+
   try {
     loading.value = true;
     errorMessage.value = "";
 
+    let avatarUrl = "";
+
+    // Upload Avatar First
+    if (avatarFile.value) {
+      avatarUrl = await authStore.uploadAvatar(avatarFile.value);
+
+      localStorage.setItem("pending_avatar", avatarUrl);
+    }
+
+    // Save User Data
+    localStorage.setItem(
+      "pending_profile",
+      JSON.stringify({
+        fullName: form.value.fullName,
+        email: form.value.email,
+        phone: form.value.phone,
+        gender: form.value.gender,
+        address: form.value.address,
+        city: form.value.city,
+        country: form.value.country,
+        postalCode: form.value.postalCode,
+        bio: form.value.bio,
+        password: form.value.password,
+      }),
+    );
+
+    // Register User
     await authStore.register({
       fullName: form.value.fullName,
       email: form.value.email,
@@ -252,6 +356,7 @@ const handleRegister = async () => {
     await router.push("/auth/verify-email");
   } catch (error: any) {
     console.error(error);
+
     errorMessage.value = error?.message || "Something went wrong";
   } finally {
     loading.value = false;

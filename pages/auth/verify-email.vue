@@ -33,9 +33,14 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useSupabase } from "../../composables/useSupabase";
+import { useAuthStore } from "../../stores/auth";
 
+definePageMeta({
+  middleware: ["guest"],
+});
 const router = useRouter();
 const supabase = useSupabase();
+const authStore = useAuthStore();
 
 const otp = ref("");
 const error = ref("");
@@ -63,9 +68,43 @@ const verifyOtp = async () => {
       throw verifyError;
     }
 
-    localStorage.removeItem("verify_email");
+    const pendingProfile = localStorage.getItem("pending_profile");
+    const avatar = localStorage.getItem("pending_avatar") || "";
 
-    router.push("/auth/login");
+    if (!pendingProfile) {
+      throw new Error("Profile data not found");
+    }
+
+    const profileData = JSON.parse(pendingProfile);
+
+    await authStore.login(profileData.email, profileData.password);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    await authStore.createProfile({
+      id: user.id,
+      email: profileData.email,
+      fullName: profileData.fullName,
+      avatar,
+      phone: profileData.phone,
+      gender: profileData.gender,
+      address: profileData.address,
+      city: profileData.city,
+      country: profileData.country,
+      postalCode: profileData.postalCode,
+      bio: profileData.bio,
+    });
+
+    localStorage.removeItem("verify_email");
+    localStorage.removeItem("pending_profile");
+    localStorage.removeItem("pending_avatar");
+    router.push("/");
   } catch (err: any) {
     error.value = err.message;
   } finally {

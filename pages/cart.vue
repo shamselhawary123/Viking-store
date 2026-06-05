@@ -191,9 +191,10 @@
           </div>
 
           <button
+            @click="handleCheckout"
             class="mt-8 w-full rounded-2xl bg-[#FF4D00] py-4 text-lg font-bold transition hover:opacity-90"
           >
-            Proceed To Checkout
+            Place Order
           </button>
         </div>
       </div>
@@ -203,10 +204,23 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-
+import { useAuthStore } from "../stores/auth";
 import { useCartStore } from "../stores/cart";
 
 const cartStore = useCartStore();
+const authStore = useAuthStore();
+
+const handleCheckout = async () => {
+  try {
+    await authStore.createOrder(cartStore.items, cartStore.totalPrice);
+
+    cartStore.clearCart();
+
+    alert("Order placed successfully 🔥");
+  } catch (error: any) {
+    alert(error.message);
+  }
+};
 
 onMounted(() => {
   cartStore.loadCart();

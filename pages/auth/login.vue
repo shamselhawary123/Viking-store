@@ -129,6 +129,9 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
+definePageMeta({
+  middleware: ["guest"],
+});
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -164,14 +167,17 @@ const validate = () => {
 };
 
 const handleLogin = async () => {
+  if (!validate()) return;
+
   try {
     loading.value = true;
+    loginError.value = "";
 
     await authStore.login(email.value, password.value);
 
     router.push("/");
   } catch (error: any) {
-    loginError.value = error.message;
+    loginError.value = error?.message || "Login Failed";
   } finally {
     loading.value = false;
   }

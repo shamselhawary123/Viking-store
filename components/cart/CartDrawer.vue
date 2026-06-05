@@ -147,6 +147,7 @@
           </NuxtLink>
 
           <button
+            @click="handleCheckout"
             class="w-full rounded-2xl bg-[#FF4D00] py-4 font-bold transition hover:opacity-90"
           >
             Checkout
@@ -159,8 +160,22 @@
 
 <script setup lang="ts">
 import { useCartStore } from "../../stores/cart";
+import { useAuthStore } from "../../stores/auth";
 
+const authStore = useAuthStore();
 const cartStore = useCartStore();
+
+const handleCheckout = async () => {
+  try {
+    await authStore.createOrder(cartStore.items, cartStore.totalPrice);
+
+    cartStore.clearCart();
+
+    alert("Order placed successfully 🔥");
+  } catch (error: any) {
+    alert(error.message);
+  }
+};
 </script>
 
 <style scoped>

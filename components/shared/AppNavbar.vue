@@ -22,7 +22,7 @@
 
         <NuxtLink to="/about" class="nav-link"> About </NuxtLink>
 
-        <NuxtLink to="/contact" class="nav-link"> Contact </NuxtLink>
+        <NuxtLink to="/profile/orders" class="nav-link"> Orders </NuxtLink>
       </nav>
 
       <!-- Actions -->
@@ -41,21 +41,45 @@
           </span>
         </button>
 
-        <!-- Theme -->
+        <!-- Mobile Profile Avatar -->
+        <NuxtLink v-if="authStore.user" to="/profile" class="md:hidden">
+          <img
+            :src="
+              authStore.profile?.avatar ||
+              'https://ui-avatars.com/api/?name=User'
+            "
+            class="h-10 w-10 rounded-full border-2 border-white/10 object-cover transition hover:border-[#FF4D00]"
+          />
+        </NuxtLink>
+
+        <!-- Theme (Desktop Only) -->
         <button
-          class="rounded-xl border border-white/10 p-2 transition hover:border-[#FF4D00]"
+          class="hidden rounded-xl border border-white/10 p-2 transition hover:border-[#FF4D00] md:flex"
         >
           🌙
         </button>
 
         <!-- User -->
         <div v-if="authStore.user" class="hidden md:flex">
-          <div class="flex items-center gap-3">
-            <NuxtLink
-              to="/profile"
-              class="rounded-xl border border-white/10 px-4 py-2 transition hover:border-[#FF4D00]"
-            >
-              {{ authStore.user?.fullName }}
+          <div class="flex items-center gap-4">
+            <NuxtLink to="/profile" class="group flex items-center gap-3">
+              <img
+                :src="
+                  authStore.profile?.avatar ||
+                  'https://ui-avatars.com/api/?name=User'
+                "
+                class="h-11 w-11 rounded-full border-2 border-white/10 object-cover transition group-hover:border-[#FF4D00]"
+              />
+
+              <div class="hidden lg:block">
+                <p
+                  class="text-sm font-bold text-white transition group-hover:text-[#FF4D00]"
+                >
+                  {{ authStore.profile?.full_name }}
+                </p>
+
+                <p class="text-xs text-gray-400">Viking Member</p>
+              </div>
             </NuxtLink>
 
             <button
@@ -128,20 +152,46 @@
           >
             Contact
           </NuxtLink>
+
+          <NuxtLink
+            to="/profile/orders"
+            class="mobile-link"
+            @click="isMenuOpen = false"
+          >
+            Orders
+          </NuxtLink>
+
           <div class="mt-4 border-t border-white/10 pt-4">
-            <div v-if="authStore.user" class="flex flex-col gap-3">
-              <NuxtLink to="/profile">
-                {{ authStore.user?.fullName }}
+            <div v-if="authStore.user" class="flex flex-col gap-4">
+              <NuxtLink
+                to="/profile"
+                class="flex items-center gap-4 rounded-2xl border border-white/10 bg-[#111111] p-4"
+                @click="isMenuOpen = false"
+              >
+                <img
+                  :src="
+                    authStore.profile?.avatar ||
+                    'https://ui-avatars.com/api/?name=User'
+                  "
+                  class="h-14 w-14 rounded-full object-cover"
+                />
+
+                <div>
+                  <p class="font-bold text-white">
+                    {{ authStore.profile?.full_name }}
+                  </p>
+
+                  <p class="text-sm text-gray-400">Viking Member</p>
+                </div>
               </NuxtLink>
 
               <button
                 @click="handleLogout"
-                class="rounded-xl bg-red-500 px-4 py-3 font-bold"
+                class="rounded-xl bg-red-500 px-4 py-3 font-bold text-white"
               >
                 Logout
               </button>
             </div>
-
             <div v-else class="flex flex-col gap-3">
               <NuxtLink
                 to="/auth/login"
@@ -178,6 +228,10 @@ const isMenuOpen = ref(false);
 onMounted(async () => {
   try {
     await authStore.getUser();
+
+    if (authStore.user) {
+      await authStore.getProfile();
+    }
   } catch (err) {
     console.log(err);
   }

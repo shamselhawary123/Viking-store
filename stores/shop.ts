@@ -5,7 +5,7 @@ export const useShopStore = defineStore("shop", {
     search: "",
     selectedCategory: "All",
     sortBy: "default",
-    maxPrice: 5000,
+    maxPrice: 500,
   }),
 
   actions: {
