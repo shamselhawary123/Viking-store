@@ -69,8 +69,8 @@ const verifyOtp = async () => {
     }
 
     const pendingProfile = localStorage.getItem("pending_profile");
-    const avatar = localStorage.getItem("pending_avatar") || "";
-
+    // const avatar = localStorage.getItem("pending_avatar") || "";
+    const avatar = "";
     if (!pendingProfile) {
       throw new Error("Profile data not found");
     }
@@ -91,7 +91,7 @@ const verifyOtp = async () => {
       id: user.id,
       email: profileData.email,
       fullName: profileData.fullName,
-      avatar,
+      avatar: "",
       phone: profileData.phone,
       gender: profileData.gender,
       address: profileData.address,
@@ -104,7 +104,7 @@ const verifyOtp = async () => {
     localStorage.removeItem("verify_email");
     localStorage.removeItem("pending_profile");
     localStorage.removeItem("pending_avatar");
-    router.push("/");
+    router.push("/profile/edit");
   } catch (err: any) {
     error.value = err.message;
   } finally {

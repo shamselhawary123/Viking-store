@@ -56,7 +56,6 @@
                     class="hidden"
                     accept="image/*"
                     @change="handleAvatar"
-                    required
                   />
                 </label>
               </div>
@@ -252,10 +251,10 @@ const handleAvatar = (event: Event) => {
 };
 
 const validate = () => {
-  if (!avatarFile.value) {
-    errorMessage.value = "Avatar is required";
-    return false;
-  }
+  // if (!avatarFile.value) {
+  //   errorMessage.value = "Avatar is required";
+  //   return false;
+  // }
 
   if (!form.value.fullName.trim()) {
     errorMessage.value = "Full Name is required";
@@ -320,12 +319,12 @@ const handleRegister = async () => {
 
     let avatarUrl = "";
 
-    // Upload Avatar First
-    if (avatarFile.value) {
-      avatarUrl = await authStore.uploadAvatar(avatarFile.value);
+    // // Upload Avatar First
+    // if (avatarFile.value) {
+    //   avatarUrl = await authStore.uploadAvatar(avatarFile.value);
 
-      localStorage.setItem("pending_avatar", avatarUrl);
-    }
+    //   localStorage.setItem("pending_avatar", avatarUrl);
+    // }
 
     // Save User Data
     localStorage.setItem(
