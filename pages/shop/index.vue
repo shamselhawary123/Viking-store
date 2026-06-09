@@ -2,7 +2,7 @@
   <section class="px-4 py-10 md:px-6">
     <div class="mx-auto grid max-w-7xl grid-cols-12 gap-8">
       <!-- Sidebar -->
-      <aside class="hidden lg:col-span-3 lg:block">
+      <aside class="lg:col-span-3">
         <ShopSidebar />
       </aside>
 
@@ -19,25 +19,39 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
-
-import { products } from "../../data/products";
+import { useProductsStore } from "../../stores/products";
+import { useShopStore } from "../../stores/shop";
 
 const route = useRoute();
+const productsStore = useProductsStore();
+const shopStore = useShopStore();
+
+onMounted(async () => {
+  await productsStore.getProducts();
+});
 
 const category = computed(() => route.query.category);
 
 const filteredProducts = computed(() => {
   if (!category.value || category.value === "all") {
-    return products;
+    return productsStore.products;
   }
 
-  return products.filter((product) =>
-    product.category
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .includes(category.value as string),
+  return productsStore.products.filter(
+    (product) => product.categories?.slug === category.value,
   );
 });
+
+watch(
+  () => route.query.category,
+  (newCategory) => {
+    shopStore.selectedCategory = (newCategory as string) || "all";
+  },
+  { immediate: true },
+);
+
+console.log(productsStore.products);
+console.log(route.query.category);
 </script>

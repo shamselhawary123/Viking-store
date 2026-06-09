@@ -4,7 +4,7 @@
 
     <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       <ShopCategoryCard
-        v-for="category in categories"
+        v-for="category in categoriesStore.categories"
         :key="category.id"
         :name="category.name"
         :image="category.image"
@@ -15,5 +15,12 @@
 </template>
 
 <script setup lang="ts">
-import { categories } from "../../data/categories";
+import { onMounted } from "vue";
+import { useCategoriesStore } from "../../stores/categories";
+
+const categoriesStore = useCategoriesStore();
+
+onMounted(async () => {
+  await categoriesStore.getCategories();
+});
 </script>

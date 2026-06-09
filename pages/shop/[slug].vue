@@ -16,17 +16,19 @@
 
         <!-- Gallery -->
         <div class="grid grid-cols-4 gap-4">
-          <button
-            v-for="image in activeColor?.images"
-            :key="image"
-            @click="selectedImage = image"
+          <!-- <button
+            v-for="image in activeColor?.product_images"
+            :key="image.id"
+            @click="selectedImage = image.image_url"
             class="overflow-hidden rounded-2xl border transition"
             :class="
-              selectedImage === image ? 'border-[#FF4D00]' : 'border-white/10'
+              selectedImage === image.image_url
+                ? 'border-[#FF4D00]'
+                : 'border-white/10'
             "
           >
-            <img :src="image" alt="" class="h-24 w-full object-cover" />
-          </button>
+            <img :src="image.image_url" class="h-24 w-full object-cover" /> 
+          </button> -->
         </div>
       </div>
 
@@ -49,7 +51,7 @@
 
         <!-- Category -->
         <p class="uppercase tracking-[0.3em] text-[#FF4D00]">
-          {{ product.category }}
+          {{ product.categories?.name }}
         </p>
 
         <!-- Title -->
@@ -71,10 +73,10 @@
           </span>
 
           <span
-            v-if="product.oldPrice"
+            v-if="product.old_price"
             class="text-2xl text-gray-500 line-through"
           >
-            ${{ product.oldPrice }}
+            ${{ product.old_price }}
           </span>
         </div>
 
@@ -95,18 +97,18 @@
 
           <div class="flex flex-wrap gap-4">
             <button
-              v-for="color in product.colors"
-              :key="color.name"
+              v-for="color in product.product_colors"
+              :key="color.id"
               @click="changeColor(color)"
               class="overflow-hidden rounded-2xl border-2 transition"
               :class="
-                selectedColor?.name === color.name
+                selectedColor?.id === color.id
                   ? 'border-[#FF4D00]'
                   : 'border-white/10'
               "
             >
               <img
-                :src="color.images[0]"
+                :src="color.product_images?.[0]?.image_url"
                 :alt="color.name"
                 class="h-20 w-20 object-cover"
               />
@@ -120,20 +122,20 @@
 
           <div class="flex flex-wrap gap-3">
             <button
-              v-for="size in product.sizes"
-              :key="size.value"
-              :disabled="!size.inStock"
+              v-for="size in product.product_sizes"
+              :key="size.id"
+              :disabled="!size.in_stock"
               class="min-w-[70px] rounded-2xl border px-5 py-3 font-bold transition"
               :class="
-                selectedSize === size.value
+                selectedSize === size.size
                   ? 'border-[#FF4D00] bg-[#FF4D00] text-white'
-                  : size.inStock
+                  : size.in_stock
                     ? 'border-white/10 hover:border-[#FF4D00]'
                     : 'cursor-not-allowed border-white/5 text-gray-600 line-through'
               "
-              @click="selectedSize = size.value"
+              @click="selectedSize = size.size"
             >
-              {{ size.value }}
+              {{ size.size }}
             </button>
           </div>
         </div>
@@ -213,6 +215,36 @@
       </div>
     </div>
   </section>
+  <!-- Related Products -->
+  <section
+    v-if="relatedProducts.length"
+    class="mx-auto mt-20 max-w-7xl px-4 md:px-6"
+  >
+    <div class="mb-10 flex items-center justify-between">
+      <div>
+        <p class="text-sm uppercase tracking-[0.3em] text-[#FF4D00]">
+          More Gear
+        </p>
+
+        <h2 class="mt-3 text-4xl font-black text-white">Related Products</h2>
+      </div>
+
+      <NuxtLink
+        to="/shop"
+        class="rounded-2xl border border-white/10 px-6 py-3 transition hover:border-[#FF4D00]"
+      >
+        View All
+      </NuxtLink>
+    </div>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <ShopProductCard
+        v-for="item in relatedProducts"
+        :key="item.id"
+        :product="item"
+      />
+    </div>
+  </section>
 
   <div v-else class="flex min-h-[60vh] items-center justify-center text-center">
     <div>
@@ -224,34 +256,65 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
-import { products } from "../../data/products";
 import { useCartStore } from "../../stores/cart";
+import { useProductsStore } from "../../stores/products";
 
 const cartStore = useCartStore();
-
+const productsStore = useProductsStore();
 const route = useRoute();
 
-const product = products.find((item) => item.slug === route.params.slug);
+const product = ref<any>(null);
+const relatedProducts = ref<any[]>([]);
 
-const selectedColor = ref(product?.colors?.[0]);
-
-const selectedImage = ref(product?.colors?.[0]?.images?.[0] || "");
-
-const selectedSize = ref(
-  product?.sizes?.find((size) => size.inStock)?.value || "",
-);
-
+const selectedColor = ref<any>(null);
+const selectedImage = ref("");
+const selectedSize = ref("");
 const quantity = ref(1);
+
+onMounted(async () => {
+  product.value = await productsStore.getProductBySlug(
+    route.params.slug as string,
+  );
+
+  if (!product.value) return;
+
+  // Default Color
+  if (product.value.product_colors?.length) {
+    selectedColor.value = product.value.product_colors[0];
+
+    selectedImage.value =
+      selectedColor.value.product_images?.[0]?.image_url ||
+      product.value.cover_image;
+  } else {
+    selectedImage.value = product.value.cover_image;
+  }
+
+  // Default Size
+  if (product.value.product_sizes?.length) {
+    selectedSize.value =
+      product.value.product_sizes.find((size: any) => size.in_stock)?.size ||
+      "";
+  }
+
+  // Related Products
+  if (product.value.categories) {
+    relatedProducts.value = await productsStore.getRelatedProducts(
+      product.value.category_id,
+      product.value.id,
+    );
+  }
+});
 
 const activeColor = computed(() => selectedColor.value);
 
 const changeColor = (color: any) => {
   selectedColor.value = color;
 
-  selectedImage.value = color.images[0];
+  selectedImage.value =
+    color.product_images?.[0]?.image_url || product.value.cover_image;
 };
 
 const decreaseQty = () => {
@@ -260,12 +323,16 @@ const decreaseQty = () => {
   }
 };
 
+const increaseQty = () => {
+  quantity.value++;
+};
+
 const handleAddToCart = () => {
-  if (!product) return;
+  if (!product.value) return;
 
   cartStore.addToCart(
-    product,
-    selectedColor.value?.name,
+    product.value,
+    selectedColor.value?.name || "",
     selectedSize.value,
     quantity.value,
     selectedImage.value,

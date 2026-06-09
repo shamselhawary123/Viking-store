@@ -29,9 +29,10 @@
 
       <!-- Orders -->
       <div v-else class="grid gap-6">
-        <div
+        <NuxtLink
           v-for="order in orders"
           :key="order.id"
+          :to="`/profile/orders/${order.id}`"
           class="rounded-3xl border border-white/10 bg-[#111111] p-6 transition hover:border-[#FF4D00]"
         >
           <div
@@ -75,7 +76,7 @@
               </NuxtLink>
             </div>
           </div>
-        </div>
+        </NuxtLink>
       </div>
     </div>
   </section>
@@ -83,7 +84,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useAuthStore } from "../../stores/auth";
+import { useAuthStore } from "../../../stores/auth";
 
 definePageMeta({
   middleware: ["auth"],

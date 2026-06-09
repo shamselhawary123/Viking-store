@@ -146,14 +146,6 @@
           </NuxtLink>
 
           <NuxtLink
-            to="/contact"
-            class="mobile-link"
-            @click="isMenuOpen = false"
-          >
-            Contact
-          </NuxtLink>
-
-          <NuxtLink
             to="/profile/orders"
             class="mobile-link"
             @click="isMenuOpen = false"
@@ -196,6 +188,7 @@
               <NuxtLink
                 to="/auth/login"
                 class="rounded-xl border border-white/10 px-4 py-3 text-center"
+                @click="isMenuOpen = false"
               >
                 Login
               </NuxtLink>
@@ -203,6 +196,7 @@
               <NuxtLink
                 to="/auth/register"
                 class="rounded-xl bg-[#FF4D00] px-4 py-3 text-center font-bold"
+                @click="isMenuOpen = false"
               >
                 Register
               </NuxtLink>

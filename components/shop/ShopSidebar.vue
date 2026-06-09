@@ -1,12 +1,19 @@
-<script setup lang="ts">
-import { categories } from "../../data/categories";
-import { useShopStore } from "../../stores/shop";
-
-const shopStore = useShopStore();
-</script>
-
 <template>
-  <div class="space-y-8 rounded-3xl border border-white/10 bg-[#111111] p-6">
+  <div
+    class="space-y-8 rounded-3xl border border-white/10 bg-[#111111] p-6"
+    :class="[
+      shopStore.mobileFiltersOpen
+        ? 'fixed inset-0 z-50 overflow-y-auto bg-[#111111]'
+        : 'hidden lg:block',
+    ]"
+  >
+    <div class="flex items-center justify-between lg:hidden">
+      <h2 class="text-2xl font-black">Filters</h2>
+
+      <button @click="shopStore.mobileFiltersOpen = false" class="text-2xl">
+        ✕
+      </button>
+    </div>
     <!-- Search -->
     <div>
       <h3 class="mb-4 text-xl font-bold">Search</h3>
@@ -21,20 +28,36 @@ const shopStore = useShopStore();
 
     <!-- Categories -->
     <div>
-      <h3 class="mb-4 text-xl font-bold">Categories</h3>
+      <button
+        @click="categoriesOpen = !categoriesOpen"
+        class="flex w-full items-center justify-between"
+      >
+        <h3 class="text-xl font-bold">Categories</h3>
 
-      <div class="space-y-3">
+        <Icon
+          name="heroicons:chevron-down"
+          class="text-[#FF4D00] transition duration-300"
+          :class="{ 'rotate-180': categoriesOpen }"
+        />
+      </button>
+
+      <div v-show="categoriesOpen" class="mt-4 space-y-3">
         <button
-          v-for="category in categories"
+          v-for="category in categoriesStore.categories"
           :key="category.id"
-          @click="shopStore.selectedCategory = category.name"
-          class="flex w-full items-center justify-between rounded-2xl border border-white/10 px-4 py-4 text-left transition hover:border-[#FF4D00]"
+          @click="$router.push(`/shop?category=${category.slug}`)"
+          class="flex w-full items-center justify-between rounded-2xl border px-4 py-4 text-left transition"
+          :class="
+            shopStore.selectedCategory === category.slug
+              ? 'border-[#FF4D00] bg-[#FF4D00]/10'
+              : 'border-white/10 hover:border-[#FF4D00]'
+          "
         >
           <span>
             {{ category.name }}
           </span>
 
-          <span class="text-xs text-gray-500"> → </span>
+          <Icon name="heroicons:chevron-right" class="text-gray-500" />
         </button>
       </div>
     </div>
@@ -51,3 +74,17 @@ const shopStore = useShopStore();
     </div>
   </div>
 </template>
+<script setup lang="ts">
+import { useShopStore } from "../../stores/shop";
+import { ref, onMounted } from "vue";
+import { useCategoriesStore } from "../../stores/categories";
+
+const categoriesStore = useCategoriesStore();
+const categoriesOpen = ref(true);
+
+onMounted(async () => {
+  await categoriesStore.getCategories();
+});
+
+const shopStore = useShopStore();
+</script>

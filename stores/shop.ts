@@ -6,6 +6,7 @@ export const useShopStore = defineStore("shop", {
     selectedCategory: "All",
     sortBy: "default",
     maxPrice: 500,
+    mobileFiltersOpen: false,
   }),
 
   actions: {

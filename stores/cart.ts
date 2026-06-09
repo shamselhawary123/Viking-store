@@ -39,7 +39,7 @@ export const useCartStore = defineStore("cart", {
 
           oldPrice: product.oldPrice,
 
-          image: selectedImage,
+          image: selectedImage || product.cover_image,
 
           color: selectedColor.name,
 

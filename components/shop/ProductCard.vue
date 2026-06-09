@@ -6,7 +6,7 @@
     <!-- Image -->
     <div class="relative overflow-hidden">
       <img
-        :src="product.image"
+        :src="product.cover_image"
         :alt="product.title"
         class="h-[320px] w-full object-cover transition duration-500 group-hover:scale-110"
       />
@@ -19,7 +19,6 @@
         {{ product.badge }}
       </div>
 
-      <!-- Overlay -->
       <div
         class="absolute inset-0 bg-black/10 opacity-0 transition group-hover:opacity-100"
       />
@@ -41,24 +40,15 @@
         </span>
 
         <span
-          v-if="product.oldPrice"
+          v-if="product.old_price"
           class="text-sm text-gray-500 line-through"
         >
-          ${{ product.oldPrice }}
+          ${{ product.old_price }}
         </span>
       </div>
 
-      <!-- Button -->
       <button
-        @click.prevent="
-          cartStore.addToCart(
-            props.product.id,
-            props.product.title,
-            props.product.selectedColor || '',
-            1,
-            props.product.selectedImage || '',
-          )
-        "
+        @click.prevent="handleAddToCart"
         class="w-full rounded-2xl border border-white/10 py-3 font-semibold transition hover:border-[#FF4D00] hover:bg-[#FF4D00]"
       >
         Add To Cart
@@ -69,20 +59,14 @@
 
 <script setup lang="ts">
 import { useCartStore } from "../../stores/cart";
+
 const cartStore = useCartStore();
 
 const props = defineProps<{
-  product: {
-    id: number;
-    title: string;
-    slug: string;
-    price: number;
-    oldPrice?: number;
-    category: string;
-    image: string;
-    badge?: string;
-    selectedColor?: string;
-    selectedImage?: string;
-  };
+  product: any;
 }>();
+
+const handleAddToCart = () => {
+  cartStore.addToCart(props.product, "", "", 1, props.product.image);
+};
 </script>
