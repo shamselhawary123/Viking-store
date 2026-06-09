@@ -1,19 +1,32 @@
 <template>
+  <!-- Overlay -->
   <div
-    class="space-y-8 rounded-3xl border border-white/10 bg-[#111111] p-6"
+    v-if="shopStore.mobileFiltersOpen"
+    class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden"
+    @click="shopStore.mobileFiltersOpen = false"
+  />
+
+  <!-- Sidebar -->
+  <div
+    class="space-y-8 rounded-3xl border border-white/10 bg-[#111111] p-6 transition-all duration-300 ease-in-out"
     :class="[
       shopStore.mobileFiltersOpen
-        ? 'fixed inset-0 z-50 overflow-y-auto bg-[#111111]'
-        : 'hidden lg:block',
+        ? 'fixed right-0 top-0 z-50 h-screen w-[80%] translate-x-0 overflow-y-auto'
+        : 'fixed right-0 top-0 z-50 h-screen w-[80%] translate-x-full overflow-y-auto lg:translate-x-0 lg:static lg:h-auto lg:w-auto',
     ]"
   >
+    <!-- Mobile Header -->
     <div class="flex items-center justify-between lg:hidden">
       <h2 class="text-2xl font-black">Filters</h2>
 
-      <button @click="shopStore.mobileFiltersOpen = false" class="text-2xl">
+      <button
+        @click="shopStore.mobileFiltersOpen = false"
+        class="text-3xl text-gray-400 transition hover:text-white"
+      >
         ✕
       </button>
     </div>
+
     <!-- Search -->
     <div>
       <h3 class="mb-4 text-xl font-bold">Search</h3>
@@ -22,7 +35,7 @@
         v-model="shopStore.search"
         type="text"
         placeholder="Search products..."
-        class="w-full rounded-2xl border border-white/10 bg-black px-4 py-3 outline-none focus:border-[#FF4D00]"
+        class="w-full rounded-2xl border border-white/10 bg-black px-4 py-3 outline-none transition focus:border-[#FF4D00]"
       />
     </div>
 
@@ -45,7 +58,10 @@
         <button
           v-for="category in categoriesStore.categories"
           :key="category.id"
-          @click="$router.push(`/shop?category=${category.slug}`)"
+          @click="
+            $router.push(`/shop?category=${category.slug}`);
+            shopStore.mobileFiltersOpen = false;
+          "
           class="flex w-full items-center justify-between rounded-2xl border px-4 py-4 text-left transition"
           :class="
             shopStore.selectedCategory === category.slug
@@ -61,7 +77,9 @@
         </button>
       </div>
     </div>
-    <div class="mt-8">
+
+    <!-- Price -->
+    <div>
       <h3 class="mb-4 font-semibold">Max Price: ${{ shopStore.maxPrice }}</h3>
 
       <input
@@ -74,17 +92,18 @@
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-import { useShopStore } from "../../stores/shop";
 import { ref, onMounted } from "vue";
+import { useShopStore } from "../../stores/shop";
 import { useCategoriesStore } from "../../stores/categories";
 
+const shopStore = useShopStore();
 const categoriesStore = useCategoriesStore();
+
 const categoriesOpen = ref(true);
 
 onMounted(async () => {
   await categoriesStore.getCategories();
 });
-
-const shopStore = useShopStore();
 </script>
