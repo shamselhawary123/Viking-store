@@ -1,12 +1,10 @@
 <template>
-  <section class="px-4 py-10 md:px-6">
-    <div class="mx-auto grid max-w-7xl grid-cols-12 gap-8">
-      <!-- Sidebar -->
+  <section class="section-premium">
+    <div class="container-premium grid grid-cols-12 gap-8">
       <aside class="lg:col-span-3">
         <ShopSidebar />
       </aside>
 
-      <!-- Content -->
       <div class="col-span-12 lg:col-span-9">
         <ShopTopbar />
 
@@ -25,8 +23,8 @@ import { useProductsStore } from "../../stores/products";
 import { useShopStore } from "../../stores/shop";
 
 const route = useRoute();
-const productsStore = useProductsStore();
-const shopStore = useShopStore();
+const productsStore = useProductsStore(usePinia());
+const shopStore = useShopStore(usePinia());
 
 onMounted(async () => {
   await productsStore.getProducts();
@@ -51,7 +49,4 @@ watch(
   },
   { immediate: true },
 );
-
-console.log(productsStore.products);
-console.log(route.query.category);
 </script>

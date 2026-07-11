@@ -1,9 +1,10 @@
 <template>
-  <div class="min-h-screen bg-[#050505] text-white">
+  <div class="min-h-screen overflow-x-hidden text-white">
     <SharedAppNavbar />
     <CartDrawer />
-    <main>
+    <main class="relative">
       <slot />
     </main>
+    <SharedFooter />
   </div>
 </template>

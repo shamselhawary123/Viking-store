@@ -1,28 +1,26 @@
 <template>
-  <section class="flex min-h-screen items-center justify-center bg-black px-4">
-    <div
-      class="w-full max-w-md rounded-[32px] border border-white/10 bg-[#0b0b0b] p-8"
-    >
-      <h1 class="text-4xl font-black text-white">Verify OTP</h1>
+  <section class="flex min-h-screen items-center justify-center bg-black px-4 py-12">
+    <div class="premium-panel w-full max-w-md rounded-2xl p-8">
+      <p class="eyebrow">Email verification</p>
+      <h1 class="mt-3 text-4xl font-black text-white">Verify OTP</h1>
+      <p class="mt-4 text-neutral-400">Enter the 8 digit code sent to your email.</p>
 
-      <p class="mt-4 text-gray-400">Enter the 8 digit code</p>
-
-      <form @submit.prevent="verifyOtp" class="mt-10">
+      <form class="mt-10" @submit.prevent="verifyOtp">
+        <label class="sr-only" for="otp">OTP code</label>
         <input
+          id="otp"
           v-model="otp"
           maxlength="8"
           placeholder="Enter OTP"
-          class="h-16 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-center text-2xl font-bold tracking-[0.5em] text-white outline-none focus:border-[#FF4D00]"
+          class="premium-input h-16 text-center text-2xl font-black tracking-[0.35em]"
         />
 
-        <p v-if="error" class="mt-4 text-sm text-red-500">
+        <p v-if="error" class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
           {{ error }}
         </p>
 
-        <button
-          class="mt-8 h-14 w-full rounded-2xl bg-[#FF4D00] font-bold text-white"
-        >
-          Verify OTP
+        <button :disabled="loading" class="premium-button premium-button-primary mt-8 w-full">
+          {{ loading ? "Verifying..." : "Verify OTP" }}
         </button>
       </form>
     </div>
@@ -38,9 +36,10 @@ import { useAuthStore } from "../../stores/auth";
 definePageMeta({
   middleware: ["guest"],
 });
+
 const router = useRouter();
 const supabase = useSupabase();
-const authStore = useAuthStore();
+const authStore = useAuthStore(usePinia());
 
 const otp = ref("");
 const error = ref("");
@@ -69,14 +68,12 @@ const verifyOtp = async () => {
     }
 
     const pendingProfile = localStorage.getItem("pending_profile");
-    // const avatar = localStorage.getItem("pending_avatar") || "";
-    const avatar = "";
+
     if (!pendingProfile) {
       throw new Error("Profile data not found");
     }
 
     const profileData = JSON.parse(pendingProfile);
-
     await authStore.login(profileData.email, profileData.password);
 
     const {

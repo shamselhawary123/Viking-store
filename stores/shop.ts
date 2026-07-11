@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const useShopStore = defineStore("shop", {
   state: () => ({
     search: "",
-    selectedCategory: "All",
+    selectedCategory: "all",
     sortBy: "default",
     maxPrice: 500,
     mobileFiltersOpen: false,

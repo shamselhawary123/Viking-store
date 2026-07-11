@@ -1,9 +1,12 @@
 <template>
-  <section class="flex min-h-screen items-center justify-center bg-black px-4">
+  <section class="flex min-h-screen items-center justify-center bg-black px-4 py-12">
     <div
-      class="w-full max-w-md rounded-3xl border border-white/10 bg-[#111111] p-8 text-center"
+      class="premium-panel w-full max-w-md rounded-2xl p-8 text-center"
     >
-      <h1 class="text-4xl font-black text-white">Verify Your Email</h1>
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
+        <Icon name="i-heroicons-envelope" class="text-3xl" />
+      </div>
+      <h1 class="mt-6 text-4xl font-black text-white">Verify Your Email</h1>
 
       <p class="mt-4 text-gray-400">
         Check your inbox and click the verification link.
@@ -11,7 +14,7 @@
 
       <NuxtLink
         to="/auth/login"
-        class="mt-8 inline-flex rounded-2xl bg-[#FF4D00] px-6 py-3 font-bold text-white"
+        class="premium-button premium-button-primary mt-8"
       >
         Go To Login
       </NuxtLink>

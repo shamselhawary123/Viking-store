@@ -216,7 +216,7 @@ definePageMeta({
   middleware: ["guest"],
 });
 const router = useRouter();
-const authStore = useAuthStore();
+const authStore = useAuthStore(usePinia());
 
 const showPassword = ref(false);
 const loading = ref(false);

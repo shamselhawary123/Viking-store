@@ -139,7 +139,7 @@ export const useAuthStore = defineStore("auth", {
       }
     },
     // ORDERS
-    async createOrder(cartItems: any[], totalPrice: number) {
+    async createOrder(cartItems: any[], totalPrice: number, customerData: any) {
       const supabase = useSupabase();
 
       const {
@@ -151,22 +151,30 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const { data: order, error: orderError } = await supabase
+
         .from("orders")
+
         .insert({
           user_id: user.id,
 
-          total_price: cartItems.reduce(
-            (total, item) => total + item.price * item.quantity,
-            0,
-          ),
+          total_price: totalPrice,
 
           status: "pending",
 
           payment_method: "cash",
+
+          full_name: customerData.fullName,
+
+          phone: customerData.phone,
+
+          city: customerData.city,
+
+          address: customerData.address,
+
+          notes: customerData.notes,
         })
         .select()
         .single();
-
       if (orderError) {
         throw orderError;
       }

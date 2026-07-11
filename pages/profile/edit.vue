@@ -164,7 +164,7 @@ definePageMeta({
 });
 
 const router = useRouter();
-const authStore = useAuthStore();
+const authStore = useAuthStore(usePinia());
 
 const loading = ref(false);
 

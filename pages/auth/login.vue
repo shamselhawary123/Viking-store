@@ -133,7 +133,7 @@ definePageMeta({
   middleware: ["guest"],
 });
 
-const authStore = useAuthStore();
+const authStore = useAuthStore(usePinia());
 const router = useRouter();
 
 const email = ref("");

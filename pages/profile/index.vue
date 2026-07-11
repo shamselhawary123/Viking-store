@@ -1,178 +1,109 @@
 <template>
-  <section class="min-h-screen bg-black pb-12">
-    <!-- Hero Banner -->
-    <div
-      class="relative overflow-hidden border-b border-white/10 bg-gradient-to-r from-[#1a1a1a] via-black to-[#1a1a1a]"
-    >
-      <div
-        class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#FF4D0030,transparent_40%)]"
-      ></div>
+  <section class="min-h-screen bg-black">
+    <div class="relative overflow-hidden border-b border-white/10">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,77,0,0.22),transparent_32rem)]" />
 
-      <div class="relative mx-auto max-w-6xl px-6 py-16">
-        <div
-          v-if="profile"
-          class="flex flex-col items-center gap-6 md:flex-row md:items-center"
-        >
+      <div class="container-premium relative py-14">
+        <div v-if="profile" class="flex flex-col items-center gap-6 md:flex-row md:items-center">
           <div class="relative">
             <img
-              :src="profile.avatar"
-              class="h-36 w-36 rounded-full border-4 border-[#FF4D00] object-cover shadow-[0_0_40px_rgba(255,77,0,0.4)]"
+              :src="profile.avatar || 'https://ui-avatars.com/api/?name=Viking+Member'"
+              alt="Profile avatar"
+              class="h-32 w-32 rounded-full border-4 border-[#FF4D00] object-cover shadow-[0_0_40px_rgba(255,77,0,0.28)]"
             />
-
-            <div
-              class="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#FF4D00] px-4 py-1 text-xs font-bold text-white"
-            >
-              ⚔ WARRIOR
+            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#FF4D00] px-4 py-1 text-xs font-black uppercase tracking-[0.16em]">
+              Member
             </div>
           </div>
 
           <div class="text-center md:text-left">
-            <p
-              class="mb-2 font-[Bebas_Neue] text-xl tracking-[0.3em] text-[#FF4D00]"
-            >
-              VIKING STORE
-            </p>
-
-            <h1
-              class="font-[Bebas_Neue] text-5xl tracking-wider text-white md:text-6xl"
-            >
-              {{ profile.full_name }}
-            </h1>
-
-            <p class="mt-2 text-gray-400">
-              {{ profile.email }}
-            </p>
-
-            <p class="mt-3 text-sm text-gray-500">
-              Member Since
-              {{ new Date(profile.created_at).toLocaleDateString() }}
-            </p>
+            <p class="eyebrow">Viking Store</p>
+            <h1 class="display-heading mt-2 text-6xl text-white">{{ profile.full_name || "Viking Member" }}</h1>
+            <p class="mt-2 text-neutral-400">{{ profile.email }}</p>
+            <p class="mt-3 text-sm text-neutral-500">Member since {{ formatDate(profile.created_at) }}</p>
           </div>
         </div>
+
+        <div v-else-if="loading" class="h-44 animate-pulse rounded-2xl border border-white/10 bg-white/[0.04]" />
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="mx-auto mt-10 max-w-6xl px-6" v-if="profile">
-      <!-- Stats -->
+    <div v-if="profile" class="container-premium py-10">
       <div class="grid gap-5 md:grid-cols-3">
-        <div
-          class="rounded-3xl border border-white/10 bg-[#111111] p-6 transition hover:border-[#FF4D00]/50"
-        >
-          <p class="text-sm uppercase tracking-widest text-gray-500">Rank</p>
-
-          <h3 class="mt-3 text-2xl font-black text-[#FF4D00]">
-            Viking Warrior
-          </h3>
-        </div>
-
-        <div
-          class="rounded-3xl border border-white/10 bg-[#111111] p-6 transition hover:border-[#FF4D00]/50"
-        >
-          <p class="text-sm uppercase tracking-widest text-gray-500">Country</p>
-
-          <h3 class="mt-3 text-2xl font-black text-white">
-            {{ profile.country }}
-          </h3>
-        </div>
-
-        <div
-          class="rounded-3xl border border-white/10 bg-[#111111] p-6 transition hover:border-[#FF4D00]/50"
-        >
-          <p class="text-sm uppercase tracking-widest text-gray-500">City</p>
-
-          <h3 class="mt-3 text-2xl font-black text-white">
-            {{ profile.city }}
-          </h3>
+        <div v-for="stat in stats" :key="stat.label" class="premium-panel rounded-2xl p-6">
+          <p class="text-sm font-black uppercase tracking-[0.18em] text-neutral-500">{{ stat.label }}</p>
+          <h3 class="mt-3 text-2xl font-black" :class="stat.accent ? 'text-[#FF4D00]' : 'text-white'">{{ stat.value }}</h3>
         </div>
       </div>
 
-      <!-- Information -->
-      <div class="mt-10 rounded-3xl border border-white/10 bg-[#111111] p-8">
-        <div class="mb-8 flex items-center justify-between">
-          <h2 class="text-2xl font-black text-white">⚔ Warrior Information</h2>
-
-          <NuxtLink
-            to="/profile/edit"
-            class="rounded-xl bg-[#FF4D00] px-5 py-3 font-bold text-white transition hover:scale-105"
-          >
+      <div class="premium-panel mt-8 rounded-2xl p-6 md:p-8">
+        <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p class="eyebrow">Profile</p>
+            <h2 class="mt-2 text-2xl font-black text-white">Member Information</h2>
+          </div>
+          <NuxtLink to="/profile/edit" class="premium-button premium-button-primary">
+            <Icon name="i-heroicons-pencil-square" />
             Edit Profile
           </NuxtLink>
         </div>
 
-        <div class="grid gap-5 md:grid-cols-2">
-          <div class="rounded-2xl bg-black p-5">
-            <p class="text-sm text-gray-500">Phone</p>
-            <p class="mt-2 font-semibold text-white">
-              {{ profile.phone }}
-            </p>
-          </div>
-
-          <div class="rounded-2xl bg-black p-5">
-            <p class="text-sm text-gray-500">Gender</p>
-            <p class="mt-2 font-semibold text-white">
-              {{ profile.gender }}
-            </p>
-          </div>
-
-          <div class="rounded-2xl bg-black p-5">
-            <p class="text-sm text-gray-500">Address</p>
-            <p class="mt-2 font-semibold text-white">
-              {{ profile.address }}
-            </p>
-          </div>
-
-          <div class="rounded-2xl bg-black p-5">
-            <p class="text-sm text-gray-500">Postal Code</p>
-            <p class="mt-2 font-semibold text-white">
-              {{ profile.postal_code || "N/A" }}
-            </p>
+        <div class="grid gap-4 md:grid-cols-2">
+          <div v-for="item in profileFields" :key="item.label" class="rounded-xl border border-white/10 bg-black/45 p-5">
+            <p class="text-sm text-neutral-500">{{ item.label }}</p>
+            <p class="mt-2 font-bold text-white">{{ item.value || "Not set" }}</p>
           </div>
         </div>
       </div>
 
-      <!-- Bio -->
-      <div class="mt-10 rounded-3xl border border-white/10 bg-[#111111] p-8">
-        <h2 class="mb-6 text-2xl font-black text-white">⚔ Warrior Story</h2>
-
-        <p class="leading-8 text-gray-300">
-          {{ profile.bio }}
-        </p>
+      <div class="premium-panel mt-8 rounded-2xl p-6 md:p-8">
+        <p class="eyebrow">Story</p>
+        <h2 class="mt-2 text-2xl font-black text-white">Member Bio</h2>
+        <p class="mt-5 leading-8 text-neutral-300">{{ profile.bio || "No bio added yet." }}</p>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="mt-10 flex flex-col gap-4 md:flex-row">
-        <NuxtLink
-          to="/profile/orders"
-          class="flex-1 rounded-2xl border border-white/10 bg-[#111111] py-4 text-center font-bold text-white transition hover:border-[#FF4D00]"
-        >
-          My Orders
-        </NuxtLink>
-
-        <NuxtLink
-          to="/auth/forgot-password"
-          class="flex-1 rounded-2xl bg-[#FF4D00] py-4 text-center font-bold text-white transition hover:scale-[1.02]"
-        >
-          Change Password
-        </NuxtLink>
+      <div class="mt-8 grid gap-4 md:grid-cols-3">
+        <NuxtLink to="/profile/orders" class="premium-button premium-button-secondary">My Orders</NuxtLink>
+        <NuxtLink to="/wishlist" class="premium-button premium-button-secondary">Wishlist</NuxtLink>
+        <NuxtLink to="/auth/forgot-password" class="premium-button premium-button-primary">Change Password</NuxtLink>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useAuthStore } from "../../stores/auth";
 
 definePageMeta({
   middleware: ["auth"],
 });
 
-const authStore = useAuthStore();
-
+const authStore = useAuthStore(usePinia());
 const profile = ref<any>(null);
-
 const loading = ref(true);
+
+const formatDate = (date?: string) => {
+  if (!date) return "recently";
+  return new Date(date).toLocaleDateString("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const stats = computed(() => [
+  { label: "Rank", value: "Viking Warrior", accent: true },
+  { label: "Country", value: profile.value?.country || "Not set" },
+  { label: "City", value: profile.value?.city || "Not set" },
+]);
+
+const profileFields = computed(() => [
+  { label: "Phone", value: profile.value?.phone },
+  { label: "Gender", value: profile.value?.gender },
+  { label: "Address", value: profile.value?.address },
+  { label: "Postal Code", value: profile.value?.postal_code },
+]);
 
 onMounted(async () => {
   try {

@@ -22,6 +22,16 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
+  icon: {
+    clientBundle: {
+      scan: true,
+    },
+    fetchTimeout: 10000,
+    serverBundle: {
+      collections: ["heroicons"],
+    },
+  },
+
   colorMode: {
     preference: "dark",
     fallback: "dark",

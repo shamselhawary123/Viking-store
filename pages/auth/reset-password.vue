@@ -1,36 +1,26 @@
 <template>
-  <section class="flex min-h-screen items-center justify-center bg-black px-4">
-    <div
-      class="w-full max-w-md rounded-3xl border border-white/10 bg-[#111111] p-8"
-    >
-      <h1 class="text-3xl font-black text-white">Reset Password</h1>
+  <section class="flex min-h-screen items-center justify-center bg-black px-4 py-12">
+    <div class="premium-panel w-full max-w-md rounded-2xl p-8">
+      <p class="eyebrow">Account security</p>
+      <h1 class="mt-3 text-3xl font-black text-white">Reset Password</h1>
+      <p class="mt-3 text-neutral-400">Enter and confirm your new password.</p>
 
-      <p class="mt-3 text-gray-400">Enter your new password</p>
+      <form class="mt-8 space-y-5" @submit.prevent="handleReset">
+        <label class="grid gap-2 text-sm font-bold text-neutral-300">
+          New Password
+          <input v-model="password" type="password" class="premium-input" autocomplete="new-password" />
+        </label>
 
-      <form @submit.prevent="handleReset" class="mt-8 space-y-5">
-        <input
-          v-model="password"
-          type="password"
-          placeholder="New Password"
-          class="h-14 w-full rounded-2xl border border-white/10 bg-black px-5 text-white outline-none focus:border-[#FF4D00]"
-        />
+        <label class="grid gap-2 text-sm font-bold text-neutral-300">
+          Confirm Password
+          <input v-model="confirmPassword" type="password" class="premium-input" autocomplete="new-password" />
+        </label>
 
-        <input
-          v-model="confirmPassword"
-          type="password"
-          placeholder="Confirm Password"
-          class="h-14 w-full rounded-2xl border border-white/10 bg-black px-5 text-white outline-none focus:border-[#FF4D00]"
-        />
-
-        <p v-if="errorMessage" class="text-sm text-red-500">
+        <p v-if="errorMessage" class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
           {{ errorMessage }}
         </p>
 
-        <button
-          :disabled="loading"
-          type="submit"
-          class="h-14 w-full rounded-2xl bg-[#FF4D00] font-bold text-white disabled:opacity-50"
-        >
+        <button :disabled="loading" type="submit" class="premium-button premium-button-primary w-full">
           {{ loading ? "Updating..." : "Update Password" }}
         </button>
       </form>
@@ -44,11 +34,10 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
 
 const router = useRouter();
-const authStore = useAuthStore();
+const authStore = useAuthStore(usePinia());
 
 const password = ref("");
 const confirmPassword = ref("");
-
 const loading = ref(false);
 const errorMessage = ref("");
 
@@ -72,11 +61,8 @@ const handleReset = async () => {
     }
 
     loading.value = true;
-
     await authStore.updatePassword(password.value);
-
-    alert("Password updated successfully 🔥");
-
+    alert("Password updated successfully.");
     await router.push("/auth/login");
   } catch (error: any) {
     errorMessage.value = error?.message || "Something went wrong";

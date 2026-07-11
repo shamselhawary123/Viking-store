@@ -19,7 +19,7 @@ export const useCartStore = defineStore("cart", {
       const existingItem = this.items.find(
         (item) =>
           item.id === product.id &&
-          item.color === selectedColor.name &&
+          item.color === selectedColor?.name &&
           item.size === selectedSize,
       );
 
@@ -41,9 +41,9 @@ export const useCartStore = defineStore("cart", {
 
           image: selectedImage || product.cover_image,
 
-          color: selectedColor.name,
+          color: selectedColor?.name || "",
 
-          colorValue: selectedColor.value,
+          colorValue: selectedColor?.value || "",
 
           size: selectedSize,
 

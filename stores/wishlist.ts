@@ -7,26 +7,42 @@ export const useWishlistStore = defineStore("wishlist", {
 
   actions: {
     loadWishlist() {
-      const saved = localStorage.getItem("wishlist");
+      if (typeof window !== "undefined") {
+        const data = localStorage.getItem("wishlist");
 
-      if (saved) {
-        this.items = JSON.parse(saved);
+        if (data) {
+          this.items = JSON.parse(data);
+        }
       }
+    },
+
+    addToWishlist(product: any) {
+      const exists = this.items.find((item) => item.id === product.id);
+
+      if (!exists) {
+        this.items.push(product);
+
+        localStorage.setItem("wishlist", JSON.stringify(this.items));
+      }
+    },
+
+    removeFromWishlist(id: number) {
+      this.items = this.items.filter((item) => item.id !== id);
+
+      localStorage.setItem("wishlist", JSON.stringify(this.items));
     },
 
     toggleWishlist(product: any) {
       const exists = this.items.find((item) => item.id === product.id);
 
       if (exists) {
-        this.items = this.items.filter((item) => item.id !== product.id);
+        this.removeFromWishlist(product.id);
       } else {
-        this.items.push(product);
+        this.addToWishlist(product);
       }
-
-      localStorage.setItem("wishlist", JSON.stringify(this.items));
     },
 
-    isInWishlist(id: string) {
+    isFavorite(id: number) {
       return this.items.some((item) => item.id === id);
     },
   },

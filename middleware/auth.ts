@@ -1,6 +1,6 @@
 export default defineNuxtRouteMiddleware(async () => {
   if (process.server) {
-    return;
+    return navigateTo("/auth/login");
   }
 
   const supabase = useSupabase();

@@ -3,7 +3,7 @@ export default defineNuxtPlugin(async () => {
 
   // Wait until plugins load
   await nuxtApp.hook("app:mounted", async () => {
-    const authStore = useAuthStore();
+    const authStore = useAuthStore(usePinia());
 
     await authStore.getUser();
   });

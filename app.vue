@@ -6,11 +6,12 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { useCartStore } from "./stores/cart";
 
-const cartStore = useCartStore();
+onMounted(async () => {
+  const { useCartStore } = await import("./stores/cart");
 
-onMounted(() => {
+  const cartStore = useCartStore(usePinia());
+
   cartStore.loadCart();
 });
 </script>

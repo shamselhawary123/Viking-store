@@ -1,72 +1,89 @@
 <template>
   <NuxtLink
     :to="`/shop/${product.slug}`"
-    class="group block overflow-hidden rounded-3xl border border-white/10 bg-[#111111] transition hover:-translate-y-1 hover:border-[#FF4D00]"
+    class="group block overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/70 hover:shadow-[0_24px_70px_rgba(0,0,0,0.45)]"
   >
-    <!-- Image -->
-    <div class="relative overflow-hidden">
+    <div class="relative aspect-[4/5] overflow-hidden bg-black">
       <img
-        :src="product.cover_image"
+        :src="product.cover_image || product.image"
         :alt="product.title"
-        class="h-[320px] w-full object-cover transition duration-500 group-hover:scale-110"
+        class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+        loading="lazy"
       />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20" />
 
-      <!-- Badge -->
+      <button
+        class="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#FF4D00] backdrop-blur transition hover:scale-105 hover:border-[#FF4D00]"
+        :aria-label="wishlistStore.isFavorite(product.id) ? 'Remove from wishlist' : 'Add to wishlist'"
+        @click.prevent="wishlistStore.toggleWishlist(product)"
+      >
+        <Icon :name="wishlistStore.isFavorite(product.id) ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'" class="text-xl" />
+      </button>
+
       <div
         v-if="product.badge"
-        class="absolute left-4 top-4 rounded-full bg-[#FF4D00] px-3 py-1 text-xs font-bold"
+        class="absolute left-4 top-4 rounded-full bg-[#FF4D00] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white"
       >
         {{ product.badge }}
       </div>
 
-      <div
-        class="absolute inset-0 bg-black/10 opacity-0 transition group-hover:opacity-100"
-      />
+      <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
+        <span class="rounded-full border border-white/10 bg-black/65 px-3 py-1 text-xs font-bold text-neutral-200 backdrop-blur">
+          {{ product.categories?.name || product.category || "Combat Gear" }}
+        </span>
+        <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-300">
+          In Stock
+        </span>
+      </div>
     </div>
 
-    <!-- Content -->
-    <div class="space-y-3 p-5">
-      <p class="text-sm uppercase tracking-widest text-[#FF4D00]">
-        {{ product.category }}
-      </p>
+    <div class="space-y-4 p-5">
+      <div>
+        <p class="eyebrow text-[0.65rem]">{{ product.categories?.slug || product.category || "Viking" }}</p>
+        <h3 class="mt-2 line-clamp-2 min-h-14 text-xl font-black leading-tight text-white">
+          {{ product.title }}
+        </h3>
+      </div>
 
-      <h3 class="text-xl font-bold text-white">
-        {{ product.title }}
-      </h3>
-
-      <div class="flex items-center gap-3">
-        <span class="text-2xl font-black text-white">
-          ${{ product.price }}
-        </span>
-
-        <span
-          v-if="product.old_price"
-          class="text-sm text-gray-500 line-through"
-        >
-          ${{ product.old_price }}
-        </span>
+      <div class="flex items-end justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <span class="text-2xl font-black text-white">${{ product.price }}</span>
+          <span v-if="product.old_price || product.oldPrice" class="text-sm text-neutral-500 line-through">
+            ${{ product.old_price || product.oldPrice }}
+          </span>
+        </div>
+        <div class="flex text-[#FF4D00]" aria-label="Rated 5 out of 5">
+          <Icon v-for="star in 5" :key="star" name="i-heroicons-star-solid" class="text-sm" />
+        </div>
       </div>
 
       <button
-        @click.prevent="handleAddToCart"
-        class="w-full rounded-2xl border border-white/10 py-3 font-semibold transition hover:border-[#FF4D00] hover:bg-[#FF4D00]"
+        class="premium-button premium-button-secondary min-h-0 w-full rounded-xl py-3"
+        @click.prevent="navigateToDetails"
       >
-        Add To Cart
+        View Details
+        <Icon name="i-heroicons-arrow-right" />
       </button>
     </div>
   </NuxtLink>
 </template>
 
 <script setup lang="ts">
-import { useCartStore } from "../../stores/cart";
+import { useWishlistStore } from "../../stores/wishlist";
+import { onMounted } from "vue";
 
-const cartStore = useCartStore();
+const wishlistStore = useWishlistStore(usePinia());
+const router = useRouter();
 
 const props = defineProps<{
   product: any;
 }>();
 
-const handleAddToCart = () => {
-  cartStore.addToCart(props.product, "", "", 1, props.product.image);
+onMounted(() => {
+  wishlistStore.loadWishlist();
+});
+
+const navigateToDetails = () => {
+  router.push(`/shop/${props.product.slug}`);
 };
 </script>
