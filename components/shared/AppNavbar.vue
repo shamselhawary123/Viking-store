@@ -88,7 +88,7 @@
                   name="i-heroicons-arrow-left-start-on-rectangle"
                   class="text-lg"
                 />
-                <span class="hidden lg:inline">Logout</span>
+                <!-- <span class="hidden lg:inline">Logout</span> -->
               </button>
             </template>
 
@@ -216,6 +216,7 @@ const navLinks = [
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
   { label: "Orders", to: "/profile/orders" },
+  { label: "FAQ", to: "/faq" },
 ];
 
 onMounted(async () => {

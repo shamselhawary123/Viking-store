@@ -141,38 +141,41 @@ export const useAuthStore = defineStore("auth", {
     // ORDERS
     async createOrder(cartItems: any[], totalPrice: number, customerData: any) {
       const supabase = useSupabase();
+      const user = customerData.isGuest
+        ? null
+        : customerData.user || this.user || null;
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
+      if (!user && !customerData.isGuest) {
         throw new Error("Please login first");
       }
+
+      const orderPayload = {
+        user_id: user?.id || null,
+        total_price: totalPrice,
+        status: "pending",
+        payment_method: "cash",
+        ...(user
+          ? {
+              full_name: customerData.fullName,
+              phone: customerData.phone,
+              city: customerData.city,
+              address: customerData.address,
+              notes: customerData.notes,
+            }
+          : {
+              guest_name: customerData.fullName,
+              guest_phone: customerData.phone,
+              guest_city: customerData.city,
+              guest_address: customerData.address,
+              guest_notes: customerData.notes,
+            }),
+      };
 
       const { data: order, error: orderError } = await supabase
 
         .from("orders")
 
-        .insert({
-          user_id: user.id,
-
-          total_price: totalPrice,
-
-          status: "pending",
-
-          payment_method: "cash",
-
-          full_name: customerData.fullName,
-
-          phone: customerData.phone,
-
-          city: customerData.city,
-
-          address: customerData.address,
-
-          notes: customerData.notes,
-        })
+        .insert(orderPayload)
         .select()
         .single();
       if (orderError) {
