@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { buildCheckoutOrderRequest } from "../utils/checkoutOrder";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -149,65 +150,33 @@ export const useAuthStore = defineStore("auth", {
         throw new Error("Please login first");
       }
 
-      const orderPayload = {
-        user_id: user?.id || null,
-        total_price: totalPrice,
-        status: "pending",
-        payment_method: "cash",
-        ...(user
-          ? {
-              full_name: customerData.fullName,
-              phone: customerData.phone,
-              city: customerData.city,
-              address: customerData.address,
-              notes: customerData.notes,
-            }
-          : {
-              guest_name: customerData.fullName,
-              guest_phone: customerData.phone,
-              guest_city: customerData.city,
-              guest_address: customerData.address,
-              guest_notes: customerData.notes,
-            }),
-      };
+      const orderId = crypto.randomUUID();
+      const { orderPayload, orderItems } = buildCheckoutOrderRequest({
+        orderId,
+        cartItems,
+        totalPrice,
+        customerData: {
+          ...customerData,
+          user,
+        },
+      });
 
-      const { data: order, error: orderError } = await supabase
-
+      const { error: orderError } = await supabase
         .from("orders")
-
-        .insert(orderPayload)
-        .select()
-        .single();
+        .insert(orderPayload);
       if (orderError) {
         throw orderError;
       }
 
-      const items = cartItems.map((item) => ({
-        order_id: order.id,
-
-        product_id: item.id,
-
-        product_name: item.title,
-
-        product_image: item.image,
-
-        product_price: item.price,
-
-        color: item.color,
-
-        size: item.size,
-
-        quantity: item.quantity,
-      }));
       const { error: itemsError } = await supabase
         .from("order_items")
-        .insert(items);
+        .insert(orderItems);
 
       if (itemsError) {
         throw itemsError;
       }
 
-      return order;
+      return orderPayload;
     },
     // GET ORDERS
     async getOrders() {

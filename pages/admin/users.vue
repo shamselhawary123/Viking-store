@@ -55,7 +55,7 @@ import { onMounted, ref } from "vue";
 
 definePageMeta({
   layout: "admin",
-  middleware: ["auth"],
+  middleware: ["admin"],
 });
 
 type UserRow = {
