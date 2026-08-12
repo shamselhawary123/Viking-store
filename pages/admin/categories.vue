@@ -1,42 +1,77 @@
 <template>
   <section class="space-y-6">
-    <div>
-      <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">
-        Catalog
-      </p>
-      <h2 class="mt-2 text-3xl font-black">Categories</h2>
+    <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">Catalog</p>
+        <h2 class="mt-2 text-3xl font-black">Categories</h2>
+      </div>
+
+      <button class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white transition hover:opacity-90" @click="openCreate">
+        Add Category
+      </button>
     </div>
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <div
-        v-for="category in categories"
-        :key="category.id"
-        class="overflow-hidden rounded-3xl border border-white/10 bg-[#111111]"
-      >
-        <img
-          :src="category.image || '/logo.png'"
-          :alt="category.name"
-          class="h-48 w-full object-cover"
-        />
+      <article v-for="category in categories" :key="category.id" class="overflow-hidden rounded-3xl border border-white/10 bg-[#111111]">
+        <img :src="category.image || '/logo.png'" :alt="category.name" class="h-44 w-full object-cover" />
         <div class="p-5">
           <h3 class="text-xl font-black">{{ category.name }}</h3>
           <p class="mt-2 text-sm text-gray-500">{{ category.slug }}</p>
+          <div class="mt-5 flex gap-2">
+            <button class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]" @click="openEdit(category)">
+              Edit
+            </button>
+            <button class="rounded-xl border border-red-500/40 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500 hover:text-white" @click="deleteCategory(category)">
+              Delete
+            </button>
+          </div>
         </div>
-      </div>
+      </article>
     </div>
 
-    <p v-if="!loading && !categories.length" class="text-sm text-gray-500">
-      No categories found.
-    </p>
+    <p v-if="!loading && !categories.length" class="text-sm text-gray-500">No categories found.</p>
+
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <form class="w-full max-w-xl rounded-3xl border border-white/10 bg-[#111111] p-6" @submit.prevent="saveCategory">
+        <div class="flex items-center justify-between gap-4">
+          <h3 class="text-2xl font-black">{{ editingId ? "Edit Category" : "Add Category" }}</h3>
+          <button type="button" class="text-gray-400 hover:text-white" @click="closeModal">Close</button>
+        </div>
+
+        <div class="mt-6 space-y-4">
+          <label class="block">
+            <span class="field-label">Name</span>
+            <input v-model="form.name" required class="field mt-2" />
+          </label>
+          <label class="block">
+            <span class="field-label">Slug</span>
+            <input v-model="form.slug" required class="field mt-2" />
+          </label>
+          <label class="block">
+            <span class="field-label">Image URL</span>
+            <input v-model="form.image" class="field mt-2" />
+          </label>
+        </div>
+
+        <p v-if="errorMessage" class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ errorMessage }}</p>
+
+        <div class="mt-6 flex justify-end gap-3">
+          <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">Cancel</button>
+          <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
+            {{ saving ? "Saving..." : "Save Category" }}
+          </button>
+        </div>
+      </form>
+    </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 definePageMeta({
   layout: "admin",
-  middleware: ["auth"],
+  middleware: ["admin"],
 });
 
 type CategoryRow = {
@@ -49,10 +84,124 @@ type CategoryRow = {
 const supabase = useSupabase();
 const categories = ref<CategoryRow[]>([]);
 const loading = ref(true);
+const saving = ref(false);
+const modalOpen = ref(false);
+const editingId = ref<number | null>(null);
+const errorMessage = ref("");
 
-onMounted(async () => {
-  const { data } = await supabase.from("categories").select("*").order("id");
+const form = ref({
+  name: "",
+  slug: "",
+  image: "",
+});
+
+watch(
+  () => form.value.name,
+  (name) => {
+    if (editingId.value || form.value.slug) return;
+    form.value.slug = name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+  },
+);
+
+const loadCategories = async () => {
+  loading.value = true;
+
+  const { data, error } = await supabase.from("categories").select("*").order("id");
+  if (error) alert(error.message);
+
   categories.value = (data || []) as CategoryRow[];
   loading.value = false;
-});
+};
+
+const resetForm = () => {
+  form.value = {
+    name: "",
+    slug: "",
+    image: "",
+  };
+  editingId.value = null;
+  errorMessage.value = "";
+};
+
+const openCreate = () => {
+  resetForm();
+  modalOpen.value = true;
+};
+
+const openEdit = (category: CategoryRow) => {
+  editingId.value = category.id;
+  form.value = {
+    name: category.name,
+    slug: category.slug,
+    image: category.image || "",
+  };
+  errorMessage.value = "";
+  modalOpen.value = true;
+};
+
+const closeModal = () => {
+  modalOpen.value = false;
+};
+
+const saveCategory = async () => {
+  try {
+    saving.value = true;
+    errorMessage.value = "";
+
+    if (editingId.value) {
+      const { error } = await supabase.from("categories").update(form.value).eq("id", editingId.value);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from("categories").insert(form.value);
+      if (error) throw error;
+    }
+
+    await loadCategories();
+    closeModal();
+  } catch (error: unknown) {
+    errorMessage.value = error instanceof Error ? error.message : "Unable to save category";
+  } finally {
+    saving.value = false;
+  }
+};
+
+const deleteCategory = async (category: CategoryRow) => {
+  if (!confirm(`Delete ${category.name}?`)) return;
+
+  const { error } = await supabase.from("categories").delete().eq("id", category.id);
+  if (error) {
+    alert(error.message);
+    return;
+  }
+
+  await loadCategories();
+};
+
+onMounted(loadCategories);
 </script>
+
+<style scoped>
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #d4d4d4;
+}
+
+.field {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: #000;
+  padding: 0.875rem 1rem;
+  color: #fff;
+  outline: none;
+}
+
+.field:focus {
+  border-color: #ff4d00;
+}
+</style>

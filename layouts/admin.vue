@@ -63,6 +63,14 @@
             {{ item.label }}
           </NuxtLink>
         </nav>
+
+        <button
+          class="m-4 hidden rounded-2xl border border-white/10 px-4 py-3 text-sm font-bold text-gray-400 transition hover:border-[#FF4D00] hover:text-white lg:flex lg:items-center lg:gap-3"
+          @click="logout"
+        >
+          <Icon name="i-heroicons-arrow-right-on-rectangle" class="text-xl" />
+          Sign out
+        </button>
       </header>
 
       <main class="px-4 py-8 lg:px-8">
@@ -76,13 +84,17 @@
 import { ref } from "vue";
 
 const mobileOpen = ref(false);
+const supabase = useSupabase();
 
 const navItems = [
   { label: "Dashboard", to: "/admin", icon: "i-heroicons-squares-2x2" },
-  { label: "Products", to: "/admin/products", icon: "i-heroicons-shopping-bag" },
   { label: "Orders", to: "/admin/orders", icon: "i-heroicons-clipboard-document-list" },
+  { label: "Products", to: "/admin/products", icon: "i-heroicons-shopping-bag" },
   { label: "Categories", to: "/admin/categories", icon: "i-heroicons-tag" },
-  { label: "Users", to: "/admin/users", icon: "i-heroicons-users" },
-  { label: "Settings", to: "/admin/settings", icon: "i-heroicons-cog-6-tooth" },
 ];
+
+const logout = async () => {
+  await supabase.auth.signOut();
+  await navigateTo("/admin/login");
+};
 </script>
