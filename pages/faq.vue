@@ -164,7 +164,6 @@ const faqs = [
   { categoryKey: "pages.ordersTopic", questionKey: "pages.faqTrackQ", answerKey: "pages.faqTrackA" },
   { categoryKey: "pages.ordersTopic", questionKey: "pages.faqChangeQ", answerKey: "pages.faqChangeA" },
   { categoryKey: "pages.shippingTopic", questionKey: "pages.faqShippingQ", answerKey: "pages.faqShippingA" },
-  { categoryKey: "pages.shippingTopic", questionKey: "pages.faqInternationalQ", answerKey: "pages.faqInternationalA" },
   { categoryKey: "pages.paymentsTopic", questionKey: "pages.faqPaymentQ", answerKey: "pages.faqPaymentA" },
   { categoryKey: "pages.paymentsTopic", questionKey: "pages.faqSecureQ", answerKey: "pages.faqSecureA" },
   { categoryKey: "pages.returnsTopic", questionKey: "pages.faqReturnQ", answerKey: "pages.faqReturnA" },

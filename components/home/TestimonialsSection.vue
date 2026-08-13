@@ -2,13 +2,13 @@
   <section class="section-premium bg-black">
     <div class="container-premium">
       <div class="mx-auto mb-16 max-w-3xl text-center">
-        <p class="eyebrow">Testimonials</p>
+        <p class="eyebrow">{{ t("home.testimonials.eyebrow") }}</p>
 
         <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">
-          WHAT FIGHTERS SAY
+          {{ t("home.testimonials.title") }}
         </h2>
         <p class="mt-5 leading-8 text-neutral-400">
-          Feedback from athletes and coaches who put their gear through real training volume.
+          {{ t("home.testimonials.description") }}
         </p>
       </div>
 
@@ -24,7 +24,7 @@
             </div>
             <span class="font-display text-5xl leading-none text-white/10 transition group-hover:text-[#FF4D00]/25">"</span>
           </div>
-          <p class="min-h-24 leading-8 text-neutral-300">"{{ item.review }}"</p>
+          <p class="min-h-24 leading-8 text-neutral-300">"{{ t(item.reviewKey) }}"</p>
 
           <div class="mt-8 flex items-center gap-4 border-t border-white/10 pt-6">
             <div class="flex h-12 w-12 items-center justify-center rounded-full bg-[#FF4D00] font-black text-white">
@@ -36,7 +36,7 @@
             </h3>
 
             <p class="text-sm text-[#FF4D00]">
-              {{ item.role }}
+              {{ t(item.roleKey) }}
             </p>
             </div>
           </div>
@@ -47,21 +47,23 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 const testimonials = [
   {
     name: "Ahmed Ali",
-    role: "Kickboxing Athlete",
-    review: "The quality surprised me. Definitely my favorite gear.",
+    roleKey: "home.testimonials.ahmedRole",
+    reviewKey: "home.testimonials.ahmedReview",
   },
   {
     name: "Mohamed Hassan",
-    role: "Boxing Coach",
-    review: "Professional products and very fast shipping.",
+    roleKey: "home.testimonials.mohamedRole",
+    reviewKey: "home.testimonials.mohamedReview",
   },
   {
     name: "Omar Khaled",
-    role: "MMA Fighter",
-    review: "I use Viking equipment every single week.",
+    roleKey: "home.testimonials.omarRole",
+    reviewKey: "home.testimonials.omarReview",
   },
 ];
 </script>

@@ -16,12 +16,12 @@
 
       <div class="container-premium section-premium">
         <div class="mx-auto max-w-4xl text-center reveal-contact">
-          <p class="eyebrow">{{ t('pages.vikingSupport') }}</p>
+          <p class="eyebrow">{{ t("pages.vikingSupport") }}</p>
           <h1 class="display-heading mt-5 text-7xl text-white md:text-8xl">
-            {{ t('pages.getInTouch') }}
+            {{ t("pages.getInTouch") }}
           </h1>
           <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-neutral-300">
-            {{ t('pages.contactLead') }}
+            {{ t("pages.contactLead") }}
           </p>
         </div>
       </div>
@@ -39,8 +39,12 @@
           >
             <Icon :name="item.icon" class="text-2xl" />
           </div>
-          <h2 class="mt-5 text-xl font-black text-white">{{ t(item.titleKey) }}</h2>
-          <p class="mt-2 leading-7 text-neutral-400">{{ item.textKey ? t(item.textKey) : item.text }}</p>
+          <h2 class="mt-5 text-xl font-black text-white">
+            {{ t(item.titleKey) }}
+          </h2>
+          <p class="mt-2 leading-7 text-neutral-400">
+            {{ item.textKey ? t(item.textKey) : item.text }}
+          </p>
           <a
             v-if="item.href"
             :href="item.href"
@@ -61,10 +65,12 @@
         @submit.prevent="handleSubmit"
       >
         <div class="mb-8">
-          <p class="eyebrow">{{ t('pages.contactForm') }}</p>
-          <h2 class="mt-3 text-3xl font-black text-white">{{ t('pages.sendMessage') }}</h2>
+          <p class="eyebrow">{{ t("pages.contactForm") }}</p>
+          <h2 class="mt-3 text-3xl font-black text-white">
+            {{ t("pages.sendMessage") }}
+          </h2>
           <p class="mt-3 leading-7 text-neutral-400">
-            {{ t('pages.contactFormNote') }}
+            {{ t("pages.contactFormNote") }}
           </p>
         </div>
 
@@ -77,7 +83,7 @@
               autocomplete="name"
               placeholder=" "
             />
-            <span>{{ t('common.name') }}</span>
+            <span>{{ t("common.name") }}</span>
           </label>
           <label class="floating-field">
             <input
@@ -88,7 +94,7 @@
               autocomplete="email"
               placeholder=" "
             />
-            <span>{{ t('common.email') }}</span>
+            <span>{{ t("common.email") }}</span>
           </label>
         </div>
 
@@ -99,7 +105,7 @@
             :class="{ 'field-error': submitted && !form.subject }"
             placeholder=" "
           />
-          <span>{{ t('pages.subject') }}</span>
+          <span>{{ t("pages.subject") }}</span>
         </label>
 
         <label class="floating-field mt-5">
@@ -110,27 +116,27 @@
             :class="{ 'field-error': submitted && !form.message }"
             placeholder=" "
           />
-          <span>{{ t('pages.message') }}</span>
+          <span>{{ t("pages.message") }}</span>
         </label>
 
         <p
           v-if="submitted && !isFormValid"
           class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm font-bold text-red-300"
         >
-          {{ t('pages.completeFields') }}
+          {{ t("pages.completeFields") }}
         </p>
         <p
           v-else-if="submitted && isFormValid"
           class="mt-4 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm font-bold text-emerald-300"
         >
-          {{ t('pages.messageReady') }}
+          {{ t("pages.messageReady") }}
         </p>
 
         <button
           class="premium-button premium-button-primary mt-6 w-full"
           type="submit"
         >
-          {{ t('pages.sendMessage') }}
+          {{ t("pages.sendMessage") }}
           <Icon name="i-heroicons-paper-airplane" />
         </button>
       </form>
@@ -140,10 +146,12 @@
           class="overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f]"
         >
           <div class="p-6">
-            <p class="eyebrow">{{ t('pages.findUs') }}</p>
-            <h2 class="mt-3 text-3xl font-black text-white">{{ t('pages.vikingHq') }}</h2>
+            <p class="eyebrow">{{ t("pages.findUs") }}</p>
+            <h2 class="mt-3 text-3xl font-black text-white">
+              {{ t("pages.vikingHq") }}
+            </h2>
             <p class="mt-3 leading-7 text-neutral-400">
-              {{ t('pages.hqText') }}
+              {{ t("pages.hqText") }}
             </p>
           </div>
           <iframe
@@ -173,12 +181,14 @@
       class="container-premium grid gap-8 pb-24 lg:grid-cols-[0.8fr_1.2fr]"
     >
       <div>
-        <p class="eyebrow">{{ t('pages.faqPreview') }}</p>
+        <p class="eyebrow">{{ t("pages.faqPreview") }}</p>
         <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">
-          {{ t('pages.quickAnswers') }}
+          {{ t("pages.quickAnswers") }}
         </h2>
-        <NuxtLink to="/faq" class="premium-button premium-button-secondary mt-8"
-          >{{ t('pages.viewFaq') }}</NuxtLink
+        <NuxtLink
+          to="/faq"
+          class="premium-button premium-button-secondary mt-8"
+          >{{ t("pages.viewFaq") }}</NuxtLink
         >
       </div>
 
@@ -188,7 +198,9 @@
           :key="faq.question"
           class="rounded-2xl border border-white/10 bg-white/[0.03] p-5"
         >
-          <h3 class="text-lg font-black text-white">{{ t(faq.questionKey) }}</h3>
+          <h3 class="text-lg font-black text-white">
+            {{ t(faq.questionKey) }}
+          </h3>
           <p class="mt-3 leading-7 text-neutral-400">{{ t(faq.answerKey) }}</p>
         </article>
       </div>
@@ -199,21 +211,23 @@
         class="relative overflow-hidden rounded-2xl border border-[#FF4D00]/30 bg-[#120903] p-8 text-center md:p-12"
       >
         <div class="mx-auto max-w-3xl">
-          <p class="eyebrow">{{ t('pages.needHelp') }}</p>
+          <p class="eyebrow">{{ t("pages.needHelp") }}</p>
           <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">
-            {{ t('pages.contactSupportTeam') }}
+            {{ t("pages.contactSupportTeam") }}
           </h2>
           <p class="mt-5 leading-8 text-neutral-300">
-            {{ t('pages.supportHelpText') }}
+            {{ t("pages.supportHelpText") }}
           </p>
           <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <a
               href="mailto:support@vikingstore.com"
               class="premium-button premium-button-primary"
-              >{{ t('pages.emailUs') }}</a
+              >{{ t("pages.emailUs") }}</a
             >
-            <NuxtLink to="/shop" class="premium-button premium-button-secondary"
-              >{{ t('home.shopNow') }}</NuxtLink
+            <NuxtLink
+              to="/shop"
+              class="premium-button premium-button-secondary"
+              >{{ t("home.shopNow") }}</NuxtLink
             >
           </div>
         </div>
@@ -238,15 +252,15 @@ const contactCards = [
   {
     icon: "i-heroicons-envelope",
     titleKey: "common.email",
-    text: "support@vikingstore.com",
-    href: "mailto:support@vikingstore.com",
+    text: "shamselhawary123@gmail.com",
+    href: "mailto:shamselhawary123@gmail.com",
     actionKey: "pages.sendEmail",
   },
   {
     icon: "i-heroicons-phone",
     titleKey: "common.phone",
-    text: "+20 100 000 0000",
-    href: "tel:+201000000000",
+    text: "01123997154",
+    href: "tel:+201123997154",
     actionKey: "pages.callNow",
   },
   {
@@ -267,23 +281,22 @@ const socials = [
   {
     name: "Facebook",
     icon: "i-heroicons-hand-thumb-up",
-    href: "https://facebook.com",
+    href: "https://www.facebook.com/profile.php?id=100025354200512",
   },
   {
     name: "Instagram",
     icon: "i-heroicons-camera",
-    href: "https://instagram.com",
+    href: "https://www.instagram.com/shams_elhawary123/",
   },
   {
     name: "TikTok",
     icon: "i-heroicons-musical-note",
-    href: "https://tiktok.com",
+    href: "https://www.tiktok.com/@the_vikings22?is_from_webapp=1&sender_device=pc",
   },
-  { name: "YouTube", icon: "i-heroicons-play", href: "https://youtube.com" },
   {
-    name: "LinkedIn",
-    icon: "i-heroicons-briefcase",
-    href: "https://linkedin.com",
+    name: "YouTube",
+    icon: "i-heroicons-play",
+    href: "https://www.youtube.com",
   },
 ];
 

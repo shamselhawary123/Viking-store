@@ -15,5 +15,5 @@
 </template>
 
 <script setup lang="ts">
-const brands = ["VENUM", "FAIRTEX", "TWINS", "HAYABUSA", "KING PRO"];
+const brands = ["VENUM", "RDX", "WOLON", "EVERLAST", "TOP TEN"];
 </script>

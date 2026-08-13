@@ -1,111 +1,274 @@
 <template>
   <footer class="relative overflow-hidden border-t border-white/10 bg-black">
-    <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF4D00]/70 to-transparent" />
-    <div class="container-premium py-16 md:py-20">
-      <div class="grid gap-10 lg:grid-cols-[1.1fr_1.4fr]">
-        <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-7">
-          <NuxtLink to="/" class="inline-flex items-center gap-4" :aria-label="t('nav.home')">
-            <img src="/logo.png" alt="Viking Store" width="56" height="56" class="h-14 w-14 object-contain" loading="lazy" decoding="async" />
+    <div
+      class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF4D00]/70 to-transparent"
+    />
+
+    <div class="container-premium py-8 sm:py-12 md:py-20">
+      <!-- Main Footer -->
+      <div class="grid gap-5 lg:grid-cols-[1.1fr_1.4fr] lg:gap-10">
+        <!-- Brand -->
+        <div
+          class="rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:rounded-2xl sm:p-6 md:p-7"
+        >
+          <NuxtLink
+            to="/"
+            class="inline-flex items-center gap-3 sm:gap-4"
+            :aria-label="t('nav.home')"
+          >
+            <img
+              src="/logo.png"
+              alt="Viking Store"
+              width="56"
+              height="56"
+              class="h-10 w-10 object-contain sm:h-12 sm:w-12 md:h-14 md:w-14"
+              loading="lazy"
+              decoding="async"
+            />
+
             <div>
-              <h2 class="font-display text-5xl leading-none text-white md:text-6xl">VIKING</h2>
-              <p class="text-xs font-black uppercase tracking-[0.34em] text-[#FF4D00]">{{ t('footer.combatStore') }}</p>
+              <p
+                class="text-[10px] font-black uppercase tracking-[0.25em] text-[#FF4D00] sm:text-xs sm:tracking-[0.34em]"
+              >
+                {{ t("footer.combatStore") }}
+              </p>
             </div>
           </NuxtLink>
 
-          <p class="mt-6 max-w-xl leading-8 text-neutral-400">
-            {{ t('footer.description') }}
+          <p
+            class="mt-4 max-w-xl text-sm leading-6 text-neutral-400 sm:mt-6 sm:leading-8"
+          >
+            {{ t("footer.description") }}
           </p>
 
-          <div class="mt-7 grid gap-3 sm:grid-cols-3">
-            <div v-for="badge in securityBadges" :key="badge.label" class="rounded-xl border border-white/10 bg-black/25 p-4">
-              <Icon :name="badge.icon" class="text-2xl text-[#FF4D00]" />
-              <p class="mt-3 text-xs font-black uppercase tracking-[0.14em] text-neutral-300">{{ t(badge.labelKey) }}</p>
+          <!-- Security badges -->
+          <div class="mt-5 grid grid-cols-3 gap-2 sm:mt-7 sm:gap-3">
+            <div
+              v-for="badge in securityBadges"
+              :key="badge.label"
+              class="flex min-w-0 flex-col items-center rounded-lg border border-white/10 bg-black/25 px-2 py-3 text-center sm:rounded-xl sm:p-4"
+            >
+              <Icon
+                :name="badge.icon"
+                class="text-lg text-[#FF4D00] sm:text-2xl"
+              />
+
+              <p
+                class="mt-2 line-clamp-2 text-[9px] font-black uppercase leading-3 tracking-[0.08em] text-neutral-300 sm:mt-3 sm:text-xs sm:tracking-[0.14em]"
+              >
+                {{ t(badge.labelKey) }}
+              </p>
             </div>
           </div>
         </div>
 
-        <div class="rounded-2xl border border-[#FF4D00]/20 bg-[#120903] p-6 md:p-7">
-          <div class="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+        <!-- Newsletter -->
+        <div
+          class="rounded-xl border border-[#FF4D00]/20 bg-[#120903] p-4 sm:rounded-2xl sm:p-6 md:p-7"
+        >
+          <div
+            class="grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-center lg:gap-6"
+          >
             <div>
-              <p class="eyebrow">{{ t('footer.stayReady') }}</p>
-              <h3 class="mt-3 text-3xl font-black text-white">{{ t('footer.joinList') }}</h3>
-              <p class="mt-3 leading-7 text-neutral-400">{{ t('footer.newsletterText') }}</p>
+              <p class="eyebrow">
+                {{ t("footer.stayReady") }}
+              </p>
+
+              <h3
+                class="mt-2 text-2xl font-black text-white sm:mt-3 sm:text-3xl"
+              >
+                {{ t("footer.joinList") }}
+              </h3>
+
+              <p
+                class="mt-2 text-sm leading-6 text-neutral-400 sm:mt-3 sm:leading-7"
+              >
+                {{ t("footer.newsletterText") }}
+              </p>
             </div>
-            <form class="grid gap-3 sm:grid-cols-[1fr_auto]" @submit.prevent="newsletterSubmitted = true">
-              <label class="sr-only" for="footer-email">{{ t('footer.emailAddress') }}</label>
-              <input id="footer-email" v-model="newsletterEmail" type="email" class="premium-input min-w-0" :placeholder="t('footer.emailAddress')" autocomplete="email" />
-              <button class="premium-button premium-button-primary" type="submit">{{ t('footer.subscribe') }}</button>
-              <p v-if="newsletterSubmitted" class="text-sm font-bold text-emerald-300 sm:col-span-2">{{ t('footer.captured') }}</p>
+
+            <form
+              class="grid gap-2 sm:grid-cols-[1fr_auto] sm:gap-3"
+              @submit.prevent="newsletterSubmitted = true"
+            >
+              <label class="sr-only" for="footer-email">
+                {{ t("footer.emailAddress") }}
+              </label>
+
+              <input
+                id="footer-email"
+                v-model="newsletterEmail"
+                type="email"
+                class="premium-input min-w-0"
+                :placeholder="t('footer.emailAddress')"
+                autocomplete="email"
+              />
+
+              <button
+                class="premium-button premium-button-primary"
+                type="submit"
+              >
+                {{ t("footer.subscribe") }}
+              </button>
+
+              <p
+                v-if="newsletterSubmitted"
+                class="text-sm font-bold text-emerald-300 sm:col-span-2"
+              >
+                {{ t("footer.captured") }}
+              </p>
             </form>
           </div>
         </div>
       </div>
 
-      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
+      <!-- Links -->
+      <div
+        class="mt-6 grid grid-cols-2 gap-x-5 gap-y-7 sm:mt-10 sm:grid-cols-2 sm:gap-8 lg:grid-cols-5"
+      >
         <div v-for="group in linkGroups" :key="group.title">
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ t(group.titleKey) }}</h3>
-          <div class="mt-5 grid gap-3">
-            <NuxtLink v-for="link in group.links.filter((item) => item.to)" :key="`${group.titleKey}-${link.labelKey}`" :to="link.to" class="footer-link">
+          <h3
+            class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-sm sm:tracking-[0.22em]"
+          >
+            {{ t(group.titleKey) }}
+          </h3>
+
+          <div class="mt-3 grid gap-2 sm:mt-5 sm:gap-3">
+            <NuxtLink
+              v-for="link in group.links.filter((item) => item.to)"
+              :key="`${group.titleKey}-${link.labelKey}`"
+              :to="link.to"
+              class="footer-link text-sm"
+            >
               {{ t(link.labelKey) }}
             </NuxtLink>
-            <a v-for="link in group.links.filter((item) => item.href)" :key="`${group.titleKey}-${link.labelKey}`" :href="link.href" class="footer-link">
+
+            <a
+              v-for="link in group.links.filter((item) => item.href)"
+              :key="`${group.titleKey}-${link.labelKey}`"
+              :href="link.href"
+              class="footer-link text-sm"
+            >
               {{ t(link.labelKey) }}
             </a>
           </div>
         </div>
 
+        <!-- Categories -->
         <div>
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ t('nav.categories') }}</h3>
-          <div class="mt-5 grid gap-3">
-            <NuxtLink v-for="category in footerCategories" :key="category.slug" :to="`/shop?category=${category.slug}`" class="footer-link">
+          <h3
+            class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-sm sm:tracking-[0.22em]"
+          >
+            {{ t("nav.categories") }}
+          </h3>
+
+          <div class="mt-3 grid gap-2 sm:mt-5 sm:gap-3">
+            <NuxtLink
+              v-for="category in footerCategories"
+              :key="category.slug"
+              :to="`/shop?category=${category.slug}`"
+              class="footer-link text-sm"
+            >
               {{ getLocalizedCategoryName(category, locale) || category.name }}
             </NuxtLink>
           </div>
         </div>
 
-        <div class="sm:col-span-2 lg:col-span-1">
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ t('footer.contact') }}</h3>
-          <div class="mt-5 grid gap-4 text-sm leading-6 text-neutral-400">
-            <p v-for="item in contactItems" :key="item.label" class="flex gap-3">
-              <Icon :name="item.icon" class="mt-1 shrink-0 text-lg text-[#FF4D00]" />
-              <span><strong class="block text-white">{{ t(item.labelKey) }}</strong>{{ t(item.valueKey) }}</span>
+        <!-- Contact -->
+        <div class="col-span-2 sm:col-span-2 lg:col-span-1">
+          <h3
+            class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-sm sm:tracking-[0.22em]"
+          >
+            {{ t("footer.contact") }}
+          </h3>
+
+          <div
+            class="mt-3 grid gap-3 text-sm leading-5 text-neutral-400 sm:mt-5 sm:gap-4 sm:leading-6"
+          >
+            <p
+              v-for="item in contactItems"
+              :key="item.label"
+              class="flex gap-2 sm:gap-3"
+            >
+              <Icon
+                :name="item.icon"
+                class="mt-0.5 shrink-0 text-base text-[#FF4D00] sm:mt-1 sm:text-lg"
+              />
+
+              <span>
+                <strong class="block text-white">
+                  {{ t(item.labelKey) }}
+                </strong>
+
+                {{ t(item.valueKey) }}
+              </span>
             </p>
           </div>
         </div>
       </div>
 
-      <div class="premium-divider my-10" />
+      <div class="premium-divider my-7 sm:my-10" />
 
-      <div class="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+      <!-- Social + Payment -->
+      <div class="grid gap-6 sm:gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+        <!-- Social -->
         <div>
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ t('footer.follow') }}</h3>
-          <div class="mt-4 flex flex-wrap gap-3">
+          <h3
+            class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-sm sm:tracking-[0.22em]"
+          >
+            {{ t("footer.follow") }}
+          </h3>
+
+          <div class="mt-3 flex flex-wrap gap-2 sm:mt-4 sm:gap-3">
             <a
               v-for="social in socials"
               :key="social.label"
               :href="social.href"
-              class="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-neutral-300 transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00] hover:text-[#FF4D00]"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-neutral-300 transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00] hover:text-[#FF4D00] sm:h-12 sm:w-12"
               :aria-label="social.label"
             >
-              <Icon :name="social.icon" class="text-xl" />
+              <Icon :name="social.icon" class="text-lg sm:text-xl" />
             </a>
           </div>
         </div>
 
+        <!-- Payment -->
         <div>
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white lg:text-right">{{ t('footer.paymentMethods') }}</h3>
-          <div class="mt-4 flex flex-wrap gap-2 lg:justify-end">
-            <span v-for="method in paymentMethods" :key="method" class="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-neutral-300">
+          <h3
+            class="text-[11px] font-black uppercase tracking-[0.16em] text-white lg:text-right sm:text-sm sm:tracking-[0.22em]"
+          >
+            {{ t("footer.paymentMethods") }}
+          </h3>
+
+          <div
+            class="mt-3 flex flex-wrap gap-1.5 sm:mt-4 sm:gap-2 lg:justify-end"
+          >
+            <span
+              v-for="method in paymentMethods"
+              :key="method"
+              class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.08em] text-neutral-300 sm:px-4 sm:py-2 sm:text-xs sm:tracking-[0.12em]"
+            >
               {{ method }}
             </span>
           </div>
         </div>
       </div>
 
-      <div class="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-neutral-500 md:flex-row md:items-center md:justify-between">
-        <p>{{ t('footer.copyright') }}</p>
-        <div class="flex flex-wrap gap-4">
-          <a v-for="link in bottomLinks" :key="link.label" :href="link.href" class="footer-link">
+      <!-- Bottom -->
+      <div
+        class="mt-7 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-neutral-500 sm:mt-10 sm:gap-4 sm:pt-6 sm:text-sm md:flex-row md:items-center md:justify-between"
+      >
+        <p>
+          {{ t("footer.copyright") }}
+        </p>
+
+        <div class="flex flex-wrap gap-x-4 gap-y-2">
+          <a
+            v-for="link in bottomLinks"
+            :key="link.label"
+            :href="link.href"
+            class="footer-link text-xs sm:text-sm"
+          >
             {{ t(link.labelKey) }}
           </a>
         </div>
@@ -132,7 +295,9 @@ const fallbackCategories = [
 ];
 
 const footerCategories = computed(() => {
-  const categories = categoriesStore.categories.filter((category) => category.slug !== "all");
+  const categories = categoriesStore.categories.filter(
+    (category) => category.slug !== "all",
+  );
   return categories.length ? categories.slice(0, 5) : fallbackCategories;
 });
 
@@ -168,21 +333,52 @@ const linkGroups = [
 ];
 
 const contactItems = [
-  { icon: "i-heroicons-phone", labelKey: "common.phone", valueKey: "footer.phoneValue" },
-  { icon: "i-heroicons-envelope", labelKey: "common.email", valueKey: "footer.emailValue" },
-  { icon: "i-heroicons-map-pin", labelKey: "common.address", valueKey: "footer.addressValue" },
-  { icon: "i-heroicons-clock", labelKey: "footer.workingHours", valueKey: "footer.workingHoursValue" },
+  {
+    icon: "i-heroicons-phone",
+    labelKey: "common.phone",
+    valueKey: "footer.phoneValue",
+  },
+  {
+    icon: "i-heroicons-envelope",
+    labelKey: "common.email",
+    valueKey: "footer.emailValue",
+  },
+  {
+    icon: "i-heroicons-map-pin",
+    labelKey: "common.address",
+    valueKey: "footer.addressValue",
+  },
+  {
+    icon: "i-heroicons-clock",
+    labelKey: "footer.workingHours",
+    valueKey: "footer.workingHoursValue",
+  },
 ];
 
 const socials = [
-  { label: "Facebook", icon: "simple-icons:facebook", href: "https://facebook.com" },
-  { label: "Instagram", icon: "simple-icons:instagram", href: "https://instagram.com" },
-  { label: "TikTok", icon: "simple-icons:tiktok", href: "https://tiktok.com" },
-  { label: "YouTube", icon: "simple-icons:youtube", href: "https://youtube.com" },
-  { label: "LinkedIn", icon: "simple-icons:linkedin", href: "https://linkedin.com" },
+  {
+    label: "Facebook",
+    icon: "simple-icons:facebook",
+    href: "https://www.facebook.com/profile.php?id=100025354200512",
+  },
+  {
+    label: "Instagram",
+    icon: "simple-icons:instagram",
+    href: "https://www.instagram.com/shams_elhawary123/",
+  },
+  {
+    label: "TikTok",
+    icon: "simple-icons:tiktok",
+    href: "https://www.tiktok.com/@the_vikings22?is_from_webapp=1&sender_device=pc",
+  },
+  {
+    label: "YouTube",
+    icon: "simple-icons:youtube",
+    href: "https://youtube.com",
+  },
 ];
 
-const paymentMethods = ["Visa", "MasterCard", "PayPal", "Apple Pay", "Google Pay"];
+const paymentMethods = ["InstaPay", "cash on delivery"];
 const securityBadges = [
   { icon: "i-heroicons-lock-closed", labelKey: "footer.secureCheckout" },
   { icon: "i-heroicons-shield-check", labelKey: "footer.sslProtected" },

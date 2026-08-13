@@ -34,6 +34,7 @@ const localeOptions = [
 }
 
 .language-option {
+  cursor: pointer;
   min-height: 2.35rem;
   border-radius: 9999px;
   padding: 0 0.75rem;
