@@ -14,9 +14,9 @@
 
     <div class="mb-6 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-4 sm:flex-row sm:items-center sm:justify-between">
       <p class="text-sm font-semibold text-neutral-400">
-        Showing <span class="text-white">{{ visibleProducts.length }}</span> of <span class="text-white">{{ filteredProducts.length }}</span> products
+        {{ t('shop.showingProducts', { visible: visibleProducts.length, total: filteredProducts.length }) }}
       </p>
-      <p class="text-sm text-neutral-500">Premium combat gear curated for hard training.</p>
+      <p class="text-sm text-neutral-500">{{ t('shop.curated') }}</p>
     </div>
 
     <div v-if="productsStore.loading" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
@@ -38,7 +38,7 @@
 
       <div v-if="hasMoreProducts" class="mt-10 flex justify-center">
         <button class="premium-button premium-button-secondary rounded-xl px-8" @click="visibleCount += pageSize">
-          Load More
+          {{ t('common.loadMore') }}
           <Icon name="i-heroicons-arrow-down" />
         </button>
       </div>
@@ -48,12 +48,12 @@
       <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
         <Icon name="i-heroicons-magnifying-glass" class="text-3xl" />
       </div>
-      <h2 class="mt-6 text-3xl font-black text-white">No Products Found</h2>
+      <h2 class="mt-6 text-3xl font-black text-white">{{ t('shop.noProducts') }}</h2>
       <p class="mx-auto mt-3 max-w-md text-neutral-400">
-        Try another category, raise the price limit, or search for a different training essential.
+        {{ t('shop.tryDifferent') }}
       </p>
       <button class="premium-button premium-button-primary mt-8" @click="resetFilters">
-        Reset Filters
+        {{ t('shop.resetFilters') }}
       </button>
     </div>
   </div>
@@ -63,8 +63,11 @@
 import { computed, ref, watch } from "vue";
 import { useShopStore } from "../../stores/shop";
 import { useProductsStore } from "../../stores/products";
+import { formatStorePrice } from "../../utils/localizationFormat";
+import { SHOP_DEFAULT_MAX_PRICE, isWithinShopPriceLimit } from "../../utils/shopProducts";
 
 const productsStore = useProductsStore(usePinia());
+const { locale, t } = useI18n();
 const props = defineProps<{
   products: any[];
 }>();
@@ -85,7 +88,7 @@ const filteredProducts = computed(() => {
     result = result.filter((product) => product.title?.toLowerCase().includes(query));
   }
 
-  result = result.filter((product) => Number(product.price) <= shopStore.maxPrice);
+  result = result.filter((product) => isWithinShopPriceLimit(product.price, shopStore.maxPrice));
 
   if (shopStore.sortBy === "low") {
     result.sort((a, b) => a.price - b.price);
@@ -118,19 +121,19 @@ const activeFilters = computed(() => {
   if (shopStore.search) {
     filters.push({
       key: "search",
-      label: `Search: ${shopStore.search}`,
+      label: t("shop.searchActive", { query: shopStore.search }),
       clear: () => {
         shopStore.search = "";
       },
     });
   }
 
-  if (shopStore.maxPrice < 500) {
+  if (shopStore.maxPrice < SHOP_DEFAULT_MAX_PRICE) {
     filters.push({
       key: "price",
-      label: `Under $${shopStore.maxPrice}`,
+      label: t("shop.underPrice", { price: formatStorePrice(shopStore.maxPrice, locale.value) }),
       clear: () => {
-        shopStore.maxPrice = 500;
+        shopStore.maxPrice = SHOP_DEFAULT_MAX_PRICE;
       },
     });
   }
@@ -138,7 +141,7 @@ const activeFilters = computed(() => {
   if (shopStore.sortBy !== "default") {
     filters.push({
       key: "sort",
-      label: shopStore.sortBy === "low" ? "Lowest price" : "Highest price",
+      label: shopStore.sortBy === "low" ? t("shop.lowestPrice") : t("shop.highestPrice"),
       clear: () => {
         shopStore.sortBy = "default";
       },
@@ -165,7 +168,7 @@ const resetFilters = () => {
   shopStore.selectedCategory = "all";
   shopStore.search = "";
   shopStore.sortBy = "default";
-  shopStore.maxPrice = 500;
+  shopStore.maxPrice = SHOP_DEFAULT_MAX_PRICE;
   navigateTo("/shop");
 };
 </script>

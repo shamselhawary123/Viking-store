@@ -3,10 +3,13 @@ import { defineStore } from "pinia";
 export const useWishlistStore = defineStore("wishlist", {
   state: () => ({
     items: [] as any[],
+    loaded: false,
   }),
 
   actions: {
     loadWishlist() {
+      if (this.loaded) return;
+
       if (typeof window !== "undefined") {
         const data = localStorage.getItem("wishlist");
 
@@ -14,6 +17,8 @@ export const useWishlistStore = defineStore("wishlist", {
           this.items = JSON.parse(data);
         }
       }
+
+      this.loaded = true;
     },
 
     addToWishlist(product: any) {

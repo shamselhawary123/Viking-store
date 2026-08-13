@@ -7,14 +7,17 @@
       <img
         :src="product.cover_image || product.image"
         :alt="product.title"
+        width="640"
+        height="800"
         class="h-full w-full object-cover transition duration-700 group-hover:scale-105"
         loading="lazy"
+        decoding="async"
       />
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20" />
 
       <button
         class="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#FF4D00] backdrop-blur transition hover:scale-105 hover:border-[#FF4D00] active:scale-95"
-        :aria-label="wishlistStore.isFavorite(product.id) ? 'Remove from wishlist' : 'Add to wishlist'"
+        :aria-label="wishlistStore.isFavorite(product.id) ? t('shop.removeWishlist') : t('shop.addWishlist')"
         @click.prevent="wishlistStore.toggleWishlist(product)"
       >
         <Icon :name="wishlistStore.isFavorite(product.id) ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'" class="text-xl" />
@@ -29,17 +32,17 @@
 
       <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-2">
         <span class="min-w-0 truncate rounded-full border border-white/10 bg-black/65 px-3 py-1 text-xs font-bold text-neutral-200 backdrop-blur">
-          {{ product.categories?.name || product.category || "Combat Gear" }}
+          {{ getLocalizedCategoryName(product.categories, locale) || product.category || t('shop.combatGear') }}
         </span>
         <span class="shrink-0 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-300">
-          In Stock
+          {{ t('shop.inStock') }}
         </span>
       </div>
     </div>
 
     <div class="flex flex-1 flex-col space-y-4 p-5">
       <div>
-        <p class="eyebrow text-[0.65rem]">{{ product.categories?.slug || product.category || "Viking" }}</p>
+        <p class="eyebrow text-[0.65rem]">{{ getLocalizedCategoryName(product.categories, locale) || product.category || t('shop.viking') }}</p>
         <h3 class="mt-2 line-clamp-2 min-h-14 text-xl font-black leading-tight text-white">
           {{ product.title }}
         </h3>
@@ -47,12 +50,12 @@
 
       <div class="flex items-end justify-between gap-3">
         <div class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span class="text-2xl font-black text-white">${{ product.price }}</span>
+          <span class="text-2xl font-black text-white">{{ formatStorePrice(product.price, locale) }}</span>
           <span v-if="product.old_price || product.oldPrice" class="text-sm text-neutral-500 line-through">
-            ${{ product.old_price || product.oldPrice }}
+            {{ formatStorePrice(product.old_price || product.oldPrice, locale) }}
           </span>
         </div>
-        <div class="flex text-[#FF4D00]" aria-label="Rated 5 out of 5">
+        <div class="flex text-[#FF4D00]" :aria-label="t('shop.ratedFive')">
           <Icon v-for="star in 5" :key="star" name="i-heroicons-star-solid" class="text-sm" />
         </div>
       </div>
@@ -61,8 +64,8 @@
         class="premium-button premium-button-secondary mt-auto min-h-0 w-full rounded-xl py-3 active:scale-[0.98]"
         @click.prevent="navigateToDetails"
       >
-        View Details
-        <Icon name="i-heroicons-arrow-right" />
+        {{ t('shop.viewDetails') }}
+        <Icon :name="isRtl ? 'i-heroicons-arrow-left' : 'i-heroicons-arrow-right'" />
       </button>
     </div>
   </NuxtLink>
@@ -70,18 +73,17 @@
 
 <script setup lang="ts">
 import { useWishlistStore } from "../../stores/wishlist";
-import { onMounted } from "vue";
+import { computed } from "vue";
+import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
 
 const wishlistStore = useWishlistStore(usePinia());
 const router = useRouter();
+const { locale, t } = useI18n();
+const isRtl = computed(() => locale.value === "ar");
 
 const props = defineProps<{
   product: any;
 }>();
-
-onMounted(() => {
-  wishlistStore.loadWishlist();
-});
 
 const navigateToDetails = () => {
   router.push(`/shop/${props.product.slug}`);

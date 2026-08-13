@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import { buildCheckoutOrderRequest } from "../utils/checkoutOrder";
+import { buildRegistrationProfileUpsertPayload, type PendingRegistrationProfile } from "../utils/registrationProfile";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -28,9 +29,6 @@ export const useAuthStore = defineStore("auth", {
         },
       });
 
-      console.log("USER DATA:", userData);
-      console.log("ERROR:", error);
-
       if (error) {
         throw error;
       }
@@ -53,19 +51,41 @@ export const useAuthStore = defineStore("auth", {
     }) {
       const supabase = useSupabase();
 
-      const { error } = await supabase.from("profiles").insert({
-        id: data.id,
-        email: data.email,
-        full_name: data.fullName,
-        avatar: data.avatar,
-        phone: data.phone,
-        gender: data.gender,
-        address: data.address,
-        city: data.city,
-        country: data.country,
-        postal_code: data.postalCode,
-        bio: data.bio,
-      });
+      const { error } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: data.id,
+            email: data.email,
+            full_name: data.fullName,
+            avatar: data.avatar,
+            phone: data.phone,
+            gender: data.gender,
+            address: data.address,
+            city: data.city,
+            country: data.country,
+            postal_code: data.postalCode,
+            bio: data.bio,
+          },
+          { onConflict: "id" },
+        );
+
+      if (error) {
+        throw error;
+      }
+    },
+    async persistRegistrationProfile(
+      profile: PendingRegistrationProfile,
+      user: { id: string; email?: string | null },
+      avatar = "",
+    ) {
+      const supabase = useSupabase();
+
+      const { error } = await supabase
+        .from("profiles")
+        .upsert(buildRegistrationProfileUpsertPayload(profile, user, avatar), {
+          onConflict: "id",
+        });
 
       if (error) {
         throw error;
@@ -140,7 +160,7 @@ export const useAuthStore = defineStore("auth", {
       }
     },
     // ORDERS
-    async createOrder(cartItems: any[], totalPrice: number, customerData: any) {
+    async createOrder(cartItems: any[], totalPrice: number, customerData: any, coupon: any = null) {
       const supabase = useSupabase();
       const user = customerData.isGuest
         ? null
@@ -151,7 +171,7 @@ export const useAuthStore = defineStore("auth", {
       }
 
       const orderId = crypto.randomUUID();
-      const { orderPayload, orderItems } = buildCheckoutOrderRequest({
+      const { orderPayload, rpcPayload } = buildCheckoutOrderRequest({
         orderId,
         cartItems,
         totalPrice,
@@ -159,24 +179,16 @@ export const useAuthStore = defineStore("auth", {
           ...customerData,
           user,
         },
+        coupon,
       });
 
-      const { error: orderError } = await supabase
-        .from("orders")
-        .insert(orderPayload);
+      const { data: checkoutOrder, error: orderError } = await supabase
+        .rpc("create_checkout_order", rpcPayload);
       if (orderError) {
         throw orderError;
       }
 
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
-
-      if (itemsError) {
-        throw itemsError;
-      }
-
-      return orderPayload;
+      return checkoutOrder || orderPayload;
     },
     // GET ORDERS
     async getOrders() {
@@ -291,22 +303,13 @@ export const useAuthStore = defineStore("auth", {
     async uploadAvatar(file: File) {
       const supabase = useSupabase();
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      console.log("SESSION =>", session);
-
       const fileName = `${Date.now()}-${file.name}`;
 
       const result = await supabase.storage
         .from("avatars")
         .upload(fileName, file);
 
-      console.log("UPLOAD RESULT =>", result);
-
       if (result.error) {
-        console.error("UPLOAD ERROR =>", result.error);
         throw result.error;
       }
 

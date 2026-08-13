@@ -11,19 +11,20 @@
   <Transition name="drawer">
     <aside
       v-if="cartStore.isOpen"
-      class="fixed right-0 top-0 z-[100] flex h-dvh w-full max-w-md flex-col border-l border-white/10 bg-[#070707]"
-      aria-label="Shopping cart"
+      class="fixed top-0 z-[100] flex h-dvh w-full max-w-md flex-col border-white/10 bg-[#070707]"
+      :class="isRtl ? 'left-0 border-r' : 'right-0 border-l'"
+      :aria-label="t('nav.cart')"
     >
       <div class="flex items-center justify-between border-b border-white/10 p-6">
         <div>
-          <p class="eyebrow">Viking cart</p>
-          <h2 class="mt-2 text-3xl font-black">Your Bag</h2>
-          <p class="mt-1 text-sm text-neutral-400">{{ cartStore.totalItems }} items selected</p>
+          <p class="eyebrow">{{ t('cart.vikingCart') }}</p>
+          <h2 class="mt-2 text-3xl font-black">{{ t('cart.yourBag') }}</h2>
+          <p class="mt-1 text-sm text-neutral-400">{{ t('cart.itemsSelected', { count: cartStore.totalItems }) }}</p>
         </div>
 
         <button
           class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 transition hover:border-[#FF4D00] hover:text-[#FF4D00]"
-          aria-label="Close cart"
+          :aria-label="t('cart.closeCart')"
           @click="cartStore.closeCart()"
         >
           <Icon name="i-heroicons-x-mark" class="text-xl" />
@@ -38,11 +39,11 @@
           <Icon name="i-heroicons-shopping-bag" class="text-4xl" />
         </div>
         <div>
-          <h3 class="text-3xl font-black">Your Bag Is Empty</h3>
-          <p class="mt-3 text-neutral-400">Add fight-tested gear and it will appear here.</p>
+          <h3 class="text-3xl font-black">{{ t('cart.emptyBag') }}</h3>
+          <p class="mt-3 text-neutral-400">{{ t('cart.emptyBagText') }}</p>
         </div>
         <NuxtLink to="/shop" class="premium-button premium-button-primary" @click="cartStore.closeCart()">
-          Continue Shopping
+          {{ t('cart.continueShopping') }}
         </NuxtLink>
       </div>
 
@@ -53,7 +54,7 @@
           class="premium-panel rounded-2xl p-4"
         >
           <div class="flex gap-4">
-            <img :src="item.image" :alt="item.title" class="h-24 w-24 rounded-xl object-cover" />
+            <img :src="item.image" :alt="item.title" width="96" height="96" class="h-24 w-24 rounded-xl object-cover" loading="lazy" decoding="async" />
 
             <div class="min-w-0 flex-1">
               <div class="flex items-start justify-between gap-3">
@@ -63,7 +64,7 @@
                 </div>
                 <button
                   class="text-neutral-500 transition hover:text-red-400"
-                  aria-label="Remove item from cart"
+                  :aria-label="t('cart.removeItemFromCart')"
                   @click="cartStore.removeFromCart(index)"
                 >
                   <Icon name="i-heroicons-trash" class="text-lg" />
@@ -74,7 +75,7 @@
                 <div class="flex items-center overflow-hidden rounded-full border border-white/10">
                   <button
                     class="flex h-9 w-9 items-center justify-center transition hover:bg-white/10"
-                    aria-label="Decrease quantity"
+                    :aria-label="t('cart.decreaseQuantity')"
                     @click="cartStore.decreaseQuantity(index)"
                   >
                     <Icon name="i-heroicons-minus" />
@@ -84,14 +85,14 @@
                   </div>
                   <button
                     class="flex h-9 w-9 items-center justify-center transition hover:bg-white/10"
-                    aria-label="Increase quantity"
+                    :aria-label="t('cart.increaseQuantity')"
                     @click="cartStore.increaseQuantity(index)"
                   >
                     <Icon name="i-heroicons-plus" />
                   </button>
                 </div>
 
-                <p class="text-xl font-black text-[#FF4D00]">${{ item.price * item.quantity }}</p>
+                <p class="text-xl font-black text-[#FF4D00]">{{ formatStorePrice(item.price * item.quantity, locale) }}</p>
               </div>
             </div>
           </div>
@@ -101,25 +102,25 @@
       <div v-if="cartStore.items.length" class="border-t border-white/10 p-6">
         <div class="mb-6 space-y-3">
           <div class="flex items-center justify-between text-sm text-neutral-400">
-            <span>Subtotal</span>
-            <span class="font-bold text-white">${{ cartStore.totalPrice }}</span>
+            <span>{{ t('common.subtotal') }}</span>
+            <span class="font-bold text-white">{{ formatStorePrice(cartStore.totalPrice, locale) }}</span>
           </div>
           <div class="flex items-center justify-between text-sm text-neutral-400">
-            <span>Shipping</span>
-            <span class="font-bold text-emerald-400">Free</span>
+            <span>{{ t('common.shipping') }}</span>
+            <span class="font-bold text-emerald-400">{{ t('common.free') }}</span>
           </div>
           <div class="flex items-center justify-between border-t border-white/10 pt-4">
-            <span class="text-lg font-black">Total</span>
-            <span class="text-3xl font-black text-[#FF4D00]">${{ cartStore.totalPrice }}</span>
+            <span class="text-lg font-black">{{ t('common.total') }}</span>
+            <span class="text-3xl font-black text-[#FF4D00]">{{ formatStorePrice(cartStore.totalPrice, locale) }}</span>
           </div>
         </div>
 
         <div class="grid gap-3">
           <NuxtLink to="/cart" class="premium-button premium-button-secondary w-full" @click="cartStore.closeCart()">
-            View Cart
+            {{ t('cart.viewCart') }}
           </NuxtLink>
           <button class="premium-button premium-button-primary w-full" @click="handleCheckout">
-            Checkout
+            {{ t('cart.checkout') }}
           </button>
         </div>
       </div>
@@ -129,9 +130,12 @@
 
 <script setup lang="ts">
 import { useCartStore } from "../../stores/cart";
+import { formatStorePrice } from "../../utils/localizationFormat";
 
 const router = useRouter();
 const cartStore = useCartStore(usePinia());
+const { locale, t } = useI18n();
+const isRtl = computed(() => locale.value === "ar");
 
 const handleCheckout = () => {
   cartStore.closeCart();
@@ -158,5 +162,10 @@ const handleCheckout = () => {
 .drawer-enter-from,
 .drawer-leave-to {
   transform: translateX(100%);
+}
+
+html[dir="rtl"] .drawer-enter-from,
+html[dir="rtl"] .drawer-leave-to {
+  transform: translateX(-100%);
 }
 </style>

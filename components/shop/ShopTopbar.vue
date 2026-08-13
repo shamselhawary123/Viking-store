@@ -3,7 +3,7 @@
     <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
       <div class="min-w-0">
         <p class="text-sm font-bold text-neutral-400">
-          <span class="text-white">{{ totalProducts }}</span> products curated for training and fight night
+          {{ t('shop.totalCurated', { count: totalProducts }) }}
         </p>
         <div class="mt-3 flex flex-wrap gap-2">
           <button
@@ -13,25 +13,26 @@
             :class="shopStore.sortBy === preset.value ? 'border-[#FF4D00] bg-[#FF4D00]/10 text-[#FF4D00]' : 'border-white/10 text-neutral-400 hover:border-[#FF4D00]/70 hover:text-white'"
             @click="shopStore.sortBy = preset.value"
           >
-            {{ preset.label }}
+            {{ t(preset.labelKey) }}
           </button>
         </div>
       </div>
 
       <div class="grid gap-3 sm:grid-cols-[1fr_auto] xl:min-w-[34rem]">
         <div class="relative">
-          <Icon name="i-heroicons-magnifying-glass" class="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500" />
+          <Icon name="i-heroicons-magnifying-glass" class="absolute top-1/2 -translate-y-1/2 text-neutral-500" :class="isRtl ? 'right-4' : 'left-4'" />
           <input
             id="shop-top-search"
             v-model="shopStore.search"
             type="search"
-            placeholder="Search gloves, wraps, shorts..."
-            class="premium-input h-12 pl-11 pr-11"
+            :placeholder="t('shop.searchPlaceholder')"
+            class="premium-input h-12 px-11"
           />
           <button
             v-if="shopStore.search"
-            class="absolute right-2 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-neutral-400 transition hover:bg-white/10 hover:text-white"
-            aria-label="Clear search"
+            class="absolute top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full text-neutral-400 transition hover:bg-white/10 hover:text-white"
+            :class="isRtl ? 'left-2' : 'right-2'"
+            :aria-label="t('shop.clearSearch')"
             @click="shopStore.search = ''"
           >
             <Icon name="i-heroicons-x-mark" />
@@ -44,14 +45,14 @@
             @click="toggleFilters"
           >
             <Icon name="i-heroicons-funnel" />
-            Filters
+            {{ t('common.filters') }}
           </button>
 
-          <label class="sr-only" for="sort-products">Sort products</label>
+          <label class="sr-only" for="sort-products">{{ t('shop.sortProducts') }}</label>
           <select id="sort-products" v-model="shopStore.sortBy" class="premium-input h-12 min-w-44 rounded-xl">
-            <option value="default">Featured</option>
-            <option value="low">Price: Low to High</option>
-            <option value="high">Price: High to Low</option>
+            <option value="default">{{ t('shop.defaultSort') }}</option>
+            <option value="low">{{ t('shop.priceLowToHigh') }}</option>
+            <option value="high">{{ t('shop.priceHighToLow') }}</option>
           </select>
         </div>
       </div>
@@ -61,17 +62,20 @@
 
 <script setup lang="ts">
 import { useShopStore } from "../../stores/shop";
+import { computed } from "vue";
 
 const shopStore = useShopStore(usePinia());
+const { locale, t } = useI18n();
+const isRtl = computed(() => locale.value === "ar");
 
 defineProps<{
   totalProducts: number;
 }>();
 
 const quickSorts = [
-  { value: "default", label: "Featured" },
-  { value: "low", label: "Lowest" },
-  { value: "high", label: "Highest" },
+  { value: "default", labelKey: "shop.defaultSort" },
+  { value: "low", labelKey: "shop.lowest" },
+  { value: "high", labelKey: "shop.highest" },
 ];
 
 const toggleFilters = () => {

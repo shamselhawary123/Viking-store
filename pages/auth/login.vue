@@ -8,9 +8,13 @@
       <!-- LEFT -->
       <div class="relative hidden lg:block">
         <img
-          src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1600&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=70&w=1200&auto=format&fit=crop"
           alt=""
+          width="1200"
+          height="900"
           class="h-full w-full object-cover"
+          fetchpriority="high"
+          decoding="async"
         />
 
         <div class="absolute inset-0 bg-black/60" />
@@ -21,11 +25,11 @@
           </p>
 
           <h1 class="text-5xl font-black leading-tight text-white">
-            Welcome Back Fighter
+            {{ t('auth.welcomeBack') }}
           </h1>
 
           <p class="mt-5 text-lg text-gray-300">
-            Login and continue your training journey.
+            {{ t('auth.loginLead') }}
           </p>
         </div>
       </div>
@@ -33,9 +37,9 @@
       <!-- RIGHT -->
       <div class="flex items-center p-6 md:p-10">
         <div class="w-full">
-          <h2 class="text-4xl font-black text-white">Login</h2>
+          <h2 class="text-4xl font-black text-white">{{ t('auth.login') }}</h2>
 
-          <p class="mt-3 text-gray-400">Enter your account details</p>
+          <p class="mt-3 text-gray-400">{{ t('auth.enterDetails') }}</p>
 
           <form @submit.prevent="handleLogin" class="mt-10 space-y-5">
             <!-- EMAIL -->
@@ -43,7 +47,7 @@
               <input
                 v-model="email"
                 type="email"
-                placeholder="Email Address"
+                :placeholder="t('auth.emailAddress')"
                 class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
               />
 
@@ -57,7 +61,7 @@
               <input
                 v-model="password"
                 type="password"
-                placeholder="Password"
+                :placeholder="t('common.password')"
                 class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
               />
 
@@ -80,7 +84,7 @@
                 to="/auth/forgot-password"
                 class="text-sm text-gray-400 hover:text-[#FF4D00]"
               >
-                Forgot Password?
+                {{ t('auth.forgotPassword') }}
               </NuxtLink>
             </div>
 
@@ -90,7 +94,7 @@
               :disabled="loading"
               class="h-14 w-full rounded-2xl bg-[#FF4D00] text-lg font-bold text-white transition hover:opacity-90 disabled:opacity-50"
             >
-              {{ loading ? "Logging in..." : "Login" }}
+              {{ loading ? t('auth.loggingIn') : t('auth.login') }}
             </button>
 
             <!-- GOOGLE -->
@@ -101,21 +105,26 @@
             >
               <img
                 src="https://cdn-icons-png.flaticon.com/512/300/300221.png"
+                alt=""
+                width="20"
+                height="20"
                 class="h-5 w-5"
+                loading="lazy"
+                decoding="async"
               />
 
-              Continue With Google
+              {{ t('auth.continueWithGoogle') }}
             </button>
 
             <!-- REGISTER -->
             <p class="text-center text-gray-400">
-              Don't have an account?
+              {{ t('auth.noAccount') }}
 
               <NuxtLink
                 to="/auth/register"
                 class="font-bold text-white hover:text-[#FF4D00]"
               >
-                Register
+                {{ t('auth.register') }}
               </NuxtLink>
             </p>
           </form>
@@ -135,6 +144,7 @@ definePageMeta({
 
 const authStore = useAuthStore(usePinia());
 const router = useRouter();
+const { t } = useI18n();
 
 const email = ref("");
 const password = ref("");
@@ -154,12 +164,12 @@ const validate = () => {
   let valid = true;
 
   if (!email.value) {
-    errors.value.email = "Email is required";
+    errors.value.email = t("auth.emailRequired");
     valid = false;
   }
 
   if (!password.value) {
-    errors.value.password = "Password is required";
+    errors.value.password = t("auth.passwordRequired");
     valid = false;
   }
 
@@ -177,7 +187,7 @@ const handleLogin = async () => {
 
     router.push("/");
   } catch (error: any) {
-    loginError.value = error?.message || "Login Failed";
+    loginError.value = error?.message || t("auth.loginFailed");
   } finally {
     loading.value = false;
   }

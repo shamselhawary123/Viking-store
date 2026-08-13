@@ -4,15 +4,15 @@
     <div class="container-premium">
       <div class="relative mb-14 flex flex-col gap-5 text-center md:flex-row md:items-end md:justify-between md:text-left">
         <div>
-          <p class="eyebrow">Featured Best Sellers</p>
+          <p class="eyebrow">{{ t('home.featured') }}</p>
 
-          <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">FIGHTER FAVORITES</h2>
+          <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">{{ t('home.fighterFavorites') }}</h2>
           <p class="mt-5 max-w-2xl leading-8 text-neutral-400">
-            Our most trusted picks for athletes who train often, hit hard, and expect their gear to keep up.
+            {{ t('home.featuredText') }}
           </p>
         </div>
         <NuxtLink to="/shop" class="premium-button premium-button-secondary hidden md:inline-flex min-h-14 px-6">
-          View All Products
+          {{ t('home.viewAllProducts') }}
           <Icon name="i-heroicons-arrow-right" />
         </NuxtLink>
       </div>
@@ -28,25 +28,28 @@
               <img
                 :src="product.cover_image || product.image"
                 :alt="product.title"
+                width="640"
+                height="800"
                 class="h-full w-full object-cover transition duration-700 group-hover:scale-110"
                 loading="lazy"
+                decoding="async"
               />
               <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/20" />
               <div class="absolute left-4 top-4 rounded-full bg-[#FF4D00] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(255,77,0,0.28)]">
-                {{ product.badge || "Best seller" }}
+                {{ product.badge || t('home.bestSeller') }}
               </div>
               <button
                 class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#FF4D00] backdrop-blur transition duration-300 hover:scale-105 hover:border-[#FF4D00]"
-                :aria-label="wishlistStore.isFavorite(product.id) ? 'Remove from wishlist' : 'Add to wishlist'"
+                :aria-label="wishlistStore.isFavorite(product.id) ? t('shop.removeWishlist') : t('shop.addWishlist')"
                 @click.prevent="wishlistStore.toggleWishlist(product)"
               >
                 <Icon :name="wishlistStore.isFavorite(product.id) ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'" class="text-xl" />
               </button>
               <div class="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3">
                 <span class="rounded-full border border-white/10 bg-black/65 px-3 py-1 text-xs font-bold text-neutral-200 backdrop-blur">
-                  {{ product.categories?.name || product.category || "Combat Gear" }}
+                  {{ getLocalizedCategoryName(product.categories, locale) || product.category || t('footer.combatStore') }}
                 </span>
-                <span class="flex items-center gap-1 text-[#FF4D00]" aria-label="Rated 5 out of 5">
+                <span class="flex items-center gap-1 text-[#FF4D00]" :aria-label="t('shop.ratedFive')">
                   <Icon v-for="star in 5" :key="star" name="i-heroicons-star-solid" class="text-xs" />
                 </span>
               </div>
@@ -54,25 +57,25 @@
           </NuxtLink>
 
           <div class="p-5">
-            <p class="eyebrow text-[0.65rem]">{{ product.categories?.slug || product.category || "Viking" }}</p>
+            <p class="eyebrow text-[0.65rem]">{{ getLocalizedCategoryName(product.categories, locale) || product.category || t('shop.viking') }}</p>
             <h3 class="mt-2 line-clamp-2 min-h-14 text-xl font-black leading-tight text-white">
               {{ product.title }}
             </h3>
 
             <div class="mt-5 flex items-end justify-between gap-3">
               <div>
-                <p class="text-xs font-bold uppercase tracking-[0.16em] text-neutral-500">From</p>
+                <p class="text-xs font-bold uppercase tracking-[0.16em] text-neutral-500">{{ t('shop.from') }}</p>
                 <div class="mt-1 flex items-center gap-3">
-                  <span class="text-2xl font-black text-white">${{ product.price }}</span>
+                  <span class="text-2xl font-black text-white">{{ formatStorePrice(product.price, locale) }}</span>
                   <span v-if="product.old_price || product.oldPrice" class="text-sm text-neutral-500 line-through">
-                    ${{ product.old_price || product.oldPrice }}
+                    {{ formatStorePrice(product.old_price || product.oldPrice, locale) }}
                   </span>
                 </div>
               </div>
               <NuxtLink
                 :to="`/shop/${product.slug}`"
                 class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#FF4D00] hover:bg-[#FF4D00] hover:text-white"
-                aria-label="View product details"
+                :aria-label="t('shop.viewDetails')"
               >
                 <Icon name="i-heroicons-arrow-right" />
               </NuxtLink>
@@ -86,7 +89,7 @@
           to="/shop"
           class="premium-button premium-button-secondary"
         >
-          View All Products
+          {{ t('home.viewAllProducts') }}
         </NuxtLink>
       </div>
     </div>
@@ -97,9 +100,11 @@
 import { computed, onMounted } from "vue";
 import { useProductsStore } from "../../stores/products";
 import { useWishlistStore } from "../../stores/wishlist";
+import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
 
 const productsStore = useProductsStore(usePinia());
 const wishlistStore = useWishlistStore(usePinia());
+const { locale, t } = useI18n();
 
 onMounted(async () => {
   await productsStore.getProducts();

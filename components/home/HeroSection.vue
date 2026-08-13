@@ -16,22 +16,21 @@
       <div class="reveal-up pt-4 text-center lg:text-left">
         <p class="eyebrow inline-flex items-center gap-3">
           <span class="h-px w-10 bg-[#FF4D00]" />
-          Premium Combat Equipment
+          {{ t('home.heroEyebrow') }}
         </p>
         <h1
           class="display-heading mt-6 text-7xl text-white sm:text-8xl lg:text-[9.6rem]"
         >
-          TRAIN HARD
+          {{ t('home.heroTitle') }}
           <span
             class="block text-[#FF4D00] drop-shadow-[0_0_34px_rgba(255,77,0,0.22)]"
-            >FIGHT EASY</span
+            >{{ t('home.heroAccent') }}</span
           >
         </h1>
         <p
           class="mx-auto mt-7 max-w-2xl text-base leading-8 text-neutral-300 lg:mx-0 lg:text-lg"
         >
-          Fight-tested boxing, kickboxing, Muay Thai, and MMA gear with a
-          premium fit, aggressive styling, and daily-training durability.
+          {{ t('home.heroText') }}
         </p>
 
         <div
@@ -41,14 +40,14 @@
             to="/shop"
             class="premium-button premium-button-primary min-h-14 px-7"
           >
-            Shop Gear
+            {{ t('home.shopGear') }}
             <Icon name="i-heroicons-arrow-right" />
           </NuxtLink>
           <NuxtLink
             to="/categories"
             class="premium-button premium-button-secondary min-h-14 px-7"
           >
-            Explore Categories
+            {{ t('home.exploreCategories') }}
           </NuxtLink>
         </div>
 
@@ -64,7 +63,7 @@
             <p
               class="mt-1 text-xs font-bold uppercase tracking-[0.16em] text-neutral-500"
             >
-              {{ stat.label }}
+              {{ t(stat.labelKey) }}
             </p>
           </div>
         </div>
@@ -83,7 +82,11 @@
         <img
           src="/train-hard.png"
           alt="Premium Viking combat equipment"
+          width="900"
+          height="900"
           class="relative z-10 mx-auto max-h-[40rem] w-full max-w-3xl object-contain drop-shadow-[0_35px_70px_rgba(0,0,0,0.7)] floating"
+          fetchpriority="high"
+          decoding="async"
         />
         <div
           class="absolute bottom-7 left-4 z-20 rounded-2xl border border-white/10 bg-black/75 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur md:left-10"
@@ -91,9 +94,9 @@
           <p
             class="text-xs font-black uppercase tracking-[0.22em] text-[#FF4D00]"
           >
-            Pro grade
+            {{ t('home.proGrade') }}
           </p>
-          <p class="mt-1 text-sm font-bold text-white">Built for 300+ rounds</p>
+          <p class="mt-1 text-sm font-bold text-white">{{ t('home.rounds') }}</p>
         </div>
         <div
           class="absolute right-3 top-8 z-20 rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur md:right-12"
@@ -102,7 +105,7 @@
           <p
             class="text-xs font-black uppercase tracking-[0.16em] text-[#FF4D00]"
           >
-            Fighter rating
+            {{ t('home.fighterRating') }}
           </p>
         </div>
       </div>
@@ -116,10 +119,12 @@
 </template>
 
 <script setup lang="ts">
+const { t } = useI18n();
+
 const stats = [
-  { value: "4.9", label: "Rating" },
-  { value: "24h", label: "Dispatch" },
-  { value: "Pro", label: "Quality" },
+  { value: "4.9", labelKey: "home.rating" },
+  { value: "24h", labelKey: "home.dispatch" },
+  { value: "Pro", labelKey: "home.quality" },
 ];
 </script>
 

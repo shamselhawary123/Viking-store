@@ -8,9 +8,13 @@
       <!-- LEFT -->
       <div class="relative hidden lg:block">
         <img
-          src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=70&w=1200&auto=format&fit=crop"
           alt=""
+          width="1200"
+          height="900"
           class="h-full w-full object-cover"
+          fetchpriority="high"
+          decoding="async"
         />
 
         <div class="absolute inset-0 bg-black/50" />
@@ -21,11 +25,11 @@
           </p>
 
           <h1 class="text-5xl font-black leading-tight text-white">
-            Join The Fighters Community
+            {{ t('auth.joinCommunity') }}
           </h1>
 
           <p class="mt-5 text-lg leading-relaxed text-gray-300">
-            Create your account and start your combat sports journey.
+            {{ t('auth.registerLead') }}
           </p>
         </div>
       </div>
@@ -33,23 +37,28 @@
       <!-- RIGHT -->
       <div class="p-6 md:p-10">
         <div class="mx-auto max-w-xl">
-          <h2 class="text-4xl font-black text-white">Register</h2>
+          <h2 class="text-4xl font-black text-white">{{ t('auth.register') }}</h2>
 
-          <p class="mt-3 text-gray-400">Create your account to continue</p>
+          <p class="mt-3 text-gray-400">{{ t('auth.createToContinue') }}</p>
 
           <form class="mt-10 space-y-5" @submit.prevent="handleRegister">
             <!-- Avatar -->
             <div class="flex items-center gap-5">
               <img
                 :src="avatarPreview"
+                alt=""
+                width="80"
+                height="80"
                 class="h-20 w-20 rounded-full border border-white/10 object-cover"
+                loading="lazy"
+                decoding="async"
               />
 
               <div>
                 <label
                   class="inline-flex cursor-pointer items-center rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white"
                 >
-                  Upload Avatar
+                  {{ t('auth.uploadAvatar') }}
 
                   <input
                     type="file"
@@ -65,7 +74,7 @@
             <input
               v-model="form.fullName"
               type="text"
-              placeholder="Full Name"
+              :placeholder="t('common.fullName')"
               class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
               required
             />
@@ -74,7 +83,7 @@
             <input
               v-model="form.email"
               type="email"
-              placeholder="Email Address"
+              :placeholder="t('auth.emailAddress')"
               class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
               required
             />
@@ -84,7 +93,7 @@
               <input
                 v-model="form.phone"
                 type="text"
-                placeholder="Phone Number"
+                :placeholder="t('auth.phoneNumber')"
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
                 required
               />
@@ -94,11 +103,11 @@
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
                 required
               >
-                <option value="">Select Gender</option>
+                <option value="">{{ t('auth.selectGender') }}</option>
 
-                <option>Male</option>
+                <option value="Male">{{ t('auth.male') }}</option>
 
-                <option>Female</option>
+                <option value="Female">{{ t('auth.female') }}</option>
               </select>
             </div>
 
@@ -106,7 +115,7 @@
             <input
               v-model="form.address"
               type="text"
-              placeholder="Address"
+              :placeholder="t('common.address')"
               class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
               required
             />
@@ -116,7 +125,7 @@
               <input
                 v-model="form.city"
                 type="text"
-                placeholder="City"
+                :placeholder="t('common.city')"
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
                 required
               />
@@ -124,7 +133,7 @@
               <input
                 v-model="form.country"
                 type="text"
-                placeholder="Country"
+                :placeholder="t('auth.country')"
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
                 required
               />
@@ -132,7 +141,7 @@
               <input
                 v-model="form.postalCode"
                 type="text"
-                placeholder="Postal Code"
+                :placeholder="t('auth.postalCode')"
                 class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
               />
             </div>
@@ -141,7 +150,7 @@
             <textarea
               v-model="form.bio"
               rows="4"
-              placeholder="Short Bio"
+              :placeholder="t('auth.shortBio')"
               class="w-full rounded-2xl border border-white/10 bg-[#111111] p-5 text-white outline-none transition focus:border-[#FF4D00]"
             />
 
@@ -150,7 +159,7 @@
               <input
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="Password"
+                :placeholder="t('common.password')"
                 class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 pr-20 text-white outline-none transition focus:border-[#FF4D00]"
                 required
               />
@@ -160,7 +169,7 @@
                 @click="showPassword = !showPassword"
                 class="absolute right-5 top-1/2 -translate-y-1/2 text-sm text-gray-400"
               >
-                {{ showPassword ? "Hide" : "Show" }}
+                {{ showPassword ? t('auth.hide') : t('auth.show') }}
               </button>
             </div>
             <!-- Confirm Password -->
@@ -168,7 +177,7 @@
               <input
                 v-model="form.confirmPassword"
                 :type="showPassword ? 'text' : 'password'"
-                placeholder="Confirm Password"
+                :placeholder="t('auth.confirmPassword')"
                 class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 pr-20 text-white outline-none transition focus:border-[#FF4D00]"
                 required
               />
@@ -187,17 +196,17 @@
               :disabled="loading"
               class="h-14 w-full rounded-2xl bg-[#FF4D00] text-lg font-bold text-white transition hover:opacity-90 disabled:opacity-50"
             >
-              {{ loading ? "Creating..." : "Create Account" }}
+              {{ loading ? t('auth.creating') : t('auth.createAccount') }}
             </button>
             <!-- Login -->
             <p class="text-center text-gray-400">
-              Already have an account?
+              {{ t('auth.alreadyHaveAccount') }}
 
               <NuxtLink
                 to="/auth/login"
                 class="font-bold text-white hover:text-[#FF4D00]"
               >
-                Login
+                {{ t('auth.login') }}
               </NuxtLink>
             </p>
           </form>
@@ -211,12 +220,14 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../../stores/auth";
+import { buildPendingRegistrationProfile } from "../../utils/registrationProfile";
 
 definePageMeta({
   middleware: ["guest"],
 });
 const router = useRouter();
 const authStore = useAuthStore(usePinia());
+const { t } = useI18n();
 
 const showPassword = ref(false);
 const loading = ref(false);
@@ -257,53 +268,53 @@ const validate = () => {
   // }
 
   if (!form.value.fullName.trim()) {
-    errorMessage.value = "Full Name is required";
+    errorMessage.value = t("auth.nameRequired");
     return false;
   }
 
   if (!form.value.email.trim()) {
-    errorMessage.value = "Email is required";
+    errorMessage.value = t("auth.emailRequired");
     return false;
   }
 
   if (!form.value.phone.trim()) {
-    errorMessage.value = "Phone Number is required";
+    errorMessage.value = t("auth.phoneRequired");
     return false;
   }
 
   if (!form.value.gender.trim()) {
-    errorMessage.value = "Gender is required";
+    errorMessage.value = t("auth.genderRequired");
     return false;
   }
 
   if (!form.value.address.trim()) {
-    errorMessage.value = "Address is required";
+    errorMessage.value = t("auth.addressRequired");
     return false;
   }
 
   if (!form.value.city.trim()) {
-    errorMessage.value = "City is required";
+    errorMessage.value = t("auth.cityRequired");
     return false;
   }
 
   if (!form.value.country.trim()) {
-    errorMessage.value = "Country is required";
+    errorMessage.value = t("auth.countryRequired");
     return false;
   }
 
   if (!form.value.password.trim()) {
-    errorMessage.value = "Password is required";
+    errorMessage.value = t("auth.passwordRequired");
     return false;
   }
 
   if (form.value.password.length < 6) {
-    errorMessage.value = "Password must be at least 6 characters";
+    errorMessage.value = t("auth.passwordMin");
 
     return false;
   }
 
   if (form.value.password !== form.value.confirmPassword) {
-    errorMessage.value = "Passwords do not match";
+    errorMessage.value = t("auth.passwordMismatch");
 
     return false;
   }
@@ -317,31 +328,12 @@ const handleRegister = async () => {
     loading.value = true;
     errorMessage.value = "";
 
-    let avatarUrl = "";
-
     // // Upload Avatar First
     // if (avatarFile.value) {
     //   avatarUrl = await authStore.uploadAvatar(avatarFile.value);
 
     //   localStorage.setItem("pending_avatar", avatarUrl);
     // }
-
-    // Save User Data
-    localStorage.setItem(
-      "pending_profile",
-      JSON.stringify({
-        fullName: form.value.fullName,
-        email: form.value.email,
-        phone: form.value.phone,
-        gender: form.value.gender,
-        address: form.value.address,
-        city: form.value.city,
-        country: form.value.country,
-        postalCode: form.value.postalCode,
-        bio: form.value.bio,
-        password: form.value.password,
-      }),
-    );
 
     // Register User
     await authStore.register({
@@ -350,13 +342,12 @@ const handleRegister = async () => {
       password: form.value.password,
     });
 
+    localStorage.setItem("pending_profile", JSON.stringify(buildPendingRegistrationProfile(form.value)));
     localStorage.setItem("verify_email", form.value.email);
 
     await router.push("/auth/verify-email");
   } catch (error: any) {
-    console.error(error);
-
-    errorMessage.value = error?.message || "Something went wrong";
+    errorMessage.value = error?.message || t("auth.somethingWrong");
   } finally {
     loading.value = false;
   }

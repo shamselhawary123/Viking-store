@@ -1,31 +1,36 @@
 import { defineStore } from "pinia";
+import { SHOP_PRODUCTS_SELECT } from "../utils/shopProducts";
 
 export const useProductsStore = defineStore("products", {
   state: () => ({
     products: [] as any[],
     loading: false,
+    loaded: false,
   }),
 
   actions: {
     // GET ALL PRODUCTS
-    async getProducts() {
+    async getProducts(force = false) {
+      if (!force && (this.loaded || this.loading)) return;
+
       const supabase = useSupabase();
 
       this.loading = true;
 
       try {
-        const { data, error } = await supabase.from("products").select(`
-            *,
-            categories(*)
-          `);
+        const { data, error } = await supabase
+          .from("products")
+          .select(SHOP_PRODUCTS_SELECT)
+          .order("id", { ascending: false });
 
         if (error) throw error;
 
-        console.log("PRODUCTS =>", data);
-
         this.products = data || [];
+        this.loaded = true;
       } catch (error) {
         console.error(error);
+        this.products = [];
+        this.loaded = false;
       } finally {
         this.loading = false;
       }
@@ -55,11 +60,6 @@ export const useProductsStore = defineStore("products", {
         console.error(error);
         return null;
       }
-
-      console.log("PRODUCT =>", data);
-      console.log("CATEGORY =>", data.categories);
-      console.log("COLORS =>", data.product_colors);
-      console.log("SIZES =>", data.product_sizes);
 
       return data;
     },

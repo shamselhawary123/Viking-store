@@ -1,10 +1,10 @@
 <template>
   <div class="container-premium section-premium">
     <div class="mb-10">
-      <p class="eyebrow">Shop by discipline</p>
-      <h1 class="display-heading mt-3 text-6xl text-white md:text-7xl">Categories</h1>
+      <p class="eyebrow">{{ t('pages.shopByDiscipline') }}</p>
+      <h1 class="display-heading mt-3 text-6xl text-white md:text-7xl">{{ t('common.categories') }}</h1>
       <p class="mt-4 max-w-2xl text-neutral-400">
-        Find the right gear for striking, sparring, conditioning, and daily fight camp work.
+        {{ t('pages.categoriesLead') }}
       </p>
     </div>
 
@@ -25,6 +25,7 @@ import { onMounted } from "vue";
 import { useCategoriesStore } from "../../stores/categories";
 
 const categoriesStore = useCategoriesStore(usePinia());
+const { t } = useI18n();
 
 onMounted(async () => {
   await categoriesStore.getCategories();

@@ -1,66 +1,118 @@
 <template>
   <section class="space-y-8">
     <div>
-      <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">Overview</p>
-      <h2 class="mt-2 text-3xl font-black">Dashboard Home</h2>
+      <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t('admin.overview') }}</p>
+      <h2 class="mt-2 text-3xl font-black">{{ t('admin.dashboardHome') }}</h2>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <div v-for="card in statCards" :key="card.label" class="rounded-3xl border border-white/10 bg-[#111111] p-6">
+    <p v-if="errorMessage" class="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+      {{ errorMessage }}
+    </p>
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <div v-for="card in statCards" :key="card.labelKey" class="rounded-3xl border border-white/10 bg-[#111111] p-6">
         <div class="flex items-center justify-between gap-4">
-          <p class="text-sm text-gray-400">{{ card.label }}</p>
+          <p class="text-sm text-gray-400">{{ t(card.labelKey) }}</p>
           <Icon :name="card.icon" class="text-2xl text-[#FF4D00]" />
         </div>
         <h3 class="mt-4 text-3xl font-black">{{ card.value }}</h3>
       </div>
     </div>
 
-    <div class="rounded-3xl border border-white/10 bg-[#111111]">
-      <div class="flex flex-col gap-3 border-b border-white/10 p-5 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h3 class="text-xl font-black">Latest Orders</h3>
-          <p class="mt-1 text-sm text-gray-500">Most recent customer orders.</p>
+    <div class="grid gap-6 xl:grid-cols-2">
+      <section class="rounded-3xl border border-white/10 bg-[#111111]">
+        <div class="flex flex-col gap-3 border-b border-white/10 p-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h3 class="text-xl font-black">{{ t('admin.recentOrders') }}</h3>
+            <p class="mt-1 text-sm text-gray-500">{{ t('admin.latestCustomerOrders') }}</p>
+          </div>
+          <NuxtLink to="/admin/orders" class="w-fit rounded-2xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]">
+            {{ t('admin.manageOrders') }}
+          </NuxtLink>
         </div>
-        <NuxtLink to="/admin/orders" class="w-fit rounded-2xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]">
-          Manage Orders
-        </NuxtLink>
-      </div>
 
-      <div class="overflow-x-auto">
-        <table class="w-full min-w-[760px] text-left text-sm">
-          <thead class="bg-black text-gray-500">
-            <tr>
-              <th class="px-5 py-4">Order</th>
-              <th class="px-5 py-4">Customer</th>
-              <th class="px-5 py-4">Status</th>
-              <th class="px-5 py-4">Created</th>
-              <th class="px-5 py-4 text-right">Total</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-white/10">
-            <tr v-for="order in latestOrders" :key="order.id">
-              <td class="px-5 py-4 font-bold">#{{ shortOrderId(order) }}</td>
-              <td class="px-5 py-4">{{ getOrderCustomer(order).name }}</td>
-              <td class="px-5 py-4">
-                <span class="rounded-full border border-[#FF4D00]/30 bg-[#FF4D00]/10 px-3 py-1 text-xs font-black capitalize text-[#FF4D00]">
-                  {{ order.status || "pending" }}
-                </span>
-              </td>
-              <td class="px-5 py-4 text-gray-400">{{ formatDate(order.created_at) }}</td>
-              <td class="px-5 py-4 text-right font-black">{{ formatCurrency(order.total_price) }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[760px] text-left text-sm">
+            <thead class="bg-black text-gray-500">
+              <tr>
+                <th class="px-5 py-4">{{ t('admin.order') }}</th>
+                <th class="px-5 py-4">{{ t('common.customer') }}</th>
+                <th class="px-5 py-4">{{ t('common.status') }}</th>
+                <th class="px-5 py-4">{{ t('common.created') }}</th>
+                <th class="px-5 py-4 text-right">{{ t('common.total') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+              <tr v-for="order in recentOrders" :key="order.id">
+                <td class="px-5 py-4 font-bold">#{{ getAdminOrderLabel(order) }}</td>
+                <td class="px-5 py-4">{{ getOrderCustomer(order).name }}</td>
+                <td class="px-5 py-4">
+                  <span class="rounded-full border border-[#FF4D00]/30 bg-[#FF4D00]/10 px-3 py-1 text-xs font-black capitalize text-[#FF4D00]">
+                    {{ t(statusLabelKey(order.status)) }}
+                  </span>
+                </td>
+                <td class="px-5 py-4 text-gray-400">{{ formatDate(order.created_at) }}</td>
+                <td class="px-5 py-4 text-right font-black">{{ formatCurrency(order.total_price) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-      <p v-if="!loading && !latestOrders.length" class="p-6 text-sm text-gray-500">No orders found.</p>
+        <p v-if="loading && !recentOrders.length" class="p-6 text-sm text-gray-500">{{ t('admin.loadingOrders') }}</p>
+        <p v-else-if="!recentOrders.length" class="p-6 text-sm text-gray-500">{{ t('admin.noOrders') }}</p>
+      </section>
+
+      <section class="rounded-3xl border border-white/10 bg-[#111111]">
+        <div class="flex flex-col gap-3 border-b border-white/10 p-5 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h3 class="text-xl font-black">{{ t('admin.recentProducts') }}</h3>
+            <p class="mt-1 text-sm text-gray-500">{{ t('admin.latestCatalogItems') }}</p>
+          </div>
+          <NuxtLink to="/admin/products" class="w-fit rounded-2xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]">
+            {{ t('admin.manageProducts') }}
+          </NuxtLink>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full min-w-[700px] text-left text-sm">
+            <thead class="bg-black text-gray-500">
+              <tr>
+                <th class="px-5 py-4">{{ t('common.product') }}</th>
+                <th class="px-5 py-4">{{ t('common.category') }}</th>
+                <th class="px-5 py-4">{{ t('common.created') }}</th>
+                <th class="px-5 py-4 text-right">{{ t('common.price') }}</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+              <tr v-for="product in recentProducts" :key="product.id">
+                <td class="px-5 py-4">
+                  <p class="font-bold">{{ product.title || t('admin.untitledProduct') }}</p>
+                  <p class="mt-1 text-xs text-gray-500">{{ product.slug }}</p>
+                </td>
+                <td class="px-5 py-4 text-gray-400">{{ product.categories?.name || t('admin.uncategorized') }}</td>
+                <td class="px-5 py-4 text-gray-400">{{ formatDate(product.created_at) }}</td>
+                <td class="px-5 py-4 text-right font-black">{{ formatCurrency(product.price) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p v-if="loading && !recentProducts.length" class="p-6 text-sm text-gray-500">{{ t('admin.loadingProducts') }}</p>
+        <p v-else-if="!recentProducts.length" class="p-6 text-sm text-gray-500">{{ t('admin.noProducts') }}</p>
+      </section>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
-import { formatCurrency, formatDate, getOrderCustomer } from "../../utils/admin";
+import {
+  calculateAdminDashboardStats,
+  formatCurrency,
+  formatDate,
+  getAdminOrderLabel,
+  getOrderCustomer,
+} from "../../utils/admin";
 
 definePageMeta({
   layout: "admin",
@@ -69,62 +121,90 @@ definePageMeta({
 
 type OrderRow = {
   id: string;
-  order_number?: number | string;
-  total_price: number;
-  status?: string;
-  created_at?: string;
+  order_number?: number | string | null;
+  total_price?: number | string | null;
+  status?: string | null;
+  created_at?: string | null;
   [key: string]: any;
 };
 
+type ProductRow = {
+  id: number;
+  title?: string | null;
+  slug?: string | null;
+  price?: number | string | null;
+  created_at?: string | null;
+  categories?: { name?: string | null } | null;
+};
+
 const supabase = useSupabase();
+const { t } = useI18n();
 const loading = ref(true);
-const totalOrders = ref(0);
-const totalRevenue = ref(0);
+const errorMessage = ref("");
+const allOrders = ref<OrderRow[]>([]);
+const recentOrders = ref<OrderRow[]>([]);
+const recentProducts = ref<ProductRow[]>([]);
 const totalProducts = ref(0);
-const totalCustomers = ref(0);
-const latestOrders = ref<OrderRow[]>([]);
+const totalCategories = ref(0);
+const dashboardStats = computed(() => calculateAdminDashboardStats(allOrders.value));
 
 const statCards = computed(() => [
-  { label: "Total Orders", value: totalOrders.value, icon: "i-heroicons-clipboard-document-list" },
-  { label: "Total Revenue", value: formatCurrency(totalRevenue.value), icon: "i-heroicons-banknotes" },
-  { label: "Total Products", value: totalProducts.value, icon: "i-heroicons-shopping-bag" },
-  { label: "Total Customers", value: totalCustomers.value, icon: "i-heroicons-users" },
+  { labelKey: "admin.totalOrders", value: dashboardStats.value.totalOrders, icon: "i-heroicons-clipboard-document-list" },
+  { labelKey: "admin.pendingOrders", value: dashboardStats.value.pendingOrders, icon: "i-heroicons-clock" },
+  { labelKey: "admin.completedOrders", value: dashboardStats.value.completedOrders, icon: "i-heroicons-check-circle" },
+  { labelKey: "admin.totalRevenue", value: formatCurrency(dashboardStats.value.totalRevenue), icon: "i-heroicons-banknotes" },
+  { labelKey: "admin.totalProducts", value: totalProducts.value, icon: "i-heroicons-shopping-bag" },
+  { labelKey: "admin.totalCategories", value: totalCategories.value, icon: "i-heroicons-tag" },
 ]);
 
-const getCount = async (table: string) => {
+const statusLabelKey = (status?: string | null) => {
+  const normalized = status || "pending";
+  return `orders.${normalized}`;
+};
+
+const getCount = async (table: "products" | "categories") => {
   const { count, error } = await supabase.from(table).select("id", { count: "exact", head: true });
   if (error) throw error;
   return count || 0;
 };
 
-const shortOrderId = (order: OrderRow) => order.order_number || order.id.slice(0, 8);
-
 const loadDashboard = async () => {
   loading.value = true;
+  errorMessage.value = "";
 
-  const [
-    { data: latest, error: latestError },
-    { data: revenueOrders, error: revenueError },
-    ordersCount,
-    productsCount,
-    customersCount,
-  ] = await Promise.all([
-    supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(8),
-    supabase.from("orders").select("total_price"),
-    getCount("orders"),
-    getCount("products"),
-    getCount("profiles"),
-  ]);
+  try {
+    const [
+      { data: ordersData, error: ordersError },
+      { data: latestOrdersData, error: latestOrdersError },
+      { data: latestProductsData, error: latestProductsError },
+      productsCount,
+      categoriesCount,
+    ] = await Promise.all([
+      supabase.from("orders").select("id,status,total_price"),
+      supabase.from("orders").select("*").order("created_at", { ascending: false }).limit(8),
+      supabase
+        .from("products")
+        .select("id,title,slug,price,created_at,categories(name)")
+        .order("created_at", { ascending: false })
+        .limit(8),
+      getCount("products"),
+      getCount("categories"),
+    ]);
 
-  if (latestError) throw latestError;
-  if (revenueError) throw revenueError;
+    if (ordersError) throw ordersError;
+    if (latestOrdersError) throw latestOrdersError;
+    if (latestProductsError) throw latestProductsError;
 
-  latestOrders.value = (latest || []) as OrderRow[];
-  totalRevenue.value = (revenueOrders || []).reduce((sum, order) => sum + Number(order.total_price || 0), 0);
-  totalOrders.value = ordersCount;
-  totalProducts.value = productsCount;
-  totalCustomers.value = customersCount;
-  loading.value = false;
+    allOrders.value = (ordersData || []) as OrderRow[];
+    recentOrders.value = (latestOrdersData || []) as OrderRow[];
+    recentProducts.value = (latestProductsData || []) as ProductRow[];
+    totalProducts.value = productsCount;
+    totalCategories.value = categoriesCount;
+  } catch (error: unknown) {
+    errorMessage.value = error instanceof Error ? error.message : t("admin.dashboardLoadFailed");
+  } finally {
+    loading.value = false;
+  }
 };
 
 onMounted(loadDashboard);

@@ -4,22 +4,22 @@
     <div class="container-premium py-16 md:py-20">
       <div class="grid gap-10 lg:grid-cols-[1.1fr_1.4fr]">
         <div class="rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-7">
-          <NuxtLink to="/" class="inline-flex items-center gap-4" aria-label="Viking Store home">
-            <img src="/logo.png" alt="Viking Store" class="h-14 w-14 object-contain" loading="lazy" />
+          <NuxtLink to="/" class="inline-flex items-center gap-4" :aria-label="t('nav.home')">
+            <img src="/logo.png" alt="Viking Store" width="56" height="56" class="h-14 w-14 object-contain" loading="lazy" decoding="async" />
             <div>
               <h2 class="font-display text-5xl leading-none text-white md:text-6xl">VIKING</h2>
-              <p class="text-xs font-black uppercase tracking-[0.34em] text-[#FF4D00]">Combat store</p>
+              <p class="text-xs font-black uppercase tracking-[0.34em] text-[#FF4D00]">{{ t('footer.combatStore') }}</p>
             </div>
           </NuxtLink>
 
           <p class="mt-6 max-w-xl leading-8 text-neutral-400">
-            Premium combat equipment for boxing, kickboxing, Muay Thai, and MMA athletes who demand fit, durability, and fight-night confidence.
+            {{ t('footer.description') }}
           </p>
 
           <div class="mt-7 grid gap-3 sm:grid-cols-3">
             <div v-for="badge in securityBadges" :key="badge.label" class="rounded-xl border border-white/10 bg-black/25 p-4">
               <Icon :name="badge.icon" class="text-2xl text-[#FF4D00]" />
-              <p class="mt-3 text-xs font-black uppercase tracking-[0.14em] text-neutral-300">{{ badge.label }}</p>
+              <p class="mt-3 text-xs font-black uppercase tracking-[0.14em] text-neutral-300">{{ t(badge.labelKey) }}</p>
             </div>
           </div>
         </div>
@@ -27,15 +27,15 @@
         <div class="rounded-2xl border border-[#FF4D00]/20 bg-[#120903] p-6 md:p-7">
           <div class="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
-              <p class="eyebrow">Stay fight ready</p>
-              <h3 class="mt-3 text-3xl font-black text-white">Join The Viking List</h3>
-              <p class="mt-3 leading-7 text-neutral-400">Product drops, training essentials, and member-only offers.</p>
+              <p class="eyebrow">{{ t('footer.stayReady') }}</p>
+              <h3 class="mt-3 text-3xl font-black text-white">{{ t('footer.joinList') }}</h3>
+              <p class="mt-3 leading-7 text-neutral-400">{{ t('footer.newsletterText') }}</p>
             </div>
             <form class="grid gap-3 sm:grid-cols-[1fr_auto]" @submit.prevent="newsletterSubmitted = true">
-              <label class="sr-only" for="footer-email">Email address</label>
-              <input id="footer-email" v-model="newsletterEmail" type="email" class="premium-input min-w-0" placeholder="Email address" autocomplete="email" />
-              <button class="premium-button premium-button-primary" type="submit">Subscribe</button>
-              <p v-if="newsletterSubmitted" class="text-sm font-bold text-emerald-300 sm:col-span-2">Subscription captured locally.</p>
+              <label class="sr-only" for="footer-email">{{ t('footer.emailAddress') }}</label>
+              <input id="footer-email" v-model="newsletterEmail" type="email" class="premium-input min-w-0" :placeholder="t('footer.emailAddress')" autocomplete="email" />
+              <button class="premium-button premium-button-primary" type="submit">{{ t('footer.subscribe') }}</button>
+              <p v-if="newsletterSubmitted" class="text-sm font-bold text-emerald-300 sm:col-span-2">{{ t('footer.captured') }}</p>
             </form>
           </div>
         </div>
@@ -43,32 +43,32 @@
 
       <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-5">
         <div v-for="group in linkGroups" :key="group.title">
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ group.title }}</h3>
+          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ t(group.titleKey) }}</h3>
           <div class="mt-5 grid gap-3">
-            <NuxtLink v-for="link in group.links.filter((item) => item.to)" :key="`${group.title}-${link.label}`" :to="link.to" class="footer-link">
-              {{ link.label }}
+            <NuxtLink v-for="link in group.links.filter((item) => item.to)" :key="`${group.titleKey}-${link.labelKey}`" :to="link.to" class="footer-link">
+              {{ t(link.labelKey) }}
             </NuxtLink>
-            <a v-for="link in group.links.filter((item) => item.href)" :key="`${group.title}-${link.label}`" :href="link.href" class="footer-link">
-              {{ link.label }}
+            <a v-for="link in group.links.filter((item) => item.href)" :key="`${group.titleKey}-${link.labelKey}`" :href="link.href" class="footer-link">
+              {{ t(link.labelKey) }}
             </a>
           </div>
         </div>
 
         <div>
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">Categories</h3>
+          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ t('nav.categories') }}</h3>
           <div class="mt-5 grid gap-3">
             <NuxtLink v-for="category in footerCategories" :key="category.slug" :to="`/shop?category=${category.slug}`" class="footer-link">
-              {{ category.name }}
+              {{ getLocalizedCategoryName(category, locale) || category.name }}
             </NuxtLink>
           </div>
         </div>
 
         <div class="sm:col-span-2 lg:col-span-1">
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">Contact</h3>
+          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ t('footer.contact') }}</h3>
           <div class="mt-5 grid gap-4 text-sm leading-6 text-neutral-400">
             <p v-for="item in contactItems" :key="item.label" class="flex gap-3">
               <Icon :name="item.icon" class="mt-1 shrink-0 text-lg text-[#FF4D00]" />
-              <span><strong class="block text-white">{{ item.label }}</strong>{{ item.value }}</span>
+              <span><strong class="block text-white">{{ t(item.labelKey) }}</strong>{{ t(item.valueKey) }}</span>
             </p>
           </div>
         </div>
@@ -78,7 +78,7 @@
 
       <div class="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">Follow Viking</h3>
+          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white">{{ t('footer.follow') }}</h3>
           <div class="mt-4 flex flex-wrap gap-3">
             <a
               v-for="social in socials"
@@ -93,7 +93,7 @@
         </div>
 
         <div>
-          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white lg:text-right">Payment Methods</h3>
+          <h3 class="text-sm font-black uppercase tracking-[0.22em] text-white lg:text-right">{{ t('footer.paymentMethods') }}</h3>
           <div class="mt-4 flex flex-wrap gap-2 lg:justify-end">
             <span v-for="method in paymentMethods" :key="method" class="rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-neutral-300">
               {{ method }}
@@ -103,10 +103,10 @@
       </div>
 
       <div class="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-neutral-500 md:flex-row md:items-center md:justify-between">
-        <p>Copyright 2026 Viking Store. All rights reserved.</p>
+        <p>{{ t('footer.copyright') }}</p>
         <div class="flex flex-wrap gap-4">
           <a v-for="link in bottomLinks" :key="link.label" :href="link.href" class="footer-link">
-            {{ link.label }}
+            {{ t(link.labelKey) }}
           </a>
         </div>
       </div>
@@ -117,10 +117,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useCategoriesStore } from "../../stores/categories";
+import { getLocalizedCategoryName } from "../../utils/localizationFormat";
 
 const newsletterEmail = ref("");
 const newsletterSubmitted = ref(false);
 const categoriesStore = useCategoriesStore(usePinia());
+const { locale, t } = useI18n();
 
 const fallbackCategories = [
   { name: "Gloves", slug: "gloves" },
@@ -136,40 +138,40 @@ const footerCategories = computed(() => {
 
 const linkGroups = [
   {
-    title: "Shop",
+    titleKey: "footer.shop",
     links: [
-      { label: "Shop", to: "/shop" },
-      { label: "New Arrivals", to: "/shop" },
-      { label: "Best Sellers", to: "/shop" },
-      { label: "Sale", to: "/shop" },
+      { labelKey: "nav.shop", to: "/shop" },
+      { labelKey: "footer.newArrivals", to: "/shop" },
+      { labelKey: "footer.bestSellers", to: "/shop" },
+      { labelKey: "footer.sale", to: "/shop" },
     ],
   },
   {
-    title: "Company",
+    titleKey: "footer.company",
     links: [
-      { label: "About", to: "/about" },
-      { label: "Contact", to: "/contact" },
-      { label: "FAQ", to: "/faq" },
-      { label: "Privacy Policy", href: "/privacy-policy" },
-      { label: "Terms", href: "/terms" },
+      { labelKey: "nav.about", to: "/about" },
+      { labelKey: "nav.contact", to: "/contact" },
+      { labelKey: "nav.faq", to: "/faq" },
+      { labelKey: "footer.privacyPolicy", href: "/privacy-policy" },
+      { labelKey: "footer.terms", href: "/terms" },
     ],
   },
   {
-    title: "Customer Support",
+    titleKey: "footer.customerSupport",
     links: [
-      { label: "Shipping", to: "/faq" },
-      { label: "Returns", to: "/faq" },
-      { label: "Order Tracking", to: "/profile/orders" },
-      { label: "Help Center", to: "/contact" },
+      { labelKey: "common.shipping", to: "/faq" },
+      { labelKey: "footer.returns", to: "/faq" },
+      { labelKey: "footer.orderTracking", to: "/profile/orders" },
+      { labelKey: "footer.helpCenter", to: "/contact" },
     ],
   },
 ];
 
 const contactItems = [
-  { icon: "i-heroicons-phone", label: "Phone", value: "+20 100 000 0000" },
-  { icon: "i-heroicons-envelope", label: "Email", value: "support@vikingstore.com" },
-  { icon: "i-heroicons-map-pin", label: "Address", value: "Viking Store HQ, Cairo, Egypt" },
-  { icon: "i-heroicons-clock", label: "Working Hours", value: "Sun - Thu, 10:00 AM - 8:00 PM" },
+  { icon: "i-heroicons-phone", labelKey: "common.phone", valueKey: "footer.phoneValue" },
+  { icon: "i-heroicons-envelope", labelKey: "common.email", valueKey: "footer.emailValue" },
+  { icon: "i-heroicons-map-pin", labelKey: "common.address", valueKey: "footer.addressValue" },
+  { icon: "i-heroicons-clock", labelKey: "footer.workingHours", valueKey: "footer.workingHoursValue" },
 ];
 
 const socials = [
@@ -182,14 +184,14 @@ const socials = [
 
 const paymentMethods = ["Visa", "MasterCard", "PayPal", "Apple Pay", "Google Pay"];
 const securityBadges = [
-  { icon: "i-heroicons-lock-closed", label: "Secure Checkout" },
-  { icon: "i-heroicons-shield-check", label: "SSL Protected" },
-  { icon: "i-heroicons-truck", label: "Fast Delivery" },
+  { icon: "i-heroicons-lock-closed", labelKey: "footer.secureCheckout" },
+  { icon: "i-heroicons-shield-check", labelKey: "footer.sslProtected" },
+  { icon: "i-heroicons-truck", labelKey: "footer.fastDelivery" },
 ];
 const bottomLinks = [
-  { label: "Privacy", href: "/privacy-policy" },
-  { label: "Terms", href: "/terms" },
-  { label: "Cookies", href: "/cookies" },
+  { labelKey: "footer.privacy", href: "/privacy-policy" },
+  { labelKey: "footer.terms", href: "/terms" },
+  { labelKey: "footer.cookies", href: "/cookies" },
 ];
 
 onMounted(async () => {

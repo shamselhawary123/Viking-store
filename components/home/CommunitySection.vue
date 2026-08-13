@@ -24,8 +24,11 @@
           <img
             src="/train-hard.png"
             :alt="item.title"
+            width="640"
+            height="640"
             class="absolute inset-0 h-full w-full object-cover opacity-55 transition duration-700 group-hover:scale-110 group-hover:opacity-75"
             loading="lazy"
+            decoding="async"
           />
           <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-black/10" />
           <div class="absolute inset-x-5 bottom-5">
