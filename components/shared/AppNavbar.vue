@@ -7,12 +7,16 @@
         <NuxtLink
           to="/"
           class="brand-link group"
-          aria-label="Viking Store home"
+          :aria-label="t('nav.home')"
         >
           <img
             src="/logo.png"
             alt="Viking Store"
+            width="48"
+            height="48"
             class="h-12 w-12 object-contain transition duration-300 group-hover:scale-105"
+            fetchpriority="high"
+            decoding="async"
           />
           <!-- <div class="hidden leading-none sm:block">
             <span class="font-display text-[2rem] leading-none text-white">VIKING</span>
@@ -22,7 +26,7 @@
 
         <nav
           class="nav-shell hidden lg:flex items-center"
-          aria-label="Main navigation"
+          :aria-label="t('nav.home')"
         >
           <NuxtLink
             v-for="link in navLinks"
@@ -30,14 +34,16 @@
             :to="link.to"
             class="nav-link"
           >
-            {{ link.label }}
+            {{ t(link.labelKey) }}
           </NuxtLink>
         </nav>
 
         <div class="flex items-center gap-2 sm:gap-3">
+          <SharedLanguageSwitcher class="hidden sm:inline-flex" />
+
           <button
             class="action-button relative"
-            aria-label="Open cart"
+            :aria-label="t('nav.openCart')"
             @click="cartStore.openCart()"
           >
             <Icon name="i-heroicons-shopping-bag" class="text-xl" />
@@ -53,7 +59,7 @@
             <NuxtLink
               to="/wishlist"
               class="action-button"
-              aria-label="Wishlist"
+              :aria-label="t('nav.wishlist')"
             >
               <Icon name="i-heroicons-heart" class="text-xl" />
             </NuxtLink>
@@ -66,19 +72,23 @@
                     'https://ui-avatars.com/api/?name=User'
                   "
                   alt="Profile"
+                  width="36"
+                  height="36"
                   class="h-9 w-9 rounded-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
 
                 <div class="hidden lg:block">
                   <p
                     class="text-xs font-black uppercase tracking-[0.14em] text-white transition group-hover:text-[#FF4D00]"
                   >
-                    {{ authStore.profile?.full_name || "Viking Member" }}
+                    {{ authStore.profile?.full_name || t('nav.vikingMember') }}
                   </p>
                   <p
                     class="mt-0.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-neutral-500"
                   >
-                    Account
+                    {{ t('common.account') }}
                   </p>
                 </div>
               </NuxtLink>
@@ -93,9 +103,9 @@
             </template>
 
             <template v-else>
-              <NuxtLink to="/auth/login" class="auth-link"> Login </NuxtLink>
+              <NuxtLink to="/auth/login" class="auth-link">{{ t('nav.login') }}</NuxtLink>
               <NuxtLink to="/auth/register" class="auth-link auth-link-primary">
-                Register
+                {{ t('nav.register') }}
               </NuxtLink>
             </template>
           </div>
@@ -103,7 +113,7 @@
           <div class="flex lg:hidden">
             <button
               class="action-button"
-              :aria-label="isMenuOpen ? 'Close menu' : 'Open menu'"
+              :aria-label="isMenuOpen ? t('nav.closeMenu') : t('nav.openMenu')"
               :aria-expanded="isMenuOpen"
               @click="isMenuOpen = !isMenuOpen"
             >
@@ -131,11 +141,13 @@
               class="mobile-link"
               @click="isMenuOpen = false"
             >
-              {{ link.label }}
+              {{ t(link.labelKey) }}
             </NuxtLink>
           </nav>
 
           <div class="mt-5 border-t border-white/10 pt-5">
+            <SharedLanguageSwitcher class="mb-4" />
+
             <div v-if="authStore.user" class="grid gap-3">
               <NuxtLink
                 to="/profile"
@@ -148,16 +160,20 @@
                     'https://ui-avatars.com/api/?name=User'
                   "
                   alt="Profile"
+                  width="48"
+                  height="48"
                   class="h-12 w-12 rounded-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div class="min-w-0">
                   <p class="truncate font-black text-white">
-                    {{ authStore.profile?.full_name || "Viking Member" }}
+                    {{ authStore.profile?.full_name || t('nav.vikingMember') }}
                   </p>
                   <p
                     class="text-xs font-bold uppercase tracking-[0.16em] text-neutral-500"
                   >
-                    Member account
+                    {{ t('nav.memberAccount') }}
                   </p>
                 </div>
               </NuxtLink>
@@ -170,7 +186,7 @@
                   name="i-heroicons-arrow-left-start-on-rectangle"
                   class="text-lg"
                 />
-                Logout
+                {{ t('nav.logout') }}
               </button>
             </div>
 
@@ -180,14 +196,14 @@
                 class="mobile-action"
                 @click="isMenuOpen = false"
               >
-                Login
+                {{ t('nav.login') }}
               </NuxtLink>
               <NuxtLink
                 to="/auth/register"
                 class="mobile-action mobile-action-primary"
                 @click="isMenuOpen = false"
               >
-                Register
+                {{ t('nav.register') }}
               </NuxtLink>
             </div>
           </div>
@@ -207,16 +223,17 @@ const pinia = usePinia();
 const cartStore = useCartStore(pinia);
 const authStore = useAuthStore(pinia);
 const router = useRouter();
+const { t } = useI18n();
 
 const isMenuOpen = ref(false);
 const navLinks = [
-  { label: "Home", to: "/" },
-  { label: "Shop", to: "/shop" },
-  { label: "Categories", to: "/categories" },
-  { label: "About", to: "/about" },
-  { label: "Contact", to: "/contact" },
-  { label: "Orders", to: "/profile/orders" },
-  { label: "FAQ", to: "/faq" },
+  { labelKey: "nav.home", to: "/" },
+  { labelKey: "nav.shop", to: "/shop" },
+  { labelKey: "nav.categories", to: "/categories" },
+  { labelKey: "nav.about", to: "/about" },
+  { labelKey: "nav.contact", to: "/contact" },
+  { labelKey: "nav.orders", to: "/profile/orders" },
+  { labelKey: "nav.faq", to: "/faq" },
 ];
 
 onMounted(async () => {

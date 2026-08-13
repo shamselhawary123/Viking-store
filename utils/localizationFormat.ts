@@ -1,0 +1,47 @@
+export const EGP_PER_USD = 50;
+
+const arabicCategoryBySlug: Record<string, string> = {
+  all: "الكل",
+  boxing: "ملاكمة",
+  gloves: "قفازات",
+  "muay-thai": "مواي تاي",
+  mma: "MMA",
+  protection: "معدات حماية",
+  shorts: "شورتات",
+  wraps: "لفافات",
+  training: "تدريب",
+  apparel: "ملابس رياضية",
+};
+
+const toFinitePrice = (value: number | string | null | undefined) => {
+  const amount = Number(value || 0);
+  return Number.isFinite(amount) ? amount : 0;
+};
+
+const trimTrailingZeros = (value: number) =>
+  value.toLocaleString("en-US", {
+    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+
+export const formatStorePrice = (value: number | string | null | undefined, locale = "en") => {
+  const amount = toFinitePrice(value);
+
+  if (locale === "ar") {
+    return `${trimTrailingZeros(amount)} EGP`;
+  }
+
+  return `$${trimTrailingZeros(amount / EGP_PER_USD)}`;
+};
+
+export const getLocalizedCategoryName = (
+  category: { slug?: string | null; name?: string | null } | string | null | undefined,
+  locale = "en",
+) => {
+  if (typeof category === "string") return category;
+
+  const fallback = category?.name || "";
+  if (locale !== "ar") return fallback;
+
+  return (category?.slug && arabicCategoryBySlug[category.slug]) || fallback;
+};

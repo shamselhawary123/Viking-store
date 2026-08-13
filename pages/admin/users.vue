@@ -1,57 +1,148 @@
 <template>
   <section class="space-y-6">
-    <div>
-      <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">
-        Customers
-      </p>
-      <h2 class="mt-2 text-3xl font-black">Users</h2>
+    <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">Customers</p>
+        <h2 class="mt-2 text-3xl font-black">Users</h2>
+      </div>
+
+      <input v-model="search" type="search" placeholder="Search name, email, phone..." class="field md:max-w-sm" />
     </div>
+
+    <p v-if="successMessage" class="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300">
+      {{ successMessage }}
+    </p>
+    <p v-if="errorMessage" class="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
+      {{ errorMessage }}
+    </p>
+    <p v-if="authStateWarning" class="rounded-2xl border border-yellow-500/30 bg-yellow-500/10 p-4 text-sm text-yellow-200">
+      {{ authStateWarning }}
+    </p>
 
     <div class="overflow-hidden rounded-3xl border border-white/10 bg-[#111111]">
       <div class="overflow-x-auto">
-        <table class="w-full min-w-[760px] text-left text-sm">
+        <table class="w-full min-w-[1120px] text-left text-sm">
           <thead class="bg-black text-gray-500">
             <tr>
               <th class="px-5 py-4">User</th>
               <th class="px-5 py-4">Phone</th>
-              <th class="px-5 py-4">City</th>
-              <th class="px-5 py-4">Country</th>
+              <th class="px-5 py-4">Role</th>
+              <th class="px-5 py-4">State</th>
               <th class="px-5 py-4">Joined</th>
+              <th class="px-5 py-4 text-right">Actions</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/10">
-            <tr v-for="user in users" :key="user.id">
+            <tr v-for="user in filteredUsers" :key="user.id">
               <td class="px-5 py-4">
                 <div class="flex items-center gap-3">
-                  <img
-                    :src="user.avatar || 'https://ui-avatars.com/api/?name=User'"
-                    alt=""
-                    class="h-11 w-11 rounded-full object-cover"
-                  />
+                  <img :src="user.avatar || avatarUrl(user)" alt="" class="h-11 w-11 rounded-full object-cover" />
                   <div>
                     <p class="font-bold">{{ user.full_name || "User" }}</p>
-                    <p class="text-xs text-gray-500">{{ user.email }}</p>
+                    <p class="text-xs text-gray-500">{{ user.email || "-" }}</p>
                   </div>
                 </div>
               </td>
               <td class="px-5 py-4 text-gray-400">{{ user.phone || "-" }}</td>
-              <td class="px-5 py-4 text-gray-400">{{ user.city || "-" }}</td>
-              <td class="px-5 py-4 text-gray-400">{{ user.country || "-" }}</td>
+              <td class="px-5 py-4">
+                <select
+                  :value="user.role || 'customer'"
+                  :disabled="savingUserId === user.id"
+                  class="rounded-xl border border-white/10 bg-black px-3 py-2 text-[#FF4D00] outline-none disabled:opacity-50"
+                  @change="updateRole(user, ($event.target as HTMLSelectElement).value)"
+                >
+                  <option v-for="role in ADMIN_USER_ROLES" :key="role" :value="role">{{ role }}</option>
+                </select>
+              </td>
+              <td class="px-5 py-4">
+                <span class="rounded-full border px-3 py-1 text-xs font-black" :class="userStateClass(user)">
+                  {{ getAdminUserState(user) }}
+                </span>
+              </td>
               <td class="px-5 py-4 text-gray-500">{{ formatDate(user.created_at) }}</td>
+              <td class="px-5 py-4">
+                <div class="flex justify-end gap-2">
+                  <button class="rounded-xl border border-white/10 px-3 py-2 font-bold transition hover:border-[#FF4D00]" @click="openDetails(user)">
+                    Details
+                  </button>
+                  <button
+                    v-if="getAdminUserState(user) === 'Active'"
+                    :disabled="!canRunAdminUserAction(currentAdminId, user.id, 'suspend') || savingUserId === user.id"
+                    class="rounded-xl border border-yellow-500/40 px-3 py-2 font-bold text-yellow-300 transition hover:bg-yellow-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+                    @click="runUserAction(user, 'suspend')"
+                  >
+                    Suspend
+                  </button>
+                  <button
+                    v-else
+                    :disabled="savingUserId === user.id"
+                    class="rounded-xl border border-emerald-500/40 px-3 py-2 font-bold text-emerald-300 transition hover:bg-emerald-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+                    @click="runUserAction(user, 'reactivate')"
+                  >
+                    Reactivate
+                  </button>
+                  <button
+                    :disabled="!canRunAdminUserAction(currentAdminId, user.id, 'delete') || savingUserId === user.id"
+                    class="rounded-xl border border-red-500/40 px-3 py-2 font-bold text-red-400 transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                    @click="runUserAction(user, 'delete')"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
 
-      <p v-if="!loading && !users.length" class="p-6 text-sm text-gray-500">
-        No users found.
-      </p>
+      <p v-if="loading" class="p-6 text-sm text-gray-500">Loading users...</p>
+      <p v-else-if="!filteredUsers.length" class="p-6 text-sm text-gray-500">No users found.</p>
+    </div>
+
+    <div v-if="selectedUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div class="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-white/10 bg-[#111111] p-6">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">User Details</p>
+            <h3 class="mt-2 text-2xl font-black">{{ selectedUser.full_name || "User" }}</h3>
+          </div>
+          <button class="text-gray-400 hover:text-white" @click="selectedUser = null">Close</button>
+        </div>
+
+        <div class="mt-6 flex items-center gap-4 rounded-2xl bg-black p-5">
+          <img :src="selectedUser.avatar || avatarUrl(selectedUser)" alt="" class="h-20 w-20 rounded-full object-cover" />
+          <div>
+            <p class="text-xl font-black">{{ selectedUser.full_name || "User" }}</p>
+            <p class="mt-1 text-gray-500">{{ selectedUser.email || "-" }}</p>
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-4 sm:grid-cols-2">
+          <InfoBlock label="Phone" :value="selectedUser.phone || '-'" />
+          <InfoBlock label="Role" :value="selectedUser.role || 'customer'" />
+          <InfoBlock label="State" :value="getAdminUserState(selectedUser)" />
+          <InfoBlock label="Created" :value="formatDate(selectedUser.created_at)" />
+          <InfoBlock label="City" :value="selectedUser.city || '-'" />
+          <InfoBlock label="Country" :value="selectedUser.country || '-'" />
+          <InfoBlock label="Address" :value="selectedUser.address || '-'" />
+          <InfoBlock label="Postal Code" :value="selectedUser.postal_code || '-'" />
+        </div>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, defineComponent, h, onMounted, ref } from "vue";
+import {
+  ADMIN_USER_ROLES,
+  type AdminUserAction,
+  type AdminUserRole,
+  canRunAdminUserAction,
+  filterAdminUsers,
+  getAdminUserState,
+} from "../../utils/adminUsers";
+import { formatDate } from "../../utils/admin";
 
 definePageMeta({
   layout: "admin",
@@ -60,35 +151,187 @@ definePageMeta({
 
 type UserRow = {
   id: string;
-  full_name?: string;
-  email?: string;
-  avatar?: string;
-  phone?: string;
-  city?: string;
-  country?: string;
-  created_at?: string;
+  full_name?: string | null;
+  email?: string | null;
+  avatar?: string | null;
+  phone?: string | null;
+  city?: string | null;
+  country?: string | null;
+  address?: string | null;
+  postal_code?: string | null;
+  role?: AdminUserRole | string | null;
+  created_at?: string | null;
+  banned_until?: string | null;
+  [key: string]: any;
 };
+
+const InfoBlock = defineComponent({
+  props: {
+    label: { type: String, required: true },
+    value: { type: [String, Number], default: "-" },
+  },
+  setup(props) {
+    return () =>
+      h("div", { class: "rounded-2xl bg-black p-4" }, [
+        h("p", { class: "text-sm text-gray-500" }, props.label),
+        h("p", { class: "mt-2 break-words font-bold text-white" }, String(props.value || "-")),
+      ]);
+  },
+});
 
 const supabase = useSupabase();
 const users = ref<UserRow[]>([]);
+const selectedUser = ref<UserRow | null>(null);
+const currentAdminId = ref<string | null>(null);
+const search = ref("");
 const loading = ref(true);
+const savingUserId = ref<string | null>(null);
+const successMessage = ref("");
+const errorMessage = ref("");
+const authStateWarning = ref("");
 
-const formatDate = (date?: string) => {
-  if (!date) return "-";
-  return new Date(date).toLocaleDateString("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
+const filteredUsers = computed(() => filterAdminUsers(users.value, search.value));
+
+const avatarUrl = (user: UserRow) =>
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(user.full_name || user.email || "User")}`;
+
+const userStateClass = (user: UserRow) =>
+  getAdminUserState(user) === "Suspended"
+    ? "border-yellow-500/30 bg-yellow-500/10 text-yellow-200"
+    : "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
+
+const setMessage = (type: "success" | "error", message: string) => {
+  successMessage.value = type === "success" ? message : "";
+  errorMessage.value = type === "error" ? message : "";
 };
 
-onMounted(async () => {
-  const { data } = await supabase
+const mergeAuthStates = (authUsers: Array<{ id: string; banned_until?: string | null }>) => {
+  const stateById = new Map(authUsers.map((user) => [user.id, user.banned_until || null]));
+  users.value = users.value.map((user) => ({
+    ...user,
+    banned_until: stateById.get(user.id) || null,
+  }));
+};
+
+const loadAuthStates = async () => {
+  const { data, error } = await supabase.functions.invoke("admin-users", {
+    body: { action: "list" },
+  });
+
+  if (error) {
+    authStateWarning.value = error.message || "Auth account state is unavailable until the admin-users Edge Function is deployed.";
+    return;
+  }
+
+  mergeAuthStates(data?.users || []);
+  authStateWarning.value = "";
+};
+
+const loadUsers = async () => {
+  loading.value = true;
+  setMessage("error", "");
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  currentAdminId.value = user?.id || null;
+
+  const { data, error } = await supabase
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });
 
+  if (error) {
+    setMessage("error", error.message);
+    users.value = [];
+    loading.value = false;
+    return;
+  }
+
   users.value = (data || []) as UserRow[];
+  await loadAuthStates();
   loading.value = false;
-});
+};
+
+const openDetails = (user: UserRow) => {
+  selectedUser.value = user;
+};
+
+const updateRole = async (user: UserRow, role: string) => {
+  const previousRole = user.role;
+  user.role = role;
+  savingUserId.value = user.id;
+  setMessage("error", "");
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role })
+    .eq("id", user.id);
+
+  if (error) {
+    user.role = previousRole;
+    setMessage("error", error.message);
+  } else {
+    setMessage("success", "User role updated.");
+  }
+
+  savingUserId.value = null;
+};
+
+const runUserAction = async (user: UserRow, action: Exclude<AdminUserAction, "list">) => {
+  if (!canRunAdminUserAction(currentAdminId.value, user.id, action)) {
+    setMessage("error", "You cannot suspend or delete your own admin account.");
+    return;
+  }
+
+  const label = user.full_name || user.email || "this user";
+  if (!confirm(`${action === "delete" ? "Delete" : action} ${label}?`)) return;
+
+  savingUserId.value = user.id;
+  setMessage("error", "");
+
+  const { data, error } = await supabase.functions.invoke("admin-users", {
+    body: { action, userId: user.id },
+  });
+
+  if (error) {
+    setMessage("error", error.message);
+    savingUserId.value = null;
+    return;
+  }
+
+  if (action === "delete") {
+    users.value = users.value.filter((item) => item.id !== user.id);
+    if (selectedUser.value?.id === user.id) selectedUser.value = null;
+  } else {
+    const bannedUntil = data?.user?.banned_until || null;
+    users.value = users.value.map((item) =>
+      item.id === user.id ? { ...item, banned_until: bannedUntil } : item,
+    );
+    if (selectedUser.value?.id === user.id) {
+      selectedUser.value = { ...selectedUser.value, banned_until: bannedUntil };
+    }
+  }
+
+  setMessage("success", `User ${action === "delete" ? "deleted" : action === "suspend" ? "suspended" : "reactivated"}.`);
+  savingUserId.value = null;
+};
+
+onMounted(loadUsers);
 </script>
+
+<style scoped>
+.field {
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.1);
+  background: #111111;
+  padding: 0.875rem 1rem;
+  color: #fff;
+  outline: none;
+}
+
+.field:focus {
+  border-color: #ff4d00;
+}
+</style>

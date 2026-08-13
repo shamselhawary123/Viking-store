@@ -22,6 +22,14 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/main.css"],
 
+  nitro: {
+    compressPublicAssets: true,
+  },
+
+  image: {
+    domains: ["images.unsplash.com", "cdn-icons-png.flaticon.com"],
+  },
+
   icon: {
     clientBundle: {
       scan: true,
@@ -57,16 +65,30 @@ export default defineNuxtConfig({
 
   i18n: {
     defaultLocale: "en",
+    strategy: "no_prefix",
+    langDir: "../locales/",
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "viking_locale",
+      fallbackLocale: "en",
+      redirectOn: "root",
+    },
 
     locales: [
       {
         code: "en",
+        language: "en-US",
         name: "English",
+        file: "en.json",
+        dir: "ltr",
       },
 
       {
         code: "ar",
+        language: "ar-EG",
         name: "العربية",
+        file: "ar.json",
+        dir: "rtl",
       },
     ],
   },

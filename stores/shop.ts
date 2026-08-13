@@ -1,11 +1,12 @@
 import { defineStore } from "pinia";
+import { SHOP_DEFAULT_MAX_PRICE } from "../utils/shopProducts";
 
 export const useShopStore = defineStore("shop", {
   state: () => ({
     search: "",
     selectedCategory: "all",
     sortBy: "default",
-    maxPrice: 500,
+    maxPrice: SHOP_DEFAULT_MAX_PRICE,
     mobileFiltersOpen: false,
   }),
 

@@ -8,18 +8,18 @@
         <img src="/logo.png" alt="Viking Store" class="h-12 w-12 object-contain" />
         <div>
           <p class="font-[Bebas_Neue] text-4xl leading-none">VIKING</p>
-          <p class="text-xs font-bold uppercase tracking-[0.25em] text-[#FF4D00]">Admin</p>
+          <p class="text-xs font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t('admin.admin') }}</p>
         </div>
       </div>
 
       <div class="mt-8">
-        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">Secure access</p>
-        <h1 class="mt-3 text-3xl font-black">Admin Login</h1>
+        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t('admin.secureAccess') }}</p>
+        <h1 class="mt-3 text-3xl font-black">{{ t('admin.adminLogin') }}</h1>
       </div>
 
       <div class="mt-8 space-y-4">
         <label class="block">
-          <span class="text-sm font-bold text-gray-300">Email</span>
+          <span class="text-sm font-bold text-gray-300">{{ t('common.email') }}</span>
           <input
             v-model="email"
             type="email"
@@ -30,7 +30,7 @@
         </label>
 
         <label class="block">
-          <span class="text-sm font-bold text-gray-300">Password</span>
+          <span class="text-sm font-bold text-gray-300">{{ t('common.password') }}</span>
           <input
             v-model="password"
             type="password"
@@ -51,7 +51,7 @@
         class="mt-6 flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#FF4D00] px-5 font-black text-white transition hover:opacity-90 disabled:opacity-50"
       >
         <Icon :name="loading ? 'i-heroicons-arrow-path' : 'i-heroicons-lock-closed'" :class="{ 'animate-spin': loading }" />
-        {{ loading ? "Checking..." : "Login" }}
+        {{ loading ? t('admin.checking') : t('auth.login') }}
       </button>
     </form>
   </section>
@@ -66,6 +66,7 @@ definePageMeta({
 });
 
 const supabase = useSupabase();
+const { t } = useI18n();
 const email = ref("");
 const password = ref("");
 const loading = ref(false);
@@ -80,7 +81,7 @@ const verifyAdmin = async (userId: string) => {
 
   if (error || !isAdminProfile(profile)) {
     await supabase.auth.signOut();
-    throw new Error("This account does not have admin access.");
+    throw new Error(t("admin.noAdminAccess"));
   }
 };
 
@@ -95,12 +96,12 @@ const login = async () => {
     });
 
     if (error) throw error;
-    if (!data.user) throw new Error("Unable to load admin account.");
+    if (!data.user) throw new Error(t("admin.loadAdminFailed"));
 
     await verifyAdmin(data.user.id);
     await navigateTo("/admin");
   } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : "Unable to login.";
+    errorMessage.value = error instanceof Error ? error.message : t("admin.loginFailed");
   } finally {
     loading.value = false;
   }

@@ -1,9 +1,9 @@
 <template>
   <section class="container-premium section-premium">
     <div class="mb-10">
-      <p class="eyebrow">Account</p>
-      <h1 class="display-heading mt-3 text-6xl text-white md:text-7xl">Order History</h1>
-      <p class="mt-4 max-w-2xl text-neutral-400">Track all your Viking Store orders and review order details.</p>
+      <p class="eyebrow">{{ t('common.account') }}</p>
+      <h1 class="display-heading mt-3 text-6xl text-white md:text-7xl">{{ t('profile.orderHistory') }}</h1>
+      <p class="mt-4 max-w-2xl text-neutral-400">{{ t('profile.orderHistoryLead') }}</p>
     </div>
 
     <div v-if="loading" class="grid gap-5">
@@ -14,9 +14,9 @@
       <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
         <Icon name="i-heroicons-archive-box" class="text-4xl" />
       </div>
-      <h2 class="mt-6 text-3xl font-black text-white">No Orders Yet</h2>
-      <p class="mt-3 text-neutral-400">Start shopping and your orders will appear here.</p>
-      <NuxtLink to="/shop" class="premium-button premium-button-primary mt-8">Go Shopping</NuxtLink>
+      <h2 class="mt-6 text-3xl font-black text-white">{{ t('profile.noOrdersYet') }}</h2>
+      <p class="mt-3 text-neutral-400">{{ t('profile.startShopping') }}</p>
+      <NuxtLink to="/shop" class="premium-button premium-button-primary mt-8">{{ t('profile.goShopping') }}</NuxtLink>
     </div>
 
     <div v-else class="grid gap-5">
@@ -28,20 +28,20 @@
       >
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p class="text-sm text-neutral-500">Order ID</p>
+            <p class="text-sm text-neutral-500">{{ t('orders.orderId') }}</p>
             <h3 class="mt-1 text-lg font-black text-white">#{{ order.id.slice(0, 8) }}</h3>
             <p class="mt-3 text-neutral-400">{{ formatDate(order.created_at) }}</p>
           </div>
 
           <span class="w-fit rounded-full border px-4 py-2 text-sm font-black capitalize" :class="getStatusClass(order.status)">
-            {{ order.status }}
+            {{ t(`orders.${order.status}`) }}
           </span>
 
           <div class="text-left lg:text-right">
-            <p class="text-sm text-neutral-500">Total</p>
-            <h2 class="text-4xl font-black text-[#FF4D00]">${{ order.total_price }}</h2>
+            <p class="text-sm text-neutral-500">{{ t('common.total') }}</p>
+            <h2 class="text-4xl font-black text-[#FF4D00]">{{ formatStorePrice(order.total_price, locale) }}</h2>
             <span class="mt-4 inline-flex items-center gap-2 text-sm font-black text-white">
-              View Details
+              {{ t('common.details') }}
               <Icon name="i-heroicons-arrow-right" />
             </span>
           </div>
@@ -54,17 +54,19 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useAuthStore } from "../../../stores/auth";
+import { formatStorePrice } from "../../../utils/localizationFormat";
 
 definePageMeta({
   middleware: ["auth"],
 });
 
 const authStore = useAuthStore(usePinia());
+const { locale, t } = useI18n();
 const orders = ref<any[]>([]);
 const loading = ref(true);
 
 const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString("en-US", {
+  return new Date(date).toLocaleDateString(locale.value === "ar" ? "ar-EG" : "en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",

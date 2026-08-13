@@ -11,10 +11,10 @@
         <h1
           class="font-[Bebas_Neue] text-5xl tracking-wider text-white md:text-6xl"
         >
-          EDIT PROFILE
+          {{ t('profile.editTitle') }}
         </h1>
 
-        <p class="mt-2 text-gray-400">Update your warrior information</p>
+        <p class="mt-2 text-gray-400">{{ t('profile.editLead') }}</p>
       </div>
     </div>
 
@@ -28,13 +28,18 @@
           <div class="group relative">
             <img
               :src="avatarPreview"
+              alt=""
+              width="160"
+              height="160"
               class="h-40 w-40 rounded-full border-4 border-[#FF4D00] object-cover shadow-[0_0_40px_rgba(255,77,0,.4)]"
+              loading="lazy"
+              decoding="async"
             />
 
             <label
               class="absolute inset-0 flex cursor-pointer items-center justify-center rounded-full bg-black/70 opacity-0 transition group-hover:opacity-100"
             >
-              <span class="font-bold text-white"> Change Avatar </span>
+              <span class="font-bold text-white"> {{ t('profile.changeAvatar') }} </span>
 
               <input
                 type="file"
@@ -46,7 +51,7 @@
           </div>
 
           <p class="mt-4 text-sm text-gray-400">
-            Click avatar to upload new image
+            {{ t('profile.avatarHint') }}
           </p>
         </div>
 
@@ -54,7 +59,7 @@
 
         <div class="grid gap-5 md:grid-cols-2">
           <div>
-            <label class="mb-2 block text-sm text-gray-400"> Full Name </label>
+            <label class="mb-2 block text-sm text-gray-400"> {{ t('common.fullName') }} </label>
 
             <input
               v-model="form.full_name"
@@ -63,7 +68,7 @@
           </div>
 
           <div>
-            <label class="mb-2 block text-sm text-gray-400"> Phone </label>
+            <label class="mb-2 block text-sm text-gray-400"> {{ t('common.phone') }} </label>
 
             <input
               v-model="form.phone"
@@ -72,19 +77,19 @@
           </div>
 
           <div>
-            <label class="mb-2 block text-sm text-gray-400"> Gender </label>
+            <label class="mb-2 block text-sm text-gray-400"> {{ t('auth.gender') }} </label>
 
             <select
               v-model="form.gender"
               class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#FF4D00]"
             >
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
+              <option value="Male">{{ t('auth.male') }}</option>
+              <option value="Female">{{ t('auth.female') }}</option>
             </select>
           </div>
 
           <div>
-            <label class="mb-2 block text-sm text-gray-400"> City </label>
+            <label class="mb-2 block text-sm text-gray-400"> {{ t('common.city') }} </label>
 
             <input
               v-model="form.city"
@@ -93,7 +98,7 @@
           </div>
 
           <div>
-            <label class="mb-2 block text-sm text-gray-400"> Country </label>
+            <label class="mb-2 block text-sm text-gray-400"> {{ t('auth.country') }} </label>
 
             <input
               v-model="form.country"
@@ -103,7 +108,7 @@
 
           <div>
             <label class="mb-2 block text-sm text-gray-400">
-              Postal Code
+              {{ t('auth.postalCode') }}
             </label>
 
             <input
@@ -114,7 +119,7 @@
         </div>
 
         <div class="mt-5">
-          <label class="mb-2 block text-sm text-gray-400"> Address </label>
+          <label class="mb-2 block text-sm text-gray-400"> {{ t('common.address') }} </label>
 
           <input
             v-model="form.address"
@@ -123,7 +128,7 @@
         </div>
 
         <div class="mt-5">
-          <label class="mb-2 block text-sm text-gray-400"> Bio </label>
+          <label class="mb-2 block text-sm text-gray-400"> {{ t('profile.bio') }} </label>
 
           <textarea
             v-model="form.bio"
@@ -140,14 +145,14 @@
             :disabled="loading"
             class="flex-1 rounded-2xl bg-[#FF4D00] py-4 font-bold text-white transition hover:scale-[1.02] disabled:opacity-50"
           >
-            {{ loading ? "Saving..." : "Save Changes" }}
+            {{ loading ? t('profile.saving') : t('profile.saveChanges') }}
           </button>
 
           <button
             @click="$router.back()"
             class="flex-1 rounded-2xl border border-white/10 bg-[#111111] py-4 font-bold text-white transition hover:border-[#FF4D00]"
           >
-            Cancel
+            {{ t('common.cancel') }}
           </button>
         </div>
       </div>
@@ -165,6 +170,7 @@ definePageMeta({
 
 const router = useRouter();
 const authStore = useAuthStore(usePinia());
+const { t } = useI18n();
 
 const loading = ref(false);
 

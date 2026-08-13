@@ -9,18 +9,22 @@
             <img
               :src="profile.avatar || 'https://ui-avatars.com/api/?name=Viking+Member'"
               alt="Profile avatar"
+              width="128"
+              height="128"
               class="h-32 w-32 rounded-full border-4 border-[#FF4D00] object-cover shadow-[0_0_40px_rgba(255,77,0,0.28)]"
+              loading="lazy"
+              decoding="async"
             />
             <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#FF4D00] px-4 py-1 text-xs font-black uppercase tracking-[0.16em]">
-              Member
+              {{ t('profile.member') }}
             </div>
           </div>
 
           <div class="text-center md:text-left">
             <p class="eyebrow">Viking Store</p>
-            <h1 class="display-heading mt-2 text-6xl text-white">{{ profile.full_name || "Viking Member" }}</h1>
+            <h1 class="display-heading mt-2 text-6xl text-white">{{ profile.full_name || t('profile.vikingMember') }}</h1>
             <p class="mt-2 text-neutral-400">{{ profile.email }}</p>
-            <p class="mt-3 text-sm text-neutral-500">Member since {{ formatDate(profile.created_at) }}</p>
+            <p class="mt-3 text-sm text-neutral-500">{{ t('profile.memberSince', { date: formatDate(profile.created_at) }) }}</p>
           </div>
         </div>
 
@@ -39,33 +43,33 @@
       <div class="premium-panel mt-8 rounded-2xl p-6 md:p-8">
         <div class="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p class="eyebrow">Profile</p>
-            <h2 class="mt-2 text-2xl font-black text-white">Member Information</h2>
+            <p class="eyebrow">{{ t('profile.title') }}</p>
+            <h2 class="mt-2 text-2xl font-black text-white">{{ t('profile.memberInformation') }}</h2>
           </div>
           <NuxtLink to="/profile/edit" class="premium-button premium-button-primary">
             <Icon name="i-heroicons-pencil-square" />
-            Edit Profile
+            {{ t('profile.edit') }}
           </NuxtLink>
         </div>
 
         <div class="grid gap-4 md:grid-cols-2">
           <div v-for="item in profileFields" :key="item.label" class="rounded-xl border border-white/10 bg-black/45 p-5">
             <p class="text-sm text-neutral-500">{{ item.label }}</p>
-            <p class="mt-2 font-bold text-white">{{ item.value || "Not set" }}</p>
+            <p class="mt-2 font-bold text-white">{{ item.value || t('profile.notSet') }}</p>
           </div>
         </div>
       </div>
 
       <div class="premium-panel mt-8 rounded-2xl p-6 md:p-8">
-        <p class="eyebrow">Story</p>
-        <h2 class="mt-2 text-2xl font-black text-white">Member Bio</h2>
-        <p class="mt-5 leading-8 text-neutral-300">{{ profile.bio || "No bio added yet." }}</p>
+        <p class="eyebrow">{{ t('profile.story') }}</p>
+        <h2 class="mt-2 text-2xl font-black text-white">{{ t('profile.memberBio') }}</h2>
+        <p class="mt-5 leading-8 text-neutral-300">{{ profile.bio || t('profile.noBio') }}</p>
       </div>
 
       <div class="mt-8 grid gap-4 md:grid-cols-3">
-        <NuxtLink to="/profile/orders" class="premium-button premium-button-secondary">My Orders</NuxtLink>
-        <NuxtLink to="/wishlist" class="premium-button premium-button-secondary">Wishlist</NuxtLink>
-        <NuxtLink to="/auth/forgot-password" class="premium-button premium-button-primary">Change Password</NuxtLink>
+        <NuxtLink to="/profile/orders" class="premium-button premium-button-secondary">{{ t('profile.myOrders') }}</NuxtLink>
+        <NuxtLink to="/wishlist" class="premium-button premium-button-secondary">{{ t('pages.wishlist') }}</NuxtLink>
+        <NuxtLink to="/auth/forgot-password" class="premium-button premium-button-primary">{{ t('profile.changePassword') }}</NuxtLink>
       </div>
     </div>
   </section>
@@ -80,12 +84,13 @@ definePageMeta({
 });
 
 const authStore = useAuthStore(usePinia());
+const { locale, t } = useI18n();
 const profile = ref<any>(null);
 const loading = ref(true);
 
 const formatDate = (date?: string) => {
-  if (!date) return "recently";
-  return new Date(date).toLocaleDateString("en-US", {
+  if (!date) return t("profile.recently");
+  return new Date(date).toLocaleDateString(locale.value === "ar" ? "ar-EG" : "en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -93,16 +98,16 @@ const formatDate = (date?: string) => {
 };
 
 const stats = computed(() => [
-  { label: "Rank", value: "Viking Warrior", accent: true },
-  { label: "Country", value: profile.value?.country || "Not set" },
-  { label: "City", value: profile.value?.city || "Not set" },
+  { label: t("profile.rank"), value: t("profile.vikingWarrior"), accent: true },
+  { label: t("auth.country"), value: profile.value?.country || t("profile.notSet") },
+  { label: t("common.city"), value: profile.value?.city || t("profile.notSet") },
 ]);
 
 const profileFields = computed(() => [
-  { label: "Phone", value: profile.value?.phone },
-  { label: "Gender", value: profile.value?.gender },
-  { label: "Address", value: profile.value?.address },
-  { label: "Postal Code", value: profile.value?.postal_code },
+  { label: t("common.phone"), value: profile.value?.phone },
+  { label: t("auth.gender"), value: profile.value?.gender },
+  { label: t("common.address"), value: profile.value?.address },
+  { label: t("auth.postalCode"), value: profile.value?.postal_code },
 ]);
 
 onMounted(async () => {

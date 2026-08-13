@@ -40,6 +40,8 @@ describe("buildCheckoutOrderRequest", () => {
     assert.equal(request.orderPayload.user_id, null);
     assert.equal(request.orderPayload.guest_name, "Guest Customer");
     assert.equal(request.orderItems[0].order_id, "11111111-1111-4111-8111-111111111111");
+    assert.equal(request.rpcPayload.p_order_id, "11111111-1111-4111-8111-111111111111");
+    assert.equal(request.rpcPayload.p_customer.is_guest, true);
   });
 
   it("builds authenticated orders with the real authenticated user id", () => {
@@ -58,5 +60,23 @@ describe("buildCheckoutOrderRequest", () => {
     assert.equal(request.orderPayload.user_id, "user-123");
     assert.equal(request.orderPayload.full_name, "Guest Customer");
     assert.equal(request.orderItems[0].order_id, "22222222-2222-4222-8222-222222222222");
+    assert.equal(request.rpcPayload.p_customer.is_guest, false);
+  });
+
+  it("passes only the coupon code to the secure checkout RPC", () => {
+    const request = buildCheckoutOrderRequest({
+      orderId: "33333333-3333-4333-8333-333333333333",
+      cartItems,
+      totalPrice: 240,
+      customerData: {
+        ...customerData,
+        isGuest: true,
+        user: null,
+      },
+      coupon: { code: "SAVE10", discount: 999 },
+    });
+
+    assert.equal(request.rpcPayload.p_coupon_code, "SAVE10");
+    assert.equal("discount" in request.rpcPayload, false);
   });
 });
