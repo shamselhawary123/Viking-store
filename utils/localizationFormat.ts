@@ -11,6 +11,8 @@ const arabicCategoryBySlug: Record<string, string> = {
   wraps: "لفافات",
   training: "تدريب",
   apparel: "ملابس رياضية",
+  "shin-guards": "واقيات الساق",
+  "hand-wraps": "بنداج اليد",
 };
 
 const toFinitePrice = (value: number | string | null | undefined) => {
@@ -24,7 +26,10 @@ const trimTrailingZeros = (value: number) =>
     maximumFractionDigits: 2,
   });
 
-export const formatStorePrice = (value: number | string | null | undefined, locale = "en") => {
+export const formatStorePrice = (
+  value: number | string | null | undefined,
+  locale = "en",
+) => {
   const amount = toFinitePrice(value);
 
   if (locale === "ar") {
@@ -35,7 +40,11 @@ export const formatStorePrice = (value: number | string | null | undefined, loca
 };
 
 export const getLocalizedCategoryName = (
-  category: { slug?: string | null; name?: string | null } | string | null | undefined,
+  category:
+    | { slug?: string | null; name?: string | null }
+    | string
+    | null
+    | undefined,
   locale = "en",
 ) => {
   if (typeof category === "string") return category;

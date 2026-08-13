@@ -16,8 +16,6 @@
 
     <HomeCommunitySection />
 
-    <HomeNewsletterSection />
-
     <HomeCTASection />
   </div>
 </template>
