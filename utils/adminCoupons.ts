@@ -1,3 +1,5 @@
+import { formatStorePrice } from "./localizationFormat.ts";
+
 export const ADMIN_COUPON_DISCOUNT_TYPES = ["percentage", "fixed_amount"] as const;
 
 export type AdminCouponDiscountType = (typeof ADMIN_COUPON_DISCOUNT_TYPES)[number];
@@ -114,7 +116,7 @@ export const formatCouponDiscount = (coupon: Pick<CouponLike, "discount_type" | 
     return `${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}%`;
   }
 
-  return `$${value.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+  return formatStorePrice(value);
 };
 
 export const getCouponUsageCount = (coupon: CouponLike) =>

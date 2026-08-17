@@ -333,6 +333,13 @@ const statsSection = ref<HTMLElement | null>(null);
 const { t } = useI18n();
 let observer: IntersectionObserver | null = null;
 
+useSeoMeta({
+  title: () => t("seo.aboutTitle"),
+  description: () => t("seo.aboutDescription"),
+  ogTitle: () => t("seo.aboutTitle"),
+  ogDescription: () => t("seo.aboutDescription"),
+});
+
 const timeline = [
   {
     step: "01",

@@ -1,5 +1,3 @@
-export const EGP_PER_USD = 50;
-
 const arabicCategoryBySlug: Record<string, string> = {
   all: "الكل",
   boxing: "ملاكمة",
@@ -22,21 +20,17 @@ const toFinitePrice = (value: number | string | null | undefined) => {
 
 const trimTrailingZeros = (value: number) =>
   value.toLocaleString("en-US", {
-    minimumFractionDigits: Number.isInteger(value) ? 0 : 2,
+    minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   });
 
 export const formatStorePrice = (
   value: number | string | null | undefined,
-  locale = "en",
+  _locale = "en",
 ) => {
   const amount = toFinitePrice(value);
 
-  if (locale === "ar") {
-    return `${trimTrailingZeros(amount)} EGP`;
-  }
-
-  return `$${trimTrailingZeros(amount / EGP_PER_USD)}`;
+  return `${trimTrailingZeros(amount)} EGP`;
 };
 
 export const getLocalizedCategoryName = (

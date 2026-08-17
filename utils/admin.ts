@@ -1,3 +1,5 @@
+import { formatStorePrice } from "./localizationFormat.ts";
+
 export const ADMIN_ORDER_STATUSES = [
   "pending",
   "processing",
@@ -77,10 +79,7 @@ export const calculateAdminDashboardStats = (orders: Record<string, any>[]) => (
 });
 
 export const formatCurrency = (value: number | string | null | undefined) =>
-  `$${Number(value || 0).toLocaleString("en-US", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  })}`;
+  formatStorePrice(value);
 
 export const formatDate = (date?: string | null) => {
   if (!date) return "-";
