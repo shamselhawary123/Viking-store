@@ -160,6 +160,13 @@ const activeCategory = ref("pages.all");
 const openQuestion = ref("pages.faqShippingQ");
 const { t } = useI18n();
 
+useSeoMeta({
+  title: () => t("seo.faqTitle"),
+  description: () => t("seo.faqDescription"),
+  ogTitle: () => t("seo.faqTitle"),
+  ogDescription: () => t("seo.faqDescription"),
+});
+
 const faqs = [
   { categoryKey: "pages.ordersTopic", questionKey: "pages.faqTrackQ", answerKey: "pages.faqTrackA" },
   { categoryKey: "pages.ordersTopic", questionKey: "pages.faqChangeQ", answerKey: "pages.faqChangeA" },

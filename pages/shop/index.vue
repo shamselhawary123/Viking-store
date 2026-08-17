@@ -49,6 +49,13 @@ const shopStore = useShopStore(usePinia());
 const wishlistStore = useWishlistStore(usePinia());
 const { t } = useI18n();
 
+useSeoMeta({
+  title: () => t("seo.shopTitle"),
+  description: () => t("seo.shopDescription"),
+  ogTitle: () => t("seo.shopTitle"),
+  ogDescription: () => t("seo.shopDescription"),
+});
+
 onMounted(async () => {
   wishlistStore.loadWishlist();
   await productsStore.getProducts();

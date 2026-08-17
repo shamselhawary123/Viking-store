@@ -387,12 +387,20 @@
 </template>
 
 <script setup lang="ts">
+import { createClient } from "@supabase/supabase-js";
 import { computed, ref, onBeforeUnmount, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useCartStore } from "../../stores/cart";
 import { useProductsStore } from "../../stores/products";
 import { useWishlistStore } from "../../stores/wishlist";
 import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
+import { SHOP_PRODUCTS_SELECT } from "../../utils/shopProducts";
+import {
+  buildBreadcrumbStructuredData,
+  buildCanonicalUrl,
+  buildProductStructuredData,
+  normalizeSiteUrl,
+} from "../../utils/seo";
 import {
   REVIEW_RATINGS,
   getProductReviewSummary,
@@ -422,6 +430,9 @@ const supabase = useSupabase();
 const route = useRoute();
 const router = useRouter();
 const { locale, t } = useI18n();
+const config = useRuntimeConfig();
+const slug = String(route.params.slug || "");
+const siteUrl = normalizeSiteUrl(String(config.public.siteUrl || ""));
 
 const product = ref<any>(null);
 const reviews = ref<ProductReviewRow[]>([]);
@@ -453,6 +464,44 @@ let pendingZoomOrigin = "center center";
 const addLoading = ref(false);
 const buyLoading = ref(false);
 const starNumbers = [1, 2, 3, 4, 5];
+const seoSupabase = createClient(
+  config.public.supabaseUrl as string,
+  config.public.supabaseKey as string,
+);
+
+const { data: initialProduct } = await useAsyncData(`shop-product-seo-${slug}`, async () => {
+  const { data, error } = await seoSupabase
+    .from("products")
+    .select(SHOP_PRODUCTS_SELECT)
+    .eq("slug", slug)
+    .single();
+
+  if (error) return null;
+
+  return data;
+});
+
+const { data: initialReviews } = await useAsyncData(`shop-product-reviews-seo-${slug}`, async () => {
+  if (!initialProduct.value?.id) return [];
+
+  const { data, error } = await seoSupabase
+    .from("product_reviews")
+    .select("id, product_id, user_id, rating, comment, created_at, updated_at")
+    .eq("product_id", initialProduct.value.id)
+    .order("created_at", { ascending: false });
+
+  if (error) return [];
+
+  return (data || []) as ProductReviewRow[];
+});
+
+product.value = initialProduct.value || null;
+reviews.value = initialReviews.value || [];
+
+if (!initialProduct.value) {
+  setResponseStatus(404);
+  loading.value = false;
+}
 
 const trustFeatures = [
   { icon: "i-heroicons-lock-closed", titleKey: "shop.securePayment", labelKey: "shop.protectedCheckout" },
@@ -508,13 +557,54 @@ const specifications = computed(() =>
     brandName.value ? { label: t("shop.brand"), value: brandName.value } : null,
   ].filter(Boolean),
 );
+const canonicalUrl = computed(() => buildCanonicalUrl(siteUrl, `/shop/${slug}`));
+const productMetaTitle = computed(() =>
+  product.value?.title ? `${product.value.title} | ${t("shop.combatGear")}` : t("seo.shopTitle"),
+);
+const productMetaDescription = computed(() =>
+  product.value?.description || t("seo.shopDescription"),
+);
+const productStructuredData = computed(() =>
+  product.value
+    ? buildProductStructuredData(product.value, canonicalUrl.value, reviewSummary.value)
+    : null,
+);
+const breadcrumbStructuredData = computed(() =>
+  product.value
+    ? buildBreadcrumbStructuredData([
+        { name: t("nav.home"), url: buildCanonicalUrl(siteUrl, "/") },
+        { name: t("nav.shop"), url: buildCanonicalUrl(siteUrl, "/shop") },
+        { name: product.value.title, url: canonicalUrl.value },
+      ])
+    : null,
+);
+
+useSeoMeta({
+  title: () => productMetaTitle.value,
+  description: () => productMetaDescription.value,
+  ogTitle: () => productMetaTitle.value,
+  ogDescription: () => productMetaDescription.value,
+  ogImage: () => product.value?.cover_image || product.value?.image || undefined,
+  ogUrl: () => canonicalUrl.value,
+  twitterCard: "summary_large_image",
+});
+
+useHead(() => ({
+  link: [{ rel: "canonical", href: canonicalUrl.value }],
+  script: [productStructuredData.value, breadcrumbStructuredData.value]
+    .filter(Boolean)
+    .map((data) => ({
+      type: "application/ld+json",
+      children: JSON.stringify(data),
+    })),
+}));
 
 onMounted(async () => {
   try {
     wishlistStore.loadWishlist();
     loadRecentlyViewed();
     await loadCurrentUser();
-    product.value = await productsStore.getProductBySlug(route.params.slug as string);
+    product.value ||= await productsStore.getProductBySlug(slug);
 
     if (!product.value) return;
 
@@ -533,7 +623,11 @@ onMounted(async () => {
       relatedProducts.value = await productsStore.getRelatedProducts(product.value.category_id, product.value.id);
     }
 
-    await loadReviews();
+    if (reviews.value.length) {
+      await loadReviewProfiles(reviews.value.map((review) => review.user_id));
+    } else {
+      await loadReviews();
+    }
     saveRecentlyViewed();
   } finally {
     loading.value = false;

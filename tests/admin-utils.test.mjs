@@ -8,6 +8,7 @@ import {
   buildProductPayload,
   calculateAdminDashboardStats,
   filterAdminOrders,
+  formatCurrency,
   getAdminOrderLabel,
   getOrderCustomer,
   getOrderCustomerType,
@@ -143,6 +144,12 @@ describe("admin helpers", () => {
       completedOrders: 1,
       totalRevenue: 300,
     });
+  });
+
+  it("formats admin money values as EGP without currency conversion", () => {
+    assert.equal(formatCurrency(1500), "1,500 EGP");
+    assert.equal(formatCurrency("2500.5"), "2,500.5 EGP");
+    assert.equal(formatCurrency(null), "0 EGP");
   });
 
   it("labels admin orders by order number when available", () => {

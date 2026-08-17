@@ -27,6 +27,13 @@ import { useCategoriesStore } from "../../stores/categories";
 const categoriesStore = useCategoriesStore(usePinia());
 const { t } = useI18n();
 
+useSeoMeta({
+  title: () => t("seo.categoriesTitle"),
+  description: () => t("seo.categoriesDescription"),
+  ogTitle: () => t("seo.categoriesTitle"),
+  ogDescription: () => t("seo.categoriesDescription"),
+});
+
 onMounted(async () => {
   await categoriesStore.getCategories();
 });

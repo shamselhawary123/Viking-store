@@ -248,6 +248,13 @@ const form = reactive({
   message: "",
 });
 
+useSeoMeta({
+  title: () => t("seo.contactTitle"),
+  description: () => t("seo.contactDescription"),
+  ogTitle: () => t("seo.contactTitle"),
+  ogDescription: () => t("seo.contactDescription"),
+});
+
 const contactCards = [
   {
     icon: "i-heroicons-envelope",

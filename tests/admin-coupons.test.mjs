@@ -65,7 +65,7 @@ describe("admin coupon helpers", () => {
 
   it("formats discounts and restriction summaries", () => {
     assert.equal(formatCouponDiscount({ discount_type: "percentage", discount_value: 15 }), "15%");
-    assert.equal(formatCouponDiscount({ discount_type: "fixed_amount", discount_value: 25 }), "$25");
+    assert.equal(formatCouponDiscount({ discount_type: "fixed_amount", discount_value: 25 }), "25 EGP");
     assert.equal(getCouponRestrictionSummary({ coupon_products: [], coupon_categories: [] }), "All products");
     assert.equal(getCouponRestrictionSummary({ coupon_products: [{ products: { title: "Gloves" } }], coupon_categories: [] }), "1 product");
     assert.equal(getCouponRestrictionSummary({ coupon_products: [], coupon_categories: [{ categories: { name: "Wraps" } }, { categories: { name: "Gloves" } }] }), "2 categories");

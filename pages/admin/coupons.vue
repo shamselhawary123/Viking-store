@@ -152,15 +152,15 @@
                 </select>
               </label>
               <label class="block">
-                <span class="field-label">Discount Value</span>
+                <span class="field-label">Discount Value (% or EGP)</span>
                 <input v-model.number="form.discount_value" required type="number" min="0" step="0.01" class="field mt-2" />
               </label>
               <label class="block">
-                <span class="field-label">Minimum Order</span>
+                <span class="field-label">Minimum Order (EGP)</span>
                 <input v-model.number="form.minimum_order_amount" type="number" min="0" step="0.01" class="field mt-2" />
               </label>
               <label class="block">
-                <span class="field-label">Maximum Discount</span>
+                <span class="field-label">Maximum Discount (EGP)</span>
                 <input v-model.number="form.maximum_discount_amount" :disabled="form.discount_type !== 'percentage'" type="number" min="0" step="0.01" class="field mt-2 disabled:opacity-40" />
               </label>
               <label class="block">

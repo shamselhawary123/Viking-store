@@ -121,6 +121,11 @@ const navItems = [
     icon: "i-heroicons-ticket",
   },
   {
+    labelKey: "admin.blog",
+    to: "/admin/blog",
+    icon: "i-heroicons-newspaper",
+  },
+  {
     labelKey: "admin.users",
     to: "/admin/users",
     icon: "i-heroicons-users",
