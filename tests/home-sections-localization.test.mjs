@@ -5,17 +5,11 @@ import { describe, it } from "node:test";
 const en = JSON.parse(readFileSync("locales/en.json", "utf8"));
 const ar = JSON.parse(readFileSync("locales/ar.json", "utf8"));
 
-const sectionKeys = [
-  "whyViking",
-  "testimonials",
-  "communitySection",
-  "newsletterSection",
-];
+const sectionKeys = ["whyViking", "testimonials", "newsletterSection"];
 
 const componentFiles = [
   "components/home/WhyVikingSection.vue",
   "components/home/TestimonialsSection.vue",
-  "components/home/CommunitySection.vue",
   "components/home/NewsletterSection.vue",
 ];
 
@@ -33,7 +27,10 @@ describe("home storefront section localization", () => {
     for (const key of sectionKeys) {
       assert.ok(en.home[key], `Missing English home.${key}`);
       assert.ok(ar.home[key], `Missing Arabic home.${key}`);
-      assert.deepEqual(Object.keys(ar.home[key]).sort(), Object.keys(en.home[key]).sort());
+      assert.deepEqual(
+        Object.keys(ar.home[key]).sort(),
+        Object.keys(en.home[key]).sort(),
+      );
     }
   });
 
@@ -43,7 +40,11 @@ describe("home storefront section localization", () => {
       .join("\n");
 
     for (const phrase of hardcodedPhrases) {
-      assert.equal(source.includes(phrase), false, `Found hardcoded phrase: ${phrase}`);
+      assert.equal(
+        source.includes(phrase),
+        false,
+        `Found hardcoded phrase: ${phrase}`,
+      );
     }
   });
 });

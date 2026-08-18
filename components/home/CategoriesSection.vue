@@ -13,12 +13,12 @@
         <NuxtLink
           v-for="category in categoriesStore.categories.filter((c) => c.slug !== 'all')"
           :key="category.id"
-          :to="`/shop?category=${category.slug}`"
+          :to="buildShopCategoryUrl(category.slug)"
           class="group relative min-h-[23rem] overflow-hidden rounded-2xl border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/70 hover:shadow-[0_30px_90px_rgba(255,77,0,0.12)]"
         >
           <img
             :src="category.image"
-            :alt="category.name"
+            :alt="categorySeo(category).title"
             width="640"
             height="800"
             class="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-110 group-hover:opacity-100"
@@ -35,7 +35,7 @@
           <div class="absolute bottom-6 left-6 right-6 translate-y-2 transition duration-300 group-hover:translate-y-0">
             <h3 class="font-display text-5xl leading-none text-white">{{ getLocalizedCategoryName(category, locale) || category.name }}</h3>
             <p class="mt-3 max-w-52 text-sm leading-6 text-neutral-300">
-              {{ t('home.categoryCardText') }}
+              {{ categorySeo(category).intro }}
             </p>
             <p class="mt-5 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]">
               {{ t('home.explore') }}
@@ -51,9 +51,13 @@
 import { onMounted } from "vue";
 import { useCategoriesStore } from "../../stores/categories";
 import { getLocalizedCategoryName } from "../../utils/localizationFormat";
+import { buildCategorySeo, buildShopCategoryUrl } from "../../utils/seo";
 
 const categoriesStore = useCategoriesStore(usePinia());
 const { locale, t } = useI18n();
+
+const categorySeo = (category: { slug?: string | null; name?: string | null }) =>
+  buildCategorySeo(category, locale.value);
 
 onMounted(async () => {
   await categoriesStore.getCategories();
