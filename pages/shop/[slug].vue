@@ -13,7 +13,7 @@
           <img
             :key="selectedImage"
             :src="selectedImage"
-            :alt="product.title"
+            :alt="productImageAlt"
             width="960"
             height="1120"
             class="h-[390px] w-full object-cover transition duration-500 group-hover:scale-110 md:h-[560px] lg:h-[700px]"
@@ -44,7 +44,7 @@
             :aria-label="t('shop.viewProductImage', { title: product.title })"
             @click="selectImage(index)"
           >
-            <img :src="image" :alt="product.title" width="180" height="96" class="h-24 w-full object-cover transition duration-500 hover:scale-105" loading="lazy" decoding="async" />
+            <img :src="image" :alt="productImageAlt" width="180" height="96" class="h-24 w-full object-cover transition duration-500 hover:scale-105" loading="lazy" decoding="async" />
           </button>
         </div>
       </div>
@@ -56,11 +56,13 @@
             <Icon name="i-heroicons-chevron-right" class="text-xs" />
             <NuxtLink to="/shop" class="premium-link">{{ t('nav.shop') }}</NuxtLink>
             <Icon name="i-heroicons-chevron-right" class="text-xs" />
+            <NuxtLink v-if="productCategoryUrl" :to="productCategoryUrl" class="premium-link">{{ productCategoryName }}</NuxtLink>
+            <Icon v-if="productCategoryUrl" name="i-heroicons-chevron-right" class="text-xs" />
             <span class="text-white">{{ product.title }}</span>
           </nav>
 
           <div>
-            <p class="eyebrow">{{ getLocalizedCategoryName(product.categories, locale) || t('shop.combatGear') }}</p>
+            <p class="eyebrow">{{ productCategoryName }}</p>
             <h1 class="mt-3 text-4xl font-black leading-tight text-white md:text-6xl">{{ product.title }}</h1>
           </div>
 
@@ -382,7 +384,7 @@
     <button class="absolute right-5 top-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:border-[#FF4D00] hover:text-[#FF4D00]" :aria-label="t('common.close')" @click="isLightboxOpen = false">
       <Icon name="i-heroicons-x-mark" class="text-2xl" />
     </button>
-    <img :src="selectedImage" :alt="product?.title" width="960" height="1120" class="max-h-[88vh] max-w-full rounded-2xl object-contain" decoding="async" @click.stop />
+    <img :src="selectedImage" :alt="productImageAlt" width="960" height="1120" class="max-h-[88vh] max-w-full rounded-2xl object-contain" decoding="async" @click.stop />
   </div>
 </template>
 
@@ -398,7 +400,11 @@ import { SHOP_PRODUCTS_SELECT } from "../../utils/shopProducts";
 import {
   buildBreadcrumbStructuredData,
   buildCanonicalUrl,
+  buildProductImageAlt,
+  buildProductSeoMeta,
   buildProductStructuredData,
+  buildShopCategoryCanonicalUrl,
+  buildShopCategoryUrl,
   normalizeSiteUrl,
 } from "../../utils/seo";
 import {
@@ -533,6 +539,11 @@ const discountPercent = computed(() => {
 });
 const reviewSummary = computed(() => getProductReviewSummary(reviews.value));
 const filledReviewStars = computed(() => Math.round(reviewSummary.value.average));
+const productCategoryName = computed(() =>
+  getLocalizedCategoryName(product.value?.categories, locale.value) || product.value?.category || t("shop.combatGear"),
+);
+const productCategorySlug = computed(() => product.value?.categories?.slug || "");
+const productCategoryUrl = computed(() => (productCategorySlug.value ? buildShopCategoryUrl(productCategorySlug.value) : ""));
 const currentUserReview = computed(() =>
   currentUser.value
     ? reviews.value.find((review) => review.user_id === currentUser.value.id) || null
@@ -558,12 +569,10 @@ const specifications = computed(() =>
   ].filter(Boolean),
 );
 const canonicalUrl = computed(() => buildCanonicalUrl(siteUrl, `/shop/${slug}`));
-const productMetaTitle = computed(() =>
-  product.value?.title ? `${product.value.title} | ${t("shop.combatGear")}` : t("seo.shopTitle"),
-);
-const productMetaDescription = computed(() =>
-  product.value?.description || t("seo.shopDescription"),
-);
+const productSeoMeta = computed(() => (product.value ? buildProductSeoMeta(product.value, locale.value) : null));
+const productMetaTitle = computed(() => productSeoMeta.value?.title || t("seo.shopTitle"));
+const productMetaDescription = computed(() => productSeoMeta.value?.description || t("seo.shopDescription"));
+const productImageAlt = computed(() => (product.value ? buildProductImageAlt(product.value, locale.value) : t("shop.combatGear")));
 const productStructuredData = computed(() =>
   product.value
     ? buildProductStructuredData(product.value, canonicalUrl.value, reviewSummary.value)
@@ -571,11 +580,16 @@ const productStructuredData = computed(() =>
 );
 const breadcrumbStructuredData = computed(() =>
   product.value
-    ? buildBreadcrumbStructuredData([
+    ? buildBreadcrumbStructuredData(
+      [
         { name: t("nav.home"), url: buildCanonicalUrl(siteUrl, "/") },
         { name: t("nav.shop"), url: buildCanonicalUrl(siteUrl, "/shop") },
+        productCategorySlug.value
+          ? { name: productCategoryName.value, url: buildShopCategoryCanonicalUrl(siteUrl, productCategorySlug.value) }
+          : null,
         { name: product.value.title, url: canonicalUrl.value },
-      ])
+      ].filter(Boolean) as Array<{ name: string; url: string }>,
+    )
     : null,
 );
 

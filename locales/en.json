@@ -166,16 +166,23 @@
     "cookies": "Cookies",
     "secureCheckout": "Secure Checkout",
     "sslProtected": "SSL Protected",
-    "fastDelivery": "Fast Delivery"
+    "fastDelivery": "Fast Delivery",
+    "cashOnDelivery": "Cash On Delivery",
+    "easyReturns": "Easy Returns",
+    "InstaPay": "InstaPay"
   },
   "home": {
-    "heroEyebrow": "Premium Combat Gear",
-    "heroTitle": "Train Hard",
-    "heroAccent": "FIGHT EASY",
-    "heroText": "Viking Store equips fighters with premium gear built for daily rounds, fight camp, and competition night.",
+    "heroEyebrow": "Egypt Combat Sports Store",
+    "heroTitle": "Combat Gear",
+    "heroAccent": "FOR FIGHTERS",
+    "heroText": "Shop boxing gloves, MMA gloves, kickboxing gear, and martial arts equipment in Egypt, selected for daily rounds and serious training.",
     "shopGear": "Shop Gear",
     "shopNow": "Shop Now",
     "exploreCategories": "Explore Categories",
+    "categoryQuickLinks": "Quick combat gear links",
+    "boxingGear": "Boxing Gloves",
+    "kickboxingGear": "Kickboxing Gear",
+    "mmaGear": "MMA Gloves",
     "rating": "Rating",
     "dispatch": "Dispatch",
     "quality": "Quality",
@@ -191,7 +198,7 @@
     "stats": "Built For Fighters",
     "community": "Viking Community",
     "chooseYourWeapon": "Choose Your Weapon",
-    "categoriesLead": "Shop by discipline with gear built for bag work, sparring, conditioning, and fight week.",
+    "categoriesLead": "Shop by discipline with boxing, kickboxing, MMA, Muay Thai, and martial arts gear built for bag work, sparring, conditioning, and fight week.",
     "proGear": "Pro gear",
     "categoryCardText": "Premium essentials selected for serious daily training.",
     "explore": "Explore",
@@ -232,19 +239,14 @@
       "omarRole": "MMA Fighter",
       "omarReview": "I use Viking equipment every single week."
     },
-    "communitySection": {
-      "eyebrow": "Community",
-      "title": "VIKING TRAINING CLUB",
-      "description": "A premium fight culture feed for athletes who train with discipline, intensity, and style.",
-      "cta": "Join The Movement",
-      "bagWork": "Bag work",
-      "powerRounds": "Power rounds",
-      "sparring": "Sparring",
-      "sharpSessions": "Sharp sessions",
-      "fightwear": "Fightwear",
-      "walkoutEnergy": "Walkout energy",
-      "recovery": "Recovery",
-      "readyTomorrow": "Ready tomorrow"
+    "blogSection": {
+      "eyebrow": "Viking Blog",
+      "title": "From The Viking Blog",
+      "description": "Gear guides, training notes, and fight-sport advice for building a stronger setup.",
+      "article": "Article",
+      "viewAll": "View All Articles",
+      "previous": "Previous article",
+      "next": "Next article"
     },
     "newsletterSection": {
       "eyebrow": "Newsletter",
@@ -731,8 +733,8 @@
     "categoriesLead": "Find the right gear for striking, sparring, conditioning, and daily fight camp work."
   },
   "seo": {
-    "homeTitle": "Premium Combat Sports Gear",
-    "homeDescription": "Shop Viking Store for premium boxing, MMA, kickboxing, Muay Thai, and training gear built for serious fighters.",
+    "homeTitle": "Viking Store Egypt | Combat Sports & Martial Arts Gear",
+    "homeDescription": "Shop Viking Store in Egypt for boxing gloves, MMA gloves, kickboxing gear, martial arts equipment, and daily combat-sports training essentials.",
     "shopTitle": "Shop Combat Sports Gear",
     "shopDescription": "Browse premium gloves, wraps, shorts, protection, and fightwear in EGP for training, sparring, and competition.",
     "categoriesTitle": "Combat Sports Gear Categories",

@@ -16,7 +16,11 @@ html {
 body {
   min-width: 320px;
   background:
-    radial-gradient(circle at top left, rgba(255, 77, 0, 0.13), transparent 34rem),
+    radial-gradient(
+      circle at top left,
+      rgba(255, 77, 0, 0.13),
+      transparent 34rem
+    ),
     linear-gradient(180deg, #080808 0%, #030303 42%, #090909 100%);
   color: #ffffff;
   font-family: "Inter", sans-serif;
@@ -76,7 +80,7 @@ textarea:focus-visible {
 
 .eyebrow {
   color: #ff4d00;
-  font-size: 0.75rem;
+  font-size: 1.75rem;
   font-weight: 800;
   letter-spacing: 0.28em;
   text-transform: uppercase;
@@ -91,7 +95,11 @@ textarea:focus-visible {
 .premium-panel {
   border: 1px solid rgba(255, 255, 255, 0.1);
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015)),
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0.015)
+    ),
     #101010;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
 }
@@ -165,7 +173,12 @@ textarea:focus-visible {
 
 .premium-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 77, 0, 0.55), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 77, 0, 0.55),
+    transparent
+  );
 }
 
 .reveal-up {

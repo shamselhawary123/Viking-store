@@ -14,9 +14,7 @@
 
     <HomeTestimonialsSection />
 
-    <HomeCommunitySection />
-
-    <HomeCTASection />
+    <HomeBlogSection />
   </div>
 </template>
 

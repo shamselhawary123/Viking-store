@@ -26,12 +26,34 @@ type ProductLike = {
   price?: number | string | null;
   cover_image?: string | null;
   image?: string | null;
-  product_colors?: Array<{ product_images?: Array<{ image_url?: string | null }> | null }> | null;
+  product_colors?: Array<{
+    product_images?: Array<{ image_url?: string | null }> | null;
+  }> | null;
   product_sizes?: Array<{ in_stock?: boolean | null }> | null;
-  categories?: { name?: string | null } | null;
+  categories?: { slug?: string | null; name?: string | null } | null;
   category?: string | null;
   brand?: string | { name?: string | null } | null;
   brand_name?: string | null;
+};
+
+type CategoryLike =
+  | {
+      slug?: string | null;
+      name?: string | null;
+    }
+  | string
+  | null
+  | undefined;
+
+type SeoLocale = "en" | "ar" | string;
+
+type CategorySeoIntent = {
+  slug: string;
+  label: string;
+  title: string;
+  description: string;
+  keywords: string;
+  known: boolean;
 };
 
 type ReviewSummaryLike = {
@@ -43,21 +65,276 @@ const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
 const stripQueryAndHash = (path: string) => path.split(/[?#]/)[0] || "/";
 
-export const normalizeSiteUrl = (siteUrl: string, fallback = DEFAULT_SITE_URL) =>
-  trimTrailingSlash(siteUrl || fallback);
+const categoryValue = (category: CategoryLike, key: "slug" | "name") => {
+  if (!category) return "";
+  if (typeof category === "string") return key === "name" ? category : "";
+
+  return category[key] || "";
+};
+
+export const normalizeCategorySlug = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+const categoryAliases: Record<string, string> = {
+  "kick-boxing": "kickboxing",
+  "kick-box": "kickboxing",
+  muaythai: "muay-thai",
+  "thai-boxing": "muay-thai",
+  kungfu: "kung-fu",
+  "kung-fu": "kung-fu",
+};
+
+const categorySeoIntents: Record<
+  string,
+  Record<"en" | "ar", Omit<CategorySeoIntent, "slug" | "known">>
+> = {
+  boxing: {
+    en: {
+      label: "Boxing Gear",
+      title: "Boxing Gloves & Gear",
+      description:
+        "Shop boxing gloves, wraps, protection, and training essentials built for daily rounds in Egypt.",
+      keywords: "boxing gloves, boxing gear, combat sports gear Egypt",
+    },
+    ar: {
+      label: "ادوات ملاكمة",
+      title: "قفازات ملاكمة وادوات ملاكمة",
+      description:
+        "اختار قفازات ملاكمة وادوات تمرين تستحمل شغل الكيس والسبارينج والتمرين اليومي في مصر.",
+      keywords: "قفازات ملاكمة، ادوات ملاكمة، أدوات رياضية",
+    },
+  },
+  kickboxing: {
+    en: {
+      label: "Kickboxing Gear",
+      title: "Kickboxing Gloves & Shin Guards",
+      description:
+        "Shop kickboxing gloves, shin guards, and protection for hard striking sessions.",
+      keywords: "kickboxing gloves, kickboxing shin guards, combat sports gear",
+    },
+    ar: {
+      label: "ادوات كيك بوكس",
+      title: "قفازات كيك بوكس وشنكار كيك بوكس",
+      description:
+        "جهز تمرين الكيك بوكس بقفازات وشنكار وحماية مناسبة للجولات التقيلة.",
+      keywords: "قفازات كيك بوكس، شنكار كيك بوكس، ادوات رياضية",
+    },
+  },
+  mma: {
+    en: {
+      label: "MMA Gear",
+      title: "MMA Gloves & Training Gear",
+      description:
+        "Shop MMA gloves, fightwear, and training gear for striking, grappling, and conditioning.",
+      keywords: "MMA gloves, MMA gear, martial arts equipment",
+    },
+    ar: {
+      label: "ادوات MMA",
+      title: "قفازات MMA وادوات فنون قتالية",
+      description:
+        "اختار قفازات MMA وادوات فنون قتالية للتمرين المختلط واللياقة والسبارينج.",
+      keywords: "قفازات MMA، أدوات وادوات رياضات قتالية، فنون قتالية",
+    },
+  },
+  sanda: {
+    en: {
+      label: "Sanda Gear",
+      title: "Sanda Training Gear",
+      description:
+        "Shop Sanda gear and martial arts essentials for striking, movement, and regular training.",
+      keywords: "Sanda gear, martial arts equipment, combat sports gear",
+    },
+    ar: {
+      label: "ادوات سندا",
+      title: "ادوات سندا وفنون قتالية",
+      description:
+        "ادوات سندا عملية للتمرين، الحركة، والجولات اللي محتاجة حماية وثبات.",
+      keywords: "ادوات سندا، أدوات وادوات رياضات قتالية، فنون قتالية",
+    },
+  },
+  "kung-fu": {
+    en: {
+      label: "Kung Fu Gear",
+      title: "Kung Fu Training Gear",
+      description:
+        "Shop Kung Fu and martial arts training essentials selected for discipline and daily practice.",
+      keywords: "Kung Fu gear, martial arts equipment, training gear",
+    },
+    ar: {
+      label: "ادوات كونغ فو",
+      title: "ادوات كونغ فو وتمرين فنون قتالية",
+      description:
+        "ادوات كونغ فو وفنون قتالية مناسبة للتمرين المنتظم والتحكم والحركة.",
+      keywords: "ادوات كونغ فو، فنون قتالية، أدوات رياضية",
+    },
+  },
+  "muay-thai": {
+    en: {
+      label: "Muay Thai Gear",
+      title: "Muay Thai Gloves & Training Gear",
+      description:
+        "Shop Muay Thai gloves, protection, and striking gear for pads, bag work, and sparring.",
+      keywords: "Muay Thai gloves, Muay Thai gear, striking gear",
+    },
+    ar: {
+      label: "ادوات مواي تاي",
+      title: "قفازات وادوات مواي تاي",
+      description:
+        "اختار ادوات مواي تاي للجولات التقيلة، شغل الباد، والسبارينج.",
+      keywords: "ادوات مواي تاي، قفازات مواي تاي، أدوات رياضية",
+    },
+  },
+};
+
+const categoryIntentKey = (category: CategoryLike) => {
+  const slug = normalizeCategorySlug(categoryValue(category, "slug"));
+  const name = normalizeCategorySlug(categoryValue(category, "name"));
+  const raw = slug || name;
+
+  return categoryAliases[raw] || raw;
+};
+
+export const normalizeSiteUrl = (
+  siteUrl: string,
+  fallback = DEFAULT_SITE_URL,
+) => trimTrailingSlash(siteUrl || fallback);
 
 export const buildCanonicalUrl = (siteUrl: string, path: string) => {
   const origin = normalizeSiteUrl(siteUrl);
   const cleanPath = stripQueryAndHash(path || "/");
-  const normalizedPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+  const normalizedPath = cleanPath.startsWith("/")
+    ? cleanPath
+    : `/${cleanPath}`;
 
-  return normalizedPath === "/" ? `${origin}/` : `${origin}${normalizedPath.replace(/\/+$/, "")}`;
+  return normalizedPath === "/"
+    ? `${origin}/`
+    : `${origin}${normalizedPath.replace(/\/+$/, "")}`;
+};
+
+export const buildShopCategoryUrl = (slug?: string | null) => {
+  const cleanSlug = normalizeCategorySlug(slug || "");
+
+  return !cleanSlug || cleanSlug === "all"
+    ? "/shop"
+    : `/shop?category=${encodeURIComponent(cleanSlug)}`;
+};
+
+export const buildShopCategoryCanonicalUrl = (
+  siteUrl: string,
+  slug?: string | null,
+) => {
+  const path = buildShopCategoryUrl(slug);
+  const origin = normalizeSiteUrl(siteUrl);
+
+  return path.includes("?")
+    ? `${origin}${path}`
+    : buildCanonicalUrl(origin, path);
+};
+
+export const getCategorySeoIntent = (
+  category: CategoryLike,
+  locale: SeoLocale = "en",
+): CategorySeoIntent => {
+  const requestedSlug = normalizeCategorySlug(
+    categoryValue(category, "slug") || categoryValue(category, "name"),
+  );
+  const key = categoryIntentKey(category);
+  const language = locale === "ar" ? "ar" : "en";
+  const intent = categorySeoIntents[key]?.[language];
+
+  if (intent) {
+    return {
+      ...intent,
+      slug: requestedSlug || key,
+      known: true,
+    };
+  }
+
+  const fallbackLabel =
+    categoryValue(category, "name") || requestedSlug || "Combat Gear";
+
+  return {
+    slug: requestedSlug,
+    label: fallbackLabel,
+    title:
+      language === "ar"
+        ? `${fallbackLabel} من Viking Store`
+        : `${fallbackLabel} Gear`,
+    description:
+      language === "ar"
+        ? `اختار ${fallbackLabel} من Viking Store بجودة مناسبة للتمرين اليومي.`
+        : `Shop ${fallbackLabel} at Viking Store with gear selected for daily combat-sports training.`,
+    keywords:
+      language === "ar"
+        ? `${fallbackLabel}، أدوات رياضية`
+        : `${fallbackLabel}, combat sports gear`,
+    known: false,
+  };
+};
+
+export const buildCategorySeo = (
+  category: CategoryLike,
+  locale: SeoLocale = "en",
+) => {
+  const intent = getCategorySeoIntent(category, locale);
+
+  return {
+    title: intent.title,
+    description: intent.description,
+    h1: intent.title,
+    intro: intent.description,
+    url: buildShopCategoryUrl(intent.slug),
+    keywords: intent.keywords,
+  };
+};
+
+export const buildProductSeoMeta = (
+  product: ProductLike,
+  locale: SeoLocale = "en",
+) => {
+  const name = product.title || product.name || "Viking Store Product";
+  const intent = getCategorySeoIntent(
+    product.categories || product.category,
+    locale,
+  );
+  const description = product.description?.trim();
+  const isArabic = locale === "ar";
+
+  return {
+    title: isArabic ? `${name} | ${intent.title}` : `${name} | ${intent.title}`,
+    description: description
+      ? `${description} ${intent.description}`
+      : isArabic
+        ? `${name} من Viking Store. ${intent.description}`
+        : `Shop ${name} from Viking Store. ${intent.description}`,
+  };
+};
+
+export const buildProductImageAlt = (
+  product: ProductLike,
+  locale: SeoLocale = "en",
+) => {
+  const name = product.title || product.name || "Viking Store Product";
+  const intent = getCategorySeoIntent(
+    product.categories || product.category,
+    locale,
+  );
+
+  return `${name} - ${intent.label}`;
 };
 
 export const isPrivateSeoPath = (path: string) => {
   const cleanPath = stripQueryAndHash(path);
 
-  return PRIVATE_SEO_PREFIXES.some((prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`));
+  return PRIVATE_SEO_PREFIXES.some(
+    (prefix) => cleanPath === prefix || cleanPath.startsWith(`${prefix}/`),
+  );
 };
 
 export const publicSitemapEntries = (siteUrl: string): SitemapEntry[] => [
@@ -78,14 +355,22 @@ export const escapeXml = (value: string) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 
-export const buildSitemapXml = (urls: SitemapEntry[]) => `<?xml version="1.0" encoding="UTF-8"?>
+export const buildSitemapXml = (
+  urls: SitemapEntry[],
+) => `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls
   .filter((url) => !isPrivateSeoPath(new URL(url.loc).pathname))
-  .map((url) => `  <url>
-    <loc>${escapeXml(url.loc)}</loc>${url.lastmod ? `
-    <lastmod>${escapeXml(new Date(url.lastmod).toISOString())}</lastmod>` : ""}
-  </url>`)
+  .map(
+    (url) => `  <url>
+    <loc>${escapeXml(url.loc)}</loc>${
+      url.lastmod
+        ? `
+    <lastmod>${escapeXml(new Date(url.lastmod).toISOString())}</lastmod>`
+        : ""
+    }
+  </url>`,
+  )
   .join("\n")}
 </urlset>`;
 
@@ -129,7 +414,9 @@ export const buildWebsiteStructuredData = (siteUrl: string) => ({
   },
 });
 
-export const buildBreadcrumbStructuredData = (items: Array<{ name: string; url: string }>) => ({
+export const buildBreadcrumbStructuredData = (
+  items: Array<{ name: string; url: string }>,
+) => ({
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: items.map((item, index) => ({
@@ -182,7 +469,9 @@ export const buildProductStructuredData = (
     "@type": "Product",
     name,
     description: product.description || name,
-    image: images.length ? images.map((image) => absoluteImageUrl(siteUrl, image)) : undefined,
+    image: images.length
+      ? images.map((image) => absoluteImageUrl(siteUrl, image))
+      : undefined,
     category: product.categories?.name || product.category || undefined,
     brand: {
       "@type": "Brand",
@@ -197,12 +486,13 @@ export const buildProductStructuredData = (
       availability: productAvailability(product),
       itemCondition: "https://schema.org/NewCondition",
     },
-    aggregateRating: totalReviews > 0 && averageRating > 0
-      ? {
-          "@type": "AggregateRating",
-          ratingValue: averageRating.toFixed(1),
-          reviewCount: totalReviews,
-        }
-      : undefined,
+    aggregateRating:
+      totalReviews > 0 && averageRating > 0
+        ? {
+            "@type": "AggregateRating",
+            ratingValue: averageRating.toFixed(1),
+            reviewCount: totalReviews,
+          }
+        : undefined,
   };
 };
