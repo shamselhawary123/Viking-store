@@ -1,4 +1,4 @@
-export const SHOP_DEFAULT_MAX_PRICE = 25000;
+export const SHOP_DEFAULT_MAX_PRICE = 15000;
 
 export const SHOP_PRODUCTS_SELECT = `
   *,

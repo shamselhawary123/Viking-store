@@ -9,6 +9,7 @@ import { computed, onMounted, watchEffect } from "vue";
 import {
   buildCanonicalUrl,
   buildOrganizationStructuredData,
+  buildShopCategoryUrl,
   buildWebsiteStructuredData,
   isPrivateSeoPath,
   normalizeSiteUrl,
@@ -19,23 +20,43 @@ const { locale } = useI18n();
 const route = useRoute();
 const config = useRuntimeConfig();
 const direction = computed(() => (locale.value === "ar" ? "rtl" : "ltr"));
-const siteUrl = computed(() => normalizeSiteUrl(String(config.public.siteUrl || "")));
-const canonicalUrl = computed(() => buildCanonicalUrl(siteUrl.value, route.path));
+const siteUrl = computed(() =>
+  normalizeSiteUrl(String(config.public.siteUrl || "")),
+);
+const canonicalPath = computed(() => {
+  if (route.path === "/shop" && typeof route.query.category === "string") {
+    return buildShopCategoryUrl(route.query.category);
+  }
+
+  return route.path;
+});
+const canonicalUrl = computed(() => {
+  if (canonicalPath.value.includes("?")) {
+    return `${siteUrl.value}${canonicalPath.value}`;
+  }
+
+  return buildCanonicalUrl(siteUrl.value, canonicalPath.value);
+});
 const isPrivateRoute = computed(() => isPrivateSeoPath(route.path));
 
 useHead(() => ({
-  titleTemplate: (title) => (title ? `${title} | ${SEO_SITE_NAME}` : SEO_SITE_NAME),
+  titleTemplate: (title) =>
+    title ? `${title} | ${SEO_SITE_NAME}` : SEO_SITE_NAME,
   htmlAttrs: {
     lang: locale.value,
     dir: direction.value,
   },
-  link: isPrivateRoute.value ? [] : [{ rel: "canonical", href: canonicalUrl.value }],
+  link: isPrivateRoute.value
+    ? []
+    : [{ rel: "canonical", href: canonicalUrl.value }],
   script: isPrivateRoute.value
     ? []
     : [
         {
           type: "application/ld+json",
-          children: JSON.stringify(buildOrganizationStructuredData(siteUrl.value)),
+          children: JSON.stringify(
+            buildOrganizationStructuredData(siteUrl.value),
+          ),
         },
         {
           type: "application/ld+json",
@@ -48,7 +69,7 @@ useSeoMeta({
   title: () => SEO_SITE_NAME,
   description: () =>
     locale.value === "ar"
-      ? "Viking Store لمعدات القتال عالية الجودة للملاكمة وMMA والكيك بوكسينج والتمرين اليومي."
+      ? "Viking Store لادوات القتال عالية الجودة للملاكمة وMMA والكيك بوكسينج والتمرين اليومي."
       : "Viking Store supplies premium boxing, MMA, kickboxing, and combat-sports gear for serious daily training.",
   ogSiteName: SEO_SITE_NAME,
   ogType: "website",

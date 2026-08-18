@@ -49,7 +49,7 @@
             <p class="eyebrow">{{ t("blog.storeCtaEyebrow") }}</p>
             <h2 class="mt-3 text-3xl font-black text-white">{{ t("blog.storeCtaTitle") }}</h2>
             <p class="mt-3 leading-7 text-neutral-300">{{ t("blog.storeCtaText") }}</p>
-            <NuxtLink to="/shop" class="premium-button premium-button-primary mt-6">
+            <NuxtLink :to="blogCategoryShopUrl" class="premium-button premium-button-primary mt-6">
               {{ t("blog.storeCtaButton") }}
               <Icon name="i-heroicons-arrow-right" />
             </NuxtLink>
@@ -119,6 +119,11 @@ import {
   renderSafeBlogContent,
   type BlogPostLike,
 } from "../../utils/blog";
+import {
+  buildShopCategoryUrl,
+  getCategorySeoIntent,
+  normalizeSiteUrl,
+} from "../../utils/seo";
 
 type BlogPostRow = BlogPostLike & {
   id: number;
@@ -128,8 +133,7 @@ type BlogPostRow = BlogPostLike & {
 const route = useRoute();
 const { t, locale } = useI18n();
 const config = useRuntimeConfig();
-const requestUrl = useRequestURL();
-const siteUrl = String(config.public.siteUrl || requestUrl.origin).replace(/\/$/, "");
+const siteUrl = normalizeSiteUrl(String(config.public.siteUrl || ""));
 const slug = String(route.params.slug || "");
 const supabase = createClient(
   config.public.supabaseUrl as string,
@@ -191,6 +195,10 @@ const readingTime = computed(() => calculateReadingTime(post.value?.content || "
 const renderedContent = computed(() => renderSafeBlogContent(post.value?.content || ""));
 const relatedPosts = computed(() => relatedPostsData.value || []);
 const authorName = computed(() => authorData.value?.full_name || "");
+const blogCategoryIntent = computed(() => getCategorySeoIntent({ name: post.value?.category || "" }, locale.value));
+const blogCategoryShopUrl = computed(() =>
+  blogCategoryIntent.value.known ? buildShopCategoryUrl(blogCategoryIntent.value.slug) : "/shop",
+);
 const structuredData = computed(() =>
   buildBlogStructuredData(post.value!, canonicalUrl.value, "Viking Store", authorName.value),
 );

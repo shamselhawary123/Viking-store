@@ -16,21 +16,21 @@
       <div class="reveal-up pt-4 text-center lg:text-left">
         <p class="eyebrow inline-flex items-center gap-3">
           <span class="h-px w-10 bg-[#FF4D00]" />
-          {{ t('home.heroEyebrow') }}
+          {{ t("home.heroEyebrow") }}
         </p>
         <h1
           class="display-heading mt-6 text-7xl text-white sm:text-8xl lg:text-[9.6rem]"
         >
-          {{ t('home.heroTitle') }}
+          {{ t("home.heroTitle") }}
           <span
             class="block text-[#FF4D00] drop-shadow-[0_0_34px_rgba(255,77,0,0.22)]"
-            >{{ t('home.heroAccent') }}</span
+            >{{ t("home.heroAccent") }}</span
           >
         </h1>
         <p
           class="mx-auto mt-7 max-w-2xl text-base leading-8 text-neutral-300 lg:mx-0 lg:text-lg"
         >
-          {{ t('home.heroText') }}
+          {{ t("home.heroText") }}
         </p>
 
         <div
@@ -40,14 +40,28 @@
             to="/shop"
             class="premium-button premium-button-primary min-h-14 px-7"
           >
-            {{ t('home.shopGear') }}
+            {{ t("home.shopGear") }}
             <Icon name="i-heroicons-arrow-right" />
           </NuxtLink>
           <NuxtLink
             to="/categories"
             class="premium-button premium-button-secondary min-h-14 px-7"
           >
-            {{ t('home.exploreCategories') }}
+            {{ t("home.exploreCategories") }}
+          </NuxtLink>
+        </div>
+
+        <div
+          class="mt-5 flex flex-wrap justify-center gap-2 lg:justify-start"
+          :aria-label="t('home.categoryQuickLinks')"
+        >
+          <NuxtLink
+            v-for="link in categoryLinks"
+            :key="link.slug"
+            :to="buildShopCategoryUrl(link.slug)"
+            class="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-neutral-300 transition hover:border-[#FF4D00] hover:text-[#FF4D00]"
+          >
+            {{ t(link.labelKey) }}
           </NuxtLink>
         </div>
 
@@ -94,9 +108,11 @@
           <p
             class="text-xs font-black uppercase tracking-[0.22em] text-[#FF4D00]"
           >
-            {{ t('home.proGrade') }}
+            {{ t("home.proGrade") }}
           </p>
-          <p class="mt-1 text-sm font-bold text-white">{{ t('home.rounds') }}</p>
+          <p class="mt-1 text-sm font-bold text-white">
+            {{ t("home.rounds") }}
+          </p>
         </div>
         <div
           class="absolute right-3 top-8 z-20 rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur md:right-12"
@@ -105,7 +121,7 @@
           <p
             class="text-xs font-black uppercase tracking-[0.16em] text-[#FF4D00]"
           >
-            {{ t('home.fighterRating') }}
+            {{ t("home.fighterRating") }}
           </p>
         </div>
       </div>
@@ -119,7 +135,14 @@
 </template>
 
 <script setup lang="ts">
+import { buildShopCategoryUrl } from "../../utils/seo";
+
 const { t } = useI18n();
+
+const categoryLinks = [
+  { slug: "gloves", labelKey: "home.boxingGear" },
+  { slug: "gloves", labelKey: "home.mmaGear" },
+];
 
 const stats = [
   { value: "4.9", labelKey: "home.rating" },

@@ -19,7 +19,7 @@
         </div>
         <NuxtLink
           to="/shop"
-          class="premium-button premium-button-secondary hidden md:inline-flex min-h-14 px-6"
+          class="premium-button premium-button-primary hidden md:inline-flex min-h-14 px-6"
         >
           {{ t("home.viewAllProducts") }}
           <Icon name="i-heroicons-arrow-right" />

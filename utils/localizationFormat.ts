@@ -4,13 +4,17 @@ const arabicCategoryBySlug: Record<string, string> = {
   gloves: "قفازات",
   "muay-thai": "مواي تاي",
   mma: "MMA",
-  protection: "معدات حماية",
+  protection: "ادوات حماية",
   shorts: "شورتات",
-  wraps: "لفافات",
+  wraps: "بنداج",
   training: "تدريب",
   apparel: "ملابس رياضية",
   "shin-guards": "واقيات الساق",
+  "head-guards": "واقيات الرائس",
   "hand-wraps": "بنداج اليد",
+  "t-shirts": "تيشيرتات",
+  "jump-ropes": "حبال القفز",
+  "2pcs": "طقم قطعتين",
 };
 
 const toFinitePrice = (value: number | string | null | undefined) => {

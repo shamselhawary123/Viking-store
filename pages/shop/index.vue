@@ -5,9 +5,9 @@
         <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p class="eyebrow">{{ t('admin.store') }}</p>
-            <h1 class="mt-2 text-4xl font-black leading-tight text-white md:text-6xl">{{ t('shop.shopCombatGear') }}</h1>
+            <h1 class="mt-2 text-4xl font-black leading-tight text-white md:text-6xl">{{ shopHeading }}</h1>
             <p class="mt-3 max-w-2xl text-sm leading-6 text-neutral-400 md:text-base">
-              {{ t('shop.shopLead') }}
+              {{ shopLead }}
             </p>
           </div>
           <div class="grid grid-cols-3 gap-2 text-center">
@@ -42,34 +42,66 @@ import { useRoute } from "vue-router";
 import { useProductsStore } from "../../stores/products";
 import { useShopStore } from "../../stores/shop";
 import { useWishlistStore } from "../../stores/wishlist";
+import {
+  buildCategorySeo,
+  buildShopCategoryCanonicalUrl,
+  normalizeCategorySlug,
+} from "../../utils/seo";
 
 const route = useRoute();
 const productsStore = useProductsStore(usePinia());
 const shopStore = useShopStore(usePinia());
 const wishlistStore = useWishlistStore(usePinia());
-const { t } = useI18n();
+const { locale, t } = useI18n();
+const config = useRuntimeConfig();
+
+const selectedCategorySlug = computed(() => {
+  const value = Array.isArray(route.query.category) ? route.query.category[0] : route.query.category;
+
+  return normalizeCategorySlug(String(value || "all"));
+});
+
+const selectedCategoryRecord = computed(() =>
+  productsStore.products.find((product) => product.categories?.slug === selectedCategorySlug.value)?.categories || {
+    slug: selectedCategorySlug.value,
+    name: selectedCategorySlug.value,
+  },
+);
+
+const activeCategorySeo = computed(() => buildCategorySeo(selectedCategoryRecord.value, locale.value));
+const isCategoryLanding = computed(() => Boolean(selectedCategorySlug.value && selectedCategorySlug.value !== "all"));
+const shopHeading = computed(() => (isCategoryLanding.value ? activeCategorySeo.value.h1 : t("shop.shopCombatGear")));
+const shopLead = computed(() => (isCategoryLanding.value ? activeCategorySeo.value.intro : t("shop.shopLead")));
+const shopMetaTitle = computed(() => (isCategoryLanding.value ? activeCategorySeo.value.title : t("seo.shopTitle")));
+const shopMetaDescription = computed(() => (isCategoryLanding.value ? activeCategorySeo.value.description : t("seo.shopDescription")));
+const shopCanonicalUrl = computed(() =>
+  buildShopCategoryCanonicalUrl(String(config.public.siteUrl || ""), isCategoryLanding.value ? selectedCategorySlug.value : "all"),
+);
 
 useSeoMeta({
-  title: () => t("seo.shopTitle"),
-  description: () => t("seo.shopDescription"),
-  ogTitle: () => t("seo.shopTitle"),
-  ogDescription: () => t("seo.shopDescription"),
+  title: () => shopMetaTitle.value,
+  description: () => shopMetaDescription.value,
+  ogTitle: () => shopMetaTitle.value,
+  ogDescription: () => shopMetaDescription.value,
+  ogUrl: () => shopCanonicalUrl.value,
 });
+
+useHead(() => ({
+  link: [{ rel: "canonical", href: shopCanonicalUrl.value }],
+}));
 
 onMounted(async () => {
   wishlistStore.loadWishlist();
   await productsStore.getProducts();
 });
 
-const category = computed(() => route.query.category);
-
 const filteredProducts = computed(() => {
-  if (!category.value || category.value === "all") {
+  if (!isCategoryLanding.value) {
     return productsStore.products;
   }
 
   return productsStore.products.filter(
-    (product) => product.categories?.slug === category.value,
+    (product) => product.categories?.slug === selectedCategorySlug.value,
   );
 });
 
@@ -82,7 +114,7 @@ const stats = computed(() => [
 watch(
   () => route.query.category,
   (newCategory) => {
-    shopStore.selectedCategory = (newCategory as string) || "all";
+    shopStore.selectedCategory = normalizeCategorySlug(String(newCategory || "all"));
   },
   { immediate: true },
 );
