@@ -156,6 +156,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { computed, ref } from "vue";
 import type { BlogPostLike } from "../../utils/blog";
+import { publicSupabaseReadOptions } from "../../utils/publicSupabase";
 
 type HomeBlogPost = BlogPostLike & {
   id: number | string;
@@ -169,6 +170,7 @@ const slideDirection = ref<"next" | "previous">("next");
 const supabase = createClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
+  publicSupabaseReadOptions,
 );
 
 const { data, pending } = await useAsyncData("home-blog-posts", async () => {

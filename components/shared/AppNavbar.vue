@@ -64,7 +64,7 @@
               <Icon name="i-heroicons-heart" class="text-xl" />
             </NuxtLink>
 
-            <template v-if="authStore.user">
+            <template v-if="isAuthReady && authStore.user">
               <NuxtLink to="/profile" class="profile-pill group">
                 <img
                   :src="
@@ -102,7 +102,7 @@
               </button>
             </template>
 
-            <template v-else>
+            <template v-else-if="isAuthReady">
               <NuxtLink to="/auth/login" class="auth-link">{{ t('nav.login') }}</NuxtLink>
               <NuxtLink to="/auth/register" class="auth-link auth-link-primary">
                 {{ t('nav.register') }}
@@ -148,7 +148,7 @@
           <div class="mt-5 border-t border-white/10 pt-5">
             <SharedLanguageSwitcher class="mb-4" />
 
-            <div v-if="authStore.user" class="grid gap-3">
+            <div v-if="isAuthReady && authStore.user" class="grid gap-3">
               <NuxtLink
                 to="/profile"
                 class="mobile-account"
@@ -190,7 +190,7 @@
               </button>
             </div>
 
-            <div v-else class="grid gap-3 sm:grid-cols-2">
+            <div v-else-if="isAuthReady" class="grid gap-3 sm:grid-cols-2">
               <NuxtLink
                 to="/auth/login"
                 class="mobile-action"
@@ -226,6 +226,7 @@ const router = useRouter();
 const { t } = useI18n();
 
 const isMenuOpen = ref(false);
+const isAuthReady = ref(false);
 const navLinks = [
   { labelKey: "nav.home", to: "/" },
   { labelKey: "nav.shop", to: "/shop" },
@@ -245,6 +246,8 @@ onMounted(async () => {
     }
   } catch (err) {
     console.log(err);
+  } finally {
+    isAuthReady.value = true;
   }
 
   cartStore.loadCart();

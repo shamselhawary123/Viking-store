@@ -119,6 +119,7 @@ import {
   renderSafeBlogContent,
   type BlogPostLike,
 } from "../../utils/blog";
+import { publicSupabaseReadOptions } from "../../utils/publicSupabase";
 import {
   buildShopCategoryUrl,
   getCategorySeoIntent,
@@ -138,6 +139,7 @@ const slug = String(route.params.slug || "");
 const supabase = createClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
+  publicSupabaseReadOptions,
 );
 
 const { data: post } = await useAsyncData(`blog-post-${slug}`, async () => {

@@ -49,6 +49,21 @@ describe("homepage scroll reveal", () => {
     assert.doesNotMatch(source, /addEventListener\(["']scroll/);
   });
 
+  it("registers an SSR-safe reveal directive for server rendering", () => {
+    const pluginUrl = new URL("../plugins/reveal.server.ts", import.meta.url);
+
+    assert.equal(existsSync(pluginUrl), true);
+
+    const source = read("../plugins/reveal.server.ts");
+
+    assert.match(source, /defineNuxtPlugin/);
+    assert.match(source, /vueApp\.directive\("reveal"/);
+    assert.match(source, /getSSRProps/);
+    assert.doesNotMatch(source, /IntersectionObserver/);
+    assert.doesNotMatch(source, /window/);
+    assert.doesNotMatch(source, /document/);
+  });
+
   it("defines subtle transform-based reveal CSS with reduced-motion support", () => {
     const source = read("../assets/css/main.css");
 
