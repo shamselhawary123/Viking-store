@@ -1,0 +1,15 @@
+[33m81c4131[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m Merge branch 'dev'
+[33m81c801e[m Merge branch 'main' of https://github.com/shamselhawary123/Viking-store
+[33m5435a4e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m, [m[1;31morigin/dev[m[33m)[m feat: implement mobile carousel functionality in WhyVikingSection component
+[33m6f24b93[m Merge pull request #4 from shamselhawary123/dev
+[33m6195292[m :wqMerge branch 'dev'
+[33mbc91f70[m feat: replace HomeCommunitySection with HomeBlogSection on homepage
+[33m3f04dde[m Merge branch 'dev'
+[33mce5f15b[m add a blog bage and improve the SEO
+[33m1f6169a[m Merge pull request #3 from shamselhawary123/dev
+[33mc63f160[m feat: update contact information and enhance localization
+[33m5f2f984[m Merge pull request #2 from shamselhawary123/dev
+[33md44922e[m Add tests and utility functions for coupon management and localization
+[33m3a97b18[m Merge pull request #1 from shamselhawary123/dev
+[33md562fe0[m feat: implement admin login and middleware, refactor product management
+[33m5567467[m feat: enhance product page with lightbox, recently viewed section, and improved layout

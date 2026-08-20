@@ -2,10 +2,12 @@
   <section class="section-premium bg-black">
     <div class="container-premium">
       <div v-reveal class="mx-auto mb-16 max-w-3xl text-center">
-        <p class="eyebrow">{{ t('common.categories') }}</p>
-        <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">{{ t('home.chooseYourWeapon') }}</h2>
+        <p class="eyebrow">{{ t("common.categories") }}</p>
+        <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">
+          {{ t("home.chooseYourWeapon") }}
+        </h2>
         <p class="mt-5 leading-8 text-neutral-400">
-          {{ t('home.categoriesLead') }}
+          {{ t("home.categoriesLead") }}
         </p>
       </div>
 
@@ -26,20 +28,35 @@
             loading="lazy"
             decoding="async"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
-          <div class="absolute inset-x-5 top-5 flex items-center justify-between">
-            <span class="rounded-full border border-white/10 bg-black/55 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white backdrop-blur">{{ t('home.proGear') }}</span>
-            <span class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]">
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10"
+          />
+          <div
+            class="absolute inset-x-5 top-5 flex items-center justify-between"
+          >
+            <span
+              class="rounded-full border border-white/10 bg-black/55 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white backdrop-blur"
+              >{{ t("home.proGear") }}</span
+            >
+            <span
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]"
+            >
               <Icon name="i-heroicons-arrow-right" />
             </span>
           </div>
-          <div class="absolute bottom-6 left-6 right-6 translate-y-2 transition duration-300 group-hover:translate-y-0">
-            <h3 class="font-display text-5xl leading-none text-white">{{ getLocalizedCategoryName(category, locale) || category.name }}</h3>
+          <div
+            class="absolute bottom-6 left-6 right-6 translate-y-2 transition duration-300 group-hover:translate-y-0"
+          >
+            <h3 class="font-display text-5xl leading-none text-white">
+              {{ getLocalizedCategoryName(category, locale) || category.name }}
+            </h3>
             <p class="mt-3 max-w-52 text-sm leading-6 text-neutral-300">
               {{ categorySeo(category).intro }}
             </p>
-            <p class="mt-5 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]">
-              {{ t('home.explore') }}
+            <p
+              class="mt-5 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
+            >
+              {{ t("home.explore") }}
             </p>
           </div>
         </NuxtLink>
@@ -51,9 +68,7 @@
         class="flex items-center gap-2 sm:hidden"
         :dir="locale === 'ar' ? 'rtl' : 'ltr'"
       >
-        <div
-          class="shrink-0"
-        >
+        <div class="shrink-0">
           <button
             type="button"
             class="mobile-carousel-arrow"
@@ -61,7 +76,11 @@
             @click="carousel.movePrevious"
           >
             <Icon
-              :name="locale === 'ar' ? 'i-heroicons-chevron-right' : 'i-heroicons-chevron-left'"
+              :name="
+                locale === 'ar'
+                  ? 'i-heroicons-chevron-right'
+                  : 'i-heroicons-chevron-left'
+              "
               class="text-lg"
             />
           </button>
@@ -77,7 +96,10 @@
         >
           <div
             class="mobile-carousel-track flex touch-pan-y will-change-transform"
-            :class="{ 'is-dragging': carousel.isDragging, 'is-snapping': carousel.isSnapping }"
+            :class="{
+              'is-dragging': carousel.isDragging,
+              'is-snapping': carousel.isSnapping,
+            }"
             :style="carousel.trackStyle"
           >
             <NuxtLink
@@ -95,29 +117,47 @@
                 loading="lazy"
                 decoding="async"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10" />
-              <div class="absolute inset-x-5 top-5 flex items-center justify-between">
-                <span class="rounded-full border border-white/10 bg-black/55 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white backdrop-blur">{{ t('home.proGear') }}</span>
-                <span class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]">
+              <div
+                class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10"
+              />
+              <div
+                class="absolute inset-x-5 top-5 flex items-center justify-between"
+              >
+                <span
+                  class="rounded-full border border-white/10 bg-black/55 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white backdrop-blur"
+                  >{{ t("home.proGear") }}</span
+                >
+                <span
+                  class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]"
+                >
                   <Icon name="i-heroicons-arrow-right" />
                 </span>
               </div>
-              <div class="absolute bottom-6 left-6 right-6 translate-y-2 transition duration-300 group-hover:translate-y-0">
-                <h3 class="font-display text-5xl leading-none text-white">{{ getLocalizedCategoryName(visibleCategories[itemIndex], locale) || visibleCategories[itemIndex].name }}</h3>
+              <div
+                class="absolute bottom-6 left-6 right-6 translate-y-2 transition duration-300 group-hover:translate-y-0"
+              >
+                <h3 class="font-display text-5xl leading-none text-white">
+                  {{
+                    getLocalizedCategoryName(
+                      visibleCategories[itemIndex],
+                      locale,
+                    ) || visibleCategories[itemIndex].name
+                  }}
+                </h3>
                 <p class="mt-3 max-w-52 text-sm leading-6 text-neutral-300">
                   {{ categorySeo(visibleCategories[itemIndex]).intro }}
                 </p>
-                <p class="mt-5 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]">
-                  {{ t('home.explore') }}
+                <p
+                  class="mt-5 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
+                >
+                  {{ t("home.explore") }}
                 </p>
               </div>
             </NuxtLink>
           </div>
         </div>
 
-        <div
-          class="shrink-0"
-        >
+        <div class="shrink-0">
           <button
             type="button"
             class="mobile-carousel-arrow"
@@ -125,7 +165,11 @@
             @click="carousel.moveNext"
           >
             <Icon
-              :name="locale === 'ar' ? 'i-heroicons-chevron-left' : 'i-heroicons-chevron-right'"
+              :name="
+                locale === 'ar'
+                  ? 'i-heroicons-chevron-left'
+                  : 'i-heroicons-chevron-right'
+              "
               class="text-lg"
             />
           </button>
@@ -145,16 +189,21 @@ import { buildCategorySeo, buildShopCategoryUrl } from "../../utils/seo";
 const categoriesStore = useCategoriesStore(usePinia());
 const { locale, t } = useI18n();
 
-const categorySeo = (category: { slug?: string | null; name?: string | null }) =>
-  buildCategorySeo(category, locale.value);
+const categorySeo = (category: {
+  slug?: string | null;
+  name?: string | null;
+}) => buildCategorySeo(category, locale.value);
 
 const visibleCategories = computed(() =>
   categoriesStore.categories.filter((category) => category.slug !== "all"),
 );
 const isRtl = computed(() => locale.value === "ar");
-const carousel = useMobileCarousel(computed(() => visibleCategories.value.length), {
-  isRtl,
-});
+const carousel = useMobileCarousel(
+  computed(() => visibleCategories.value.length),
+  {
+    isRtl,
+  },
+);
 
 onMounted(async () => {
   await categoriesStore.getCategories();
@@ -163,8 +212,7 @@ onMounted(async () => {
 
 <style scoped>
 .mobile-carousel-track {
-  transition:
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mobile-carousel-track.is-dragging,
