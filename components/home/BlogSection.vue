@@ -2,6 +2,7 @@
   <section v-if="pending || posts.length" class="section-premium bg-black">
     <div class="container-premium">
       <div
+        v-reveal
         class="mb-10 flex flex-col gap-5 text-center md:flex-row md:items-end md:justify-between md:text-left"
       >
         <div>
@@ -32,8 +33,9 @@
       <div v-else-if="posts.length" class="overflow-hidden">
         <div class="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-4">
           <NuxtLink
-            v-for="post in posts"
+            v-for="(post, index) in posts"
             :key="post.id"
+            v-reveal="{ delay: index * 90 }"
             :to="`/blog/${post.slug}`"
             class="group relative min-h-[18rem] overflow-hidden rounded-2xl border border-white/10 bg-[#111111] transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/70"
           >
@@ -70,7 +72,7 @@
           </NuxtLink>
         </div>
 
-        <div class="md:hidden">
+        <div v-reveal class="md:hidden">
           <div
             class="overflow-hidden"
             @touchstart.passive="handleTouchStart"

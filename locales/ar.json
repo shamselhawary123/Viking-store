@@ -190,7 +190,7 @@
     "rounds": "تستحمل أكتر من 300 جولة",
     "fighterRating": "تقييم اللاعبين",
     "featured": "منتجات مميزة",
-    "fighterFavorites": "اختيارات اللاعبين",
+    "fighterFavorites": "الاكثر مبيعاً",
     "featuredText": "اختيارات قوية للاعبين اللي بيتمرنوا بجد وعايزين ادوات تستحمل معاهم كل جولة.",
     "viewAllProducts": "شوف كل المنتجات",
     "bestSeller": "الأكثر مبيعاً",
@@ -212,7 +212,6 @@
     "ordersStat": "طلبات",
     "athletesStat": "لاعبين",
     "ratingStat": "تقييم",
-    "countriesStat": "دول",
     "whyViking": {
       "eyebrow": "ليه تختار Viking؟",
       "title": "معمول للأبطال",
