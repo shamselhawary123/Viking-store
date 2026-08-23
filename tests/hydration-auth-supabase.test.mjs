@@ -5,10 +5,26 @@ import { describe, it } from "node:test";
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 
 const publicReadClientFiles = [
-  "../components/home/BlogSection.vue",
-  "../pages/blog/index.vue",
-  "../pages/blog/[slug].vue",
-  "../pages/shop/[slug].vue",
+  {
+    path: "../components/home/BlogSection.vue",
+    storageKey: "viking-store-home-blog-readonly",
+  },
+  {
+    path: "../components/home/FeaturedProductsSection.vue",
+    storageKey: "viking-store-home-best-sellers-readonly",
+  },
+  {
+    path: "../pages/blog/index.vue",
+    storageKey: "viking-store-blog-index-readonly",
+  },
+  {
+    path: "../pages/blog/[slug].vue",
+    storageKey: "viking-store-blog-detail-readonly",
+  },
+  {
+    path: "../pages/shop/[slug].vue",
+    storageKey: "viking-store-shop-product-seo-readonly",
+  },
 ];
 
 describe("hydration-safe auth UI and public Supabase reads", () => {
@@ -31,13 +47,15 @@ describe("hydration-safe auth UI and public Supabase reads", () => {
     assert.match(utilSource, /persistSession:\s*false/);
     assert.match(utilSource, /autoRefreshToken:\s*false/);
     assert.match(utilSource, /detectSessionInUrl:\s*false/);
-    assert.match(utilSource, /storageKey:\s*"viking-store-public-readonly"/);
+    assert.match(utilSource, /createPublicSupabaseReadOptions/);
+    assert.match(utilSource, /storageKey:\s*string/);
 
-    for (const file of publicReadClientFiles) {
-      const source = read(file);
+    for (const client of publicReadClientFiles) {
+      const source = read(client.path);
 
-      assert.match(source, /publicSupabaseReadOptions/);
-      assert.match(source, /createClient\([^)]*publicSupabaseReadOptions/s);
+      assert.match(source, /createPublicSupabaseReadOptions/);
+      assert.match(source, new RegExp(client.storageKey));
+      assert.match(source, /createClient\([^)]*createPublicSupabaseReadOptions/s);
     }
   });
 });

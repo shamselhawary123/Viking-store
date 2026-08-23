@@ -13,13 +13,13 @@
     <div
       class="container-premium relative grid min-h-[calc(100dvh-5rem)] items-center gap-12 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:py-20"
     >
-      <div class="reveal-up pt-4 text-center lg:text-left">
+      <div class="reveal-up pt-4 text-center lg:text-start">
         <p class="eyebrow inline-flex items-center gap-3">
           <span class="h-px w-10 bg-[#FF4D00]" />
           {{ t("home.heroEyebrow") }}
         </p>
         <h1
-          class="display-heading mt-6 text-7xl text-white sm:text-8xl lg:text-[9.6rem]"
+          class="display-heading mt-6 text-7xl text-white sm:text-8xl lg:text-[4.5rem]"
         >
           {{ t("home.heroTitle") }}
           <span
@@ -28,7 +28,7 @@
           >
         </h1>
         <p
-          class="mx-auto mt-7 max-w-2xl text-base leading-8 text-neutral-300 lg:mx-0 lg:text-lg"
+          class="mx-auto mt-7 max-w-2xl text-base leading-8 text-neutral-300 lg:ms-0 lg:me-auto lg:text-lg"
         >
           {{ t("home.heroText") }}
         </p>
@@ -65,7 +65,7 @@
           </NuxtLink>
         </div>
 
-        <div class="mt-11 grid grid-cols-3 gap-3 text-left">
+        <div class="mt-11 grid grid-cols-3 gap-3 text-start">
           <div
             v-for="stat in stats"
             :key="stat.label"
@@ -117,7 +117,7 @@
         <div
           class="absolute right-3 top-8 z-20 rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur md:right-12"
         >
-          <p class="font-display text-4xl leading-none text-white">4.9</p>
+          <p class="font-display text-4xl leading-none text-white">4.8</p>
           <p
             class="text-xs font-black uppercase tracking-[0.16em] text-[#FF4D00]"
           >
@@ -145,7 +145,7 @@ const categoryLinks = [
 ];
 
 const stats = [
-  { value: "4.9", labelKey: "home.rating" },
+  { value: "4.8", labelKey: "home.rating" },
   { value: "24h", labelKey: "home.dispatch" },
   { value: "Pro", labelKey: "home.quality" },
 ];

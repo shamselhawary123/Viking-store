@@ -139,7 +139,7 @@
     </section>
 
     <section ref="statsSection" class="container-premium py-20">
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <article
           v-for="stat in stats"
           :key="stat.label"
@@ -410,10 +410,9 @@ const features = [
 ];
 
 const stats = ref([
-  { labelKey: "pages.productsStat", target: 120, current: "0", suffix: "+" },
-  { labelKey: "pages.happyCustomers", target: 8400, current: "0", suffix: "+" },
-  { labelKey: "pages.countries", target: 18, current: "0", suffix: "+" },
-  { labelKey: "orders.orders", target: 12500, current: "0", suffix: "+" },
+  { labelKey: "pages.productsStat", target: 50, current: "0", suffix: "+" },
+  { labelKey: "pages.happyCustomers", target: 590, current: "0", suffix: "+" },
+  { labelKey: "orders.orders", target: 999, current: "0", suffix: "+" },
 ]);
 
 const team = [
@@ -421,14 +420,14 @@ const team = [
     name: "Shams Elhawary",
     roleKey: "aboutData.founder",
     textKey: "aboutData.founderText",
-    image: "https://i.postimg.cc/g08BZjbt/IMG-20250701-WA0090.jpg",
+    image: "https://i.postimg.cc/0yVqKX27/shams.png",
     alt: "Founder standing in a combat gym",
   },
   {
     name: "Mostafa Mohamed",
     roleKey: "aboutData.gearLead",
     textKey: "aboutData.gearLeadText",
-    image: "https://i.postimg.cc/ydxqS9sS/mostafa.jpg",
+    image: "https://i.postimg.cc/G2WRhBh2/Mostafa-Mohamed.png",
     alt: "Gear lead preparing training equipment",
   },
   {
