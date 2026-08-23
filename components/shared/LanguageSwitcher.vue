@@ -6,7 +6,7 @@
       type="button"
       class="language-option"
       :class="{ active: locale === option.code }"
-      @click="setLocale(option.code)"
+      @click="switchLocale(option.code)"
     >
       {{ option.label }}
     </button>
@@ -15,11 +15,20 @@
 
 <script setup lang="ts">
 const { locale, setLocale, t } = useI18n();
+const localeCookie = useCookie<"en" | "ar">("viking_locale", {
+  maxAge: 60 * 60 * 24 * 365,
+  sameSite: "lax",
+});
 
 const localeOptions = [
   { code: "en" as const, label: "EN" },
   { code: "ar" as const, label: "عربي" },
 ];
+
+const switchLocale = async (code: "en" | "ar") => {
+  localeCookie.value = code;
+  await setLocale(code);
+};
 </script>
 
 <style scoped>

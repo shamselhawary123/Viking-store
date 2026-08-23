@@ -29,7 +29,14 @@ body {
 }
 
 html[dir="rtl"] body {
-  font-family: "Cairo", "Inter", sans-serif;
+  font-family: "IBM Plex Sans Arabic", "Inter", sans-serif;
+  line-height: 1.65;
+}
+
+html[dir="rtl"] .font-display,
+html[dir="rtl"] .display-heading {
+  font-family: "IBM Plex Sans Arabic", "Inter", sans-serif;
+  line-height: 1.08;
 }
 
 html[dir="rtl"] .eyebrow,

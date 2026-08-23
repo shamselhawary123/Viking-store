@@ -3,7 +3,7 @@
     <div class="container-premium">
       <div
         v-reveal
-        class="mb-10 flex flex-col gap-5 text-center md:flex-row md:items-end md:justify-between md:text-left"
+        class="mb-10 flex flex-col gap-5 text-center md:flex-row md:items-end md:justify-between md:text-start"
       >
         <div>
           <p class="eyebrow">{{ t("home.blogSection.eyebrow") }}</p>
@@ -156,7 +156,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { computed, ref } from "vue";
 import type { BlogPostLike } from "../../utils/blog";
-import { publicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
 
 type HomeBlogPost = BlogPostLike & {
   id: number | string;
@@ -170,7 +170,7 @@ const slideDirection = ref<"next" | "previous">("next");
 const supabase = createClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
-  publicSupabaseReadOptions,
+  createPublicSupabaseReadOptions("viking-store-home-blog-readonly"),
 );
 
 const { data, pending } = await useAsyncData("home-blog-posts", async () => {

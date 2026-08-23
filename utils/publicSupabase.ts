@@ -1,8 +1,12 @@
-export const publicSupabaseReadOptions = {
+export const createPublicSupabaseReadOptions = (storageKey: string) => ({
   auth: {
-    storageKey: "viking-store-public-readonly",
+    storageKey,
     persistSession: false,
     autoRefreshToken: false,
     detectSessionInUrl: false,
   },
-} as const;
+}) as const;
+
+export const publicSupabaseReadOptions = createPublicSupabaseReadOptions(
+  "viking-store-public-readonly",
+);

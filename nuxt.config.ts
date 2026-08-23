@@ -56,8 +56,10 @@ export default defineNuxtConfig({
         provider: "google",
       },
       {
-        name: "Cairo",
+        name: "IBM Plex Sans Arabic",
         provider: "google",
+        weights: [400, 500, 600, 700, 800],
+        styles: ["normal"],
       },
       {
         name: "Bebas Neue",
@@ -67,15 +69,10 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    defaultLocale: "en",
+    defaultLocale: "ar",
     strategy: "no_prefix",
     langDir: "../locales/",
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: "viking_locale",
-      fallbackLocale: "en",
-      redirectOn: "root",
-    },
+    detectBrowserLanguage: false,
 
     locales: [
       {

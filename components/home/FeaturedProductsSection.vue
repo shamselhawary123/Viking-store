@@ -6,7 +6,7 @@
     <div class="container-premium">
       <div
         v-reveal
-        class="relative mb-14 flex flex-col gap-5 text-center md:flex-row md:items-end md:justify-between md:text-left"
+        class="relative mb-14 flex flex-col gap-5 text-center md:flex-row md:items-end md:justify-between md:text-start"
       >
         <div>
           <p class="eyebrow">{{ t("home.featured") }}</p>
@@ -49,6 +49,7 @@
                 class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/20"
               />
               <div
+                v-if="product.isRealBestSeller || product.badge"
                 class="absolute left-4 top-4 rounded-full bg-[#FF4D00] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(255,77,0,0.28)]"
               >
                 {{ product.badge || t("home.bestSeller") }}
@@ -203,6 +204,7 @@
                     class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/20"
                   />
                   <div
+                    v-if="featuredProducts[itemIndex].isRealBestSeller || featuredProducts[itemIndex].badge"
                     class="absolute left-4 top-4 rounded-full bg-[#FF4D00] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(255,77,0,0.28)]"
                   >
                     {{ featuredProducts[itemIndex].badge || t("home.bestSeller") }}
@@ -330,25 +332,89 @@
 </template>
 
 <script setup lang="ts">
+import { createClient } from "@supabase/supabase-js";
 import { computed, onMounted } from "vue";
 import { useMobileCarousel } from "../../composables/useMobileCarousel";
-import { useProductsStore } from "../../stores/products";
 import { useWishlistStore } from "../../stores/wishlist";
+import {
+  selectHomepageBestSellerProducts,
+  type BestSellerProduct,
+  type HomeBestSellerResult,
+} from "../../utils/homeBestSellers";
 import {
   formatStorePrice,
   getLocalizedCategoryName,
 } from "../../utils/localizationFormat";
+import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { SHOP_PRODUCTS_SELECT } from "../../utils/shopProducts";
 
-const productsStore = useProductsStore(usePinia());
 const wishlistStore = useWishlistStore(usePinia());
 const { locale, t } = useI18n();
+const config = useRuntimeConfig();
+const supabase = createClient(
+  config.public.supabaseUrl as string,
+  config.public.supabaseKey as string,
+  createPublicSupabaseReadOptions("viking-store-home-best-sellers-readonly"),
+);
 
 onMounted(async () => {
-  await productsStore.getProducts();
   wishlistStore.loadWishlist();
 });
 
-const featuredProducts = computed(() => productsStore.products.slice(0, 3));
+const { data: bestSellingProducts } = await useAsyncData(
+  "home-best-selling-products",
+  async () => {
+    const { data: bestSellerResults, error: bestSellersError } =
+      await supabase.rpc("get_home_best_sellers");
+
+    if (bestSellersError) console.error(bestSellersError);
+
+    const usableBestSellerResults = bestSellersError
+      ? []
+      : ((bestSellerResults || []) as HomeBestSellerResult[]);
+    const productIds = Array.from(
+      new Set(
+        usableBestSellerResults
+          .map((item) => item.product_id)
+          .filter(Boolean)
+          .map(String),
+      ),
+    );
+    let bestSellerProducts: BestSellerProduct[] = [];
+
+    if (productIds.length) {
+      const { data: products, error: productsError } = await supabase
+        .from("products")
+        .select(SHOP_PRODUCTS_SELECT)
+        .in("id", productIds);
+
+      if (productsError) {
+        console.error(productsError);
+      } else {
+        bestSellerProducts = (products || []) as BestSellerProduct[];
+      }
+    }
+
+    const { data: fallbackProducts, error: fallbackProductsError } =
+      await supabase
+        .from("products")
+        .select(SHOP_PRODUCTS_SELECT)
+        .order("created_at", { ascending: false })
+        .order("id", { ascending: false });
+
+    if (fallbackProductsError) console.error(fallbackProductsError);
+
+    return selectHomepageBestSellerProducts({
+      bestSellerResults: usableBestSellerResults,
+      bestSellerProducts,
+      fallbackProducts: fallbackProductsError
+        ? []
+        : ((fallbackProducts || []) as BestSellerProduct[]),
+    });
+  },
+);
+
+const featuredProducts = computed(() => bestSellingProducts.value || []);
 const isRtl = computed(() => locale.value === "ar");
 const carousel = useMobileCarousel(computed(() => featuredProducts.value.length), {
   isRtl,

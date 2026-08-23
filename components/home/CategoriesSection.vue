@@ -17,44 +17,50 @@
           :key="category.id"
           v-reveal="{ delay: index * 90 }"
           :to="buildShopCategoryUrl(category.slug)"
-          class="group relative min-h-[23rem] overflow-hidden rounded-2xl border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/70 hover:shadow-[0_30px_90px_rgba(255,77,0,0.12)]"
+          class="group flex h-[25rem] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/70 hover:shadow-[0_30px_90px_rgba(255,77,0,0.12)]"
         >
-          <img
-            :src="category.image"
-            :alt="categorySeo(category).title"
-            width="640"
-            height="800"
-            class="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-110 group-hover:opacity-100"
-            loading="lazy"
-            decoding="async"
-          />
-          <div
-            class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10"
-          />
-          <div
-            class="absolute inset-x-5 top-5 flex items-center justify-between"
-          >
-            <span
-              class="rounded-full border border-white/10 bg-black/55 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white backdrop-blur"
-              >{{ t("home.proGear") }}</span
+          <div class="relative h-[70%] overflow-hidden bg-black">
+            <img
+              :src="category.image"
+              :alt="categorySeo(category).title"
+              width="640"
+              height="800"
+              class="absolute inset-0 h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-110 group-hover:opacity-100"
+              loading="lazy"
+              decoding="async"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/20"
+            />
+            <div
+              class="absolute inset-x-5 top-5 flex items-center justify-between"
             >
-            <span
-              class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]"
-            >
-              <Icon name="i-heroicons-arrow-right" />
-            </span>
+              <span
+                class="rounded-full border border-white/10 bg-black/65 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white"
+                >{{ t("home.proGear") }}</span
+              >
+              <span
+                class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]"
+              >
+                <Icon name="i-heroicons-arrow-right" />
+              </span>
+            </div>
           </div>
           <div
-            class="absolute bottom-6 left-6 right-6 translate-y-2 transition duration-300 group-hover:translate-y-0"
+            class="flex flex-1 flex-col justify-between border-t border-white/10 bg-[#0c0c0c] p-5 text-start"
           >
-            <h3 class="font-display text-5xl leading-none text-white">
-              {{ getLocalizedCategoryName(category, locale) || category.name }}
-            </h3>
-            <p class="mt-3 max-w-52 text-sm leading-6 text-neutral-300">
-              {{ categorySeo(category).intro }}
-            </p>
+            <div>
+              <h3
+                class="font-display text-3xl leading-none text-white transition duration-300 group-hover:text-[#FF4D00]"
+              >
+                {{ getLocalizedCategoryName(category, locale) || category.name }}
+              </h3>
+              <p class="mt-3 line-clamp-2 text-sm leading-6 text-neutral-400">
+                {{ categorySeo(category).intro }}
+              </p>
+            </div>
             <p
-              class="mt-5 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
+              class="mt-4 inline-flex w-fit items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
             >
               {{ t("home.explore") }}
             </p>
@@ -106,49 +112,55 @@
               v-for="(itemIndex, index) in carousel.loopedIndexes"
               :key="`${index}-${visibleCategories[itemIndex].id}`"
               :to="buildShopCategoryUrl(visibleCategories[itemIndex].slug)"
-              class="mobile-carousel-slide group relative block min-h-[23rem] shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:border-[#FF4D00]/70 hover:shadow-[0_30px_90px_rgba(255,77,0,0.12)]"
+              class="mobile-carousel-slide group flex h-[25rem] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:border-[#FF4D00]/70 hover:shadow-[0_30px_90px_rgba(255,77,0,0.12)]"
             >
-              <img
-                :src="visibleCategories[itemIndex].image"
-                :alt="categorySeo(visibleCategories[itemIndex]).title"
-                width="640"
-                height="800"
-                class="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-700 group-hover:scale-110 group-hover:opacity-100"
-                loading="lazy"
-                decoding="async"
-              />
-              <div
-                class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-black/10"
-              />
-              <div
-                class="absolute inset-x-5 top-5 flex items-center justify-between"
-              >
-                <span
-                  class="rounded-full border border-white/10 bg-black/55 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white backdrop-blur"
-                  >{{ t("home.proGear") }}</span
+              <div class="relative h-[70%] overflow-hidden bg-black">
+                <img
+                  :src="visibleCategories[itemIndex].image"
+                  :alt="categorySeo(visibleCategories[itemIndex]).title"
+                  width="640"
+                  height="800"
+                  class="absolute inset-0 h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-110 group-hover:opacity-100"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div
+                  class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/20"
+                />
+                <div
+                  class="absolute inset-x-5 top-5 flex items-center justify-between"
                 >
-                <span
-                  class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]"
-                >
-                  <Icon name="i-heroicons-arrow-right" />
-                </span>
+                  <span
+                    class="rounded-full border border-white/10 bg-black/65 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white"
+                    >{{ t("home.proGear") }}</span
+                  >
+                  <span
+                    class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]"
+                  >
+                    <Icon name="i-heroicons-arrow-right" />
+                  </span>
+                </div>
               </div>
               <div
-                class="absolute bottom-6 left-6 right-6 translate-y-2 transition duration-300 group-hover:translate-y-0"
+                class="flex flex-1 flex-col justify-between border-t border-white/10 bg-[#0c0c0c] p-5 text-start"
               >
-                <h3 class="font-display text-5xl leading-none text-white">
-                  {{
-                    getLocalizedCategoryName(
-                      visibleCategories[itemIndex],
-                      locale,
-                    ) || visibleCategories[itemIndex].name
-                  }}
-                </h3>
-                <p class="mt-3 max-w-52 text-sm leading-6 text-neutral-300">
-                  {{ categorySeo(visibleCategories[itemIndex]).intro }}
-                </p>
+                <div>
+                  <h3
+                    class="font-display text-3xl leading-none text-white transition duration-300 group-hover:text-[#FF4D00]"
+                  >
+                    {{
+                      getLocalizedCategoryName(
+                        visibleCategories[itemIndex],
+                        locale,
+                      ) || visibleCategories[itemIndex].name
+                    }}
+                  </h3>
+                  <p class="mt-3 line-clamp-2 text-sm leading-6 text-neutral-400">
+                    {{ categorySeo(visibleCategories[itemIndex]).intro }}
+                  </p>
+                </div>
                 <p
-                  class="mt-5 inline-flex items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
+                  class="mt-4 inline-flex w-fit items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
                 >
                   {{ t("home.explore") }}
                 </p>

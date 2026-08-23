@@ -396,7 +396,7 @@ import { useCartStore } from "../../stores/cart";
 import { useProductsStore } from "../../stores/products";
 import { useWishlistStore } from "../../stores/wishlist";
 import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
-import { publicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
 import { SHOP_PRODUCTS_SELECT } from "../../utils/shopProducts";
 import {
   buildBreadcrumbStructuredData,
@@ -474,7 +474,7 @@ const starNumbers = [1, 2, 3, 4, 5];
 const seoSupabase = createClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
-  publicSupabaseReadOptions,
+  createPublicSupabaseReadOptions("viking-store-shop-product-seo-readonly"),
 );
 
 const { data: initialProduct } = await useAsyncData(`shop-product-seo-${slug}`, async () => {

@@ -117,7 +117,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { computed, ref } from "vue";
 import { calculateReadingTime, formatBlogDate, type BlogPostLike } from "../../utils/blog";
-import { publicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
 import { buildCanonicalUrl, normalizeSiteUrl } from "../../utils/seo";
 
 type BlogPostRow = BlogPostLike & {
@@ -133,7 +133,7 @@ const selectedCategory = ref("all");
 const supabase = createClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
-  publicSupabaseReadOptions,
+  createPublicSupabaseReadOptions("viking-store-blog-index-readonly"),
 );
 
 const { data, pending, error } = await useAsyncData("published-blog-posts", async () => {
