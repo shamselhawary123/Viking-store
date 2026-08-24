@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-2xl border border-white/10 bg-[#0f0f0f]/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur md:p-5">
+  <div class="rounded-2xl border border-white/10 bg-[#171717]/90 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.28)] backdrop-blur md:p-5">
     <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
       <div class="min-w-0">
         <p class="text-sm font-bold text-neutral-400">
@@ -10,7 +10,7 @@
             v-for="preset in quickSorts"
             :key="preset.value"
             class="rounded-full border px-3 py-2 text-xs font-black uppercase tracking-[0.12em] transition duration-200"
-            :class="shopStore.sortBy === preset.value ? 'border-[#FF4D00] bg-[#FF4D00]/10 text-[#FF4D00]' : 'border-white/10 text-neutral-400 hover:border-[#FF4D00]/70 hover:text-white'"
+            :class="shopStore.sortBy === preset.value ? 'border-[#CF1D1D] bg-[#CF1D1D]/10 text-[#CF1D1D]' : 'border-white/10 text-neutral-400 hover:border-[#CF1D1D]/70 hover:text-white'"
             @click="shopStore.sortBy = preset.value"
           >
             {{ t(preset.labelKey) }}
@@ -41,7 +41,7 @@
 
         <div class="flex gap-3">
           <button
-            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 font-extrabold text-white transition duration-200 hover:-translate-y-0.5 hover:border-[#FF4D00] hover:text-[#FF4D00] active:scale-[0.98] lg:hidden"
+            class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.04] px-4 font-extrabold text-white transition duration-200 hover:-translate-y-0.5 hover:border-[#CF1D1D] hover:text-[#CF1D1D] active:scale-[0.98] lg:hidden"
             @click="toggleFilters"
           >
             <Icon name="i-heroicons-funnel" />

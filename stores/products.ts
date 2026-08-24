@@ -21,7 +21,8 @@ export const useProductsStore = defineStore("products", {
         const { data, error } = await supabase
           .from("products")
           .select(SHOP_PRODUCTS_SELECT)
-          .order("id", { ascending: false });
+          .order("shop_position", { ascending: true, nullsFirst: false })
+          .order("id", { ascending: true });
 
         if (error) throw error;
 

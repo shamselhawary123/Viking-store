@@ -25,7 +25,7 @@
         loading="lazy"
         decoding="async"
       />
-      <div class="relative flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
+      <div class="relative flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#CF1D1D]">
         <Icon name="i-heroicons-shopping-bag" class="text-4xl" />
       </div>
       <div class="relative">
@@ -37,16 +37,16 @@
 
     <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-12">
       <div class="space-y-5 lg:col-span-8">
-        <div class="rounded-2xl border border-white/10 bg-[#0f0f0f] p-5">
+        <div class="rounded-2xl border border-white/10 bg-[#171717] p-5">
           <div class="mb-3 flex items-center justify-between gap-4">
             <div>
-              <p class="text-sm font-black uppercase tracking-[0.16em] text-[#FF4D00]">{{ t('cart.shippingProgress') }}</p>
+              <p class="text-sm font-black uppercase tracking-[0.16em] text-[#CF1D1D]">{{ t('cart.shippingProgress') }}</p>
               <p class="mt-1 text-sm text-neutral-400">{{ t('cart.freeShippingUnlocked') }}</p>
             </div>
-            <Icon name="i-heroicons-truck" class="text-2xl text-[#FF4D00]" />
+            <Icon name="i-heroicons-truck" class="text-2xl text-[#CF1D1D]" />
           </div>
           <div class="h-2 overflow-hidden rounded-full bg-white/10">
-            <div class="h-full rounded-full bg-[#FF4D00] transition-all duration-700" :style="{ width: `${shippingProgress}%` }" />
+            <div class="h-full rounded-full bg-[#CF1D1D] transition-all duration-700" :style="{ width: `${shippingProgress}%` }" />
           </div>
         </div>
 
@@ -54,7 +54,7 @@
         <article
           v-for="(item, index) in cartStore.items"
           :key="`${item.id}-${item.color}-${item.size}-${index}`"
-            class="premium-panel group rounded-2xl p-5 transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/60"
+            class="premium-panel group rounded-2xl p-5 transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/60"
         >
           <div class="flex flex-col gap-5 md:flex-row">
               <img :src="item.image" :alt="item.title" width="320" height="320" class="h-48 w-full rounded-xl object-cover md:h-40 md:w-40" loading="lazy" decoding="async" />
@@ -86,7 +86,7 @@
                 <div class="flex items-center justify-between gap-5 md:justify-end">
                   <div class="text-right">
                     <p class="text-sm text-neutral-500">{{ t('common.subtotal') }}</p>
-                    <h3 class="text-2xl font-black text-[#FF4D00]">{{ formatStorePrice(item.price * item.quantity, locale) }}</h3>
+                    <h3 class="text-2xl font-black text-[#CF1D1D]">{{ formatStorePrice(item.price * item.quantity, locale) }}</h3>
                   </div>
                     <button class="flex h-12 w-12 items-center justify-center rounded-full border border-red-500/30 text-red-300 transition hover:-translate-y-0.5 hover:bg-red-500 hover:text-white active:scale-95" :aria-label="t('cart.removeItem')" @click="cartStore.removeFromCart(index)">
                     <Icon name="i-heroicons-trash" />
@@ -115,7 +115,7 @@
             </div>
             <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
               <div class="flex items-start gap-3">
-                <Icon name="i-heroicons-calendar-days" class="mt-1 text-xl text-[#FF4D00]" />
+                <Icon name="i-heroicons-calendar-days" class="mt-1 text-xl text-[#CF1D1D]" />
                 <div>
                   <p class="font-black text-white">{{ t('cart.estimatedDelivery') }}</p>
                   <p class="mt-1 text-sm leading-6 text-neutral-400">{{ estimatedDelivery }}</p>
@@ -125,7 +125,7 @@
             <div class="border-t border-white/10 pt-5">
               <div class="flex items-center justify-between">
                 <p class="text-xl font-black">{{ t('common.total') }}</p>
-                <span class="text-3xl font-black text-[#FF4D00]">{{ formatStorePrice(cartStore.totalPrice, locale) }}</span>
+                <span class="text-3xl font-black text-[#CF1D1D]">{{ formatStorePrice(cartStore.totalPrice, locale) }}</span>
               </div>
             </div>
           </div>
@@ -137,7 +137,7 @@
 
           <div class="mt-5 grid grid-cols-3 gap-2 text-center">
             <div v-for="badge in trustBadges" :key="badge.label" class="rounded-xl border border-white/10 bg-black/25 p-3">
-              <Icon :name="badge.icon" class="mx-auto text-xl text-[#FF4D00]" />
+              <Icon :name="badge.icon" class="mx-auto text-xl text-[#CF1D1D]" />
               <p class="mt-2 text-[0.65rem] font-bold uppercase tracking-[0.12em] text-neutral-400">{{ t(badge.labelKey) }}</p>
             </div>
           </div>

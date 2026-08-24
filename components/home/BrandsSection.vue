@@ -5,7 +5,7 @@
         <div
           v-for="brand in brands"
           :key="brand"
-          class="rounded-xl border border-white/5 bg-white/[0.025] px-4 py-5 font-display text-3xl text-neutral-500 transition duration-300 hover:border-[#FF4D00]/40 hover:text-[#FF4D00]"
+          class="rounded-xl border border-white/5 bg-white/[0.025] px-4 py-5 font-display text-3xl text-neutral-500 transition duration-300 hover:border-[#CF1D1D]/40 hover:text-[#CF1D1D]"
         >
           {{ brand }}
         </div>

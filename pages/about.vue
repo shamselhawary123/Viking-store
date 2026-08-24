@@ -23,7 +23,7 @@
             class="display-heading mt-5 text-7xl text-white sm:text-8xl lg:text-[9rem]"
           >
             {{ t("pages.builtFor") }}
-            <span class="block text-[#FF4D00]">{{ t("pages.warriors") }}</span>
+            <span class="block text-[#CF1D1D]">{{ t("pages.warriors") }}</span>
           </h1>
           <p
             class="mt-6 max-w-2xl text-base leading-8 text-neutral-300 md:text-xl"
@@ -63,17 +63,17 @@
           <article
             v-for="item in timeline"
             :key="item.year"
-            class="premium-panel relative rounded-2xl p-6 transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/60"
+            class="premium-panel relative rounded-2xl p-6 transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/60"
           >
             <div class="flex gap-5">
               <div
-                class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#FF4D00]/40 bg-black text-sm font-black text-[#FF4D00] sm:flex"
+                class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#CF1D1D]/40 bg-black text-sm font-black text-[#CF1D1D] sm:flex"
               >
                 {{ item.step }}
               </div>
               <div>
                 <p
-                  class="text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
+                  class="text-sm font-black uppercase tracking-[0.18em] text-[#CF1D1D]"
                 >
                   {{ t(item.yearKey) }}
                 </p>
@@ -97,7 +97,7 @@
           :key="item.title"
           class="premium-panel rounded-2xl p-7 md:p-9"
         >
-          <Icon :name="item.icon" class="text-4xl text-[#FF4D00]" />
+          <Icon :name="item.icon" class="text-4xl text-[#CF1D1D]" />
           <p class="eyebrow mt-7">{{ t(item.labelKey) }}</p>
           <h2 class="mt-3 text-3xl font-black text-white">
             {{ t(item.titleKey) }}
@@ -120,10 +120,10 @@
           <article
             v-for="feature in features"
             :key="feature.title"
-            class="premium-panel group rounded-2xl p-6 transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/60"
+            class="premium-panel group rounded-2xl p-6 transition duration-300 hover:-translate-y-2 hover:border-[#CF1D1D]/60"
           >
             <div
-              class="flex h-12 w-12 items-center justify-center rounded-xl border border-[#FF4D00]/30 bg-[#FF4D00]/10 text-[#FF4D00] transition group-hover:scale-105"
+              class="flex h-12 w-12 items-center justify-center rounded-xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 text-[#CF1D1D] transition group-hover:scale-105"
             >
               <Icon :name="feature.icon" class="text-2xl" />
             </div>
@@ -143,7 +143,7 @@
         <article
           v-for="stat in stats"
           :key="stat.label"
-          class="rounded-2xl border border-white/10 bg-[#0f0f0f] p-6 text-center"
+          class="rounded-2xl border border-white/10 bg-[#171717] p-6 text-center"
         >
           <p class="display-heading text-6xl text-white">
             {{ stat.current }}{{ stat.suffix }}
@@ -176,7 +176,7 @@
         <article
           v-for="member in team"
           :key="member.name"
-          class="group overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/60"
+          class="group overflow-hidden rounded-2xl border border-white/10 bg-[#171717] transition duration-300 hover:-translate-y-2 hover:border-[#CF1D1D]/60"
         >
           <div class="relative aspect-[4/5] overflow-hidden bg-neutral-950">
             <img
@@ -194,7 +194,7 @@
           </div>
           <div class="p-6">
             <p
-              class="text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
+              class="text-sm font-black uppercase tracking-[0.18em] text-[#CF1D1D]"
             >
               {{ t(member.roleKey) }}
             </p>
@@ -223,7 +223,7 @@
           <div
             v-for="partner in partners"
             :key="partner"
-            class="flex min-h-24 items-center justify-center rounded-xl border border-white/10 bg-black/30 px-4 text-center text-sm font-black uppercase tracking-[0.18em] text-neutral-300 transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/60 hover:text-white"
+            class="flex min-h-24 items-center justify-center rounded-xl border border-white/10 bg-black/30 px-4 text-center text-sm font-black uppercase tracking-[0.18em] text-neutral-300 transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/60 hover:text-white"
           >
             {{ partner }}
           </div>
@@ -245,7 +245,7 @@
           :key="quote.name"
           class="premium-panel rounded-2xl p-7"
         >
-          <div class="flex text-[#FF4D00]" :aria-label="t('shop.ratedFive')">
+          <div class="flex text-[#CF1D1D]" :aria-label="t('shop.ratedFive')">
             <Icon v-for="star in 5" :key="star" name="i-heroicons-star-solid" />
           </div>
           <p class="mt-6 leading-8 text-neutral-300">
@@ -261,7 +261,7 @@
 
     <section class="container-premium pb-24">
       <div
-        class="relative overflow-hidden rounded-2xl border border-[#FF4D00]/30 bg-[#120903] p-8 md:p-12"
+        class="relative overflow-hidden rounded-2xl border border-[#CF1D1D]/30 bg-[#170707] p-8 md:p-12"
       >
         <img
           src="https://images.unsplash.com/photo-1517438476312-10d79c077509?q=60&w=900&auto=format&fit=crop"
@@ -316,7 +316,7 @@
             {{ t(item.questionKey) }}
             <Icon
               name="i-heroicons-chevron-down"
-              class="shrink-0 text-[#FF4D00] transition group-open:rotate-180"
+              class="shrink-0 text-[#CF1D1D] transition group-open:rotate-180"
             />
           </summary>
           <p class="mt-4 leading-7 text-neutral-400">{{ t(item.answerKey) }}</p>

@@ -1,12 +1,12 @@
 <template>
   <footer class="relative overflow-hidden border-t border-white/10 bg-black">
     <div
-      class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FF4D00]/70 to-transparent"
+      class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#CF1D1D]/70 to-transparent"
     />
 
     <div class="container-premium py-6 sm:py-8 md:py-10">
       <div
-        class="grid gap-7 sm:grid-cols-2 lg:grid-cols-[1.1fr_0.8fr_0.9fr_1fr] lg:gap-8"
+        class="grid gap-5 sm:gap-7 lg:grid-cols-[1.1fr_0.8fr_0.9fr_1fr] lg:gap-8"
       >
         <div class="sm:col-span-2 lg:col-span-1">
           <NuxtLink
@@ -15,7 +15,7 @@
             :aria-label="t('nav.home')"
           >
             <img
-              src="/logo.png"
+              :src="siteLogoSrc"
               alt="Viking Store"
               width="48"
               height="48"
@@ -26,7 +26,7 @@
 
             <div>
               <p
-                class="text-[9px] font-black uppercase tracking-[0.22em] text-[#FF4D00] sm:text-[10px]"
+                class="text-[9px] font-black uppercase tracking-[0.22em] text-[#CF1D1D] sm:text-[10px]"
               >
                 {{ t("footer.combatStore") }}
               </p>
@@ -49,7 +49,7 @@
                 v-for="social in socials"
                 :key="social.label"
                 :href="social.href"
-                class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-neutral-300 transition duration-300 hover:-translate-y-0.5 hover:border-[#FF4D00] hover:text-[#FF4D00] sm:h-11 sm:w-11"
+                class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] text-neutral-300 transition duration-300 hover:-translate-y-0.5 hover:border-[#CF1D1D] hover:text-[#CF1D1D] sm:h-11 sm:w-11"
                 :aria-label="social.label"
               >
                 <Icon :name="social.icon" class="text-lg" />
@@ -58,61 +58,69 @@
           </div>
         </div>
 
-        <div>
-          <h3
-            class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-xs sm:tracking-[0.2em]"
-          >
-            {{ t("nav.categories") }}
-          </h3>
-
-          <div class="mt-3 grid gap-2">
-            <NuxtLink
-              v-for="category in footerCategories"
-              :key="category.slug"
-              :to="`/shop?category=${category.slug}`"
-              class="footer-link text-sm"
+        <div
+          class="footer-navigation-grid grid grid-cols-2 gap-4 sm:gap-6 lg:contents"
+        >
+          <div>
+            <h3
+              class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-xs sm:tracking-[0.2em]"
             >
-              {{ getLocalizedCategoryName(category, locale) || category.name }}
-            </NuxtLink>
+              {{ t("nav.categories") }}
+            </h3>
+
+            <div class="mt-3 grid gap-2">
+              <NuxtLink
+                v-for="category in footerCategories"
+                :key="category.slug"
+                :to="`/shop?category=${category.slug}`"
+                class="footer-link text-sm"
+              >
+                {{
+                  getLocalizedCategoryName(category, locale) || category.name
+                }}
+              </NuxtLink>
+            </div>
+          </div>
+
+          <div v-for="group in linkGroups" :key="group.titleKey">
+            <h3
+              class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-xs sm:tracking-[0.2em]"
+            >
+              {{ t(group.titleKey) }}
+            </h3>
+
+            <div class="mt-3 grid gap-2">
+              <NuxtLink
+                v-for="link in group.links.filter((item) => item.to)"
+                :key="`${group.titleKey}-${link.labelKey}`"
+                :to="link.to"
+                class="footer-link text-sm"
+              >
+                {{ t(link.labelKey) }}
+              </NuxtLink>
+
+              <a
+                v-for="link in group.links.filter((item) => item.href)"
+                :key="`${group.titleKey}-${link.labelKey}`"
+                :href="link.href"
+                class="footer-link text-sm"
+              >
+                {{ t(link.labelKey) }}
+              </a>
+            </div>
           </div>
         </div>
 
-        <div v-for="group in linkGroups" :key="group.titleKey">
-          <h3
-            class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-xs sm:tracking-[0.2em]"
-          >
-            {{ t(group.titleKey) }}
-          </h3>
-
-          <div class="mt-3 grid gap-2">
-            <NuxtLink
-              v-for="link in group.links.filter((item) => item.to)"
-              :key="`${group.titleKey}-${link.labelKey}`"
-              :to="link.to"
-              class="footer-link text-sm"
-            >
-              {{ t(link.labelKey) }}
-            </NuxtLink>
-
-            <a
-              v-for="link in group.links.filter((item) => item.href)"
-              :key="`${group.titleKey}-${link.labelKey}`"
-              :href="link.href"
-              class="footer-link text-sm"
-            >
-              {{ t(link.labelKey) }}
-            </a>
-          </div>
-        </div>
-
-        <div>
+        <div class="footer-contact-panel">
           <h3
             class="text-[11px] font-black uppercase tracking-[0.16em] text-white sm:text-xs sm:tracking-[0.2em]"
           >
             {{ t("footer.contact") }}
           </h3>
 
-          <div class="mt-3 grid gap-3 text-sm leading-5 text-neutral-400">
+          <div
+            class="mt-3 grid gap-2 text-sm leading-5 text-neutral-400 sm:gap-3"
+          >
             <p
               v-for="item in contactItems"
               :key="item.label"
@@ -120,7 +128,7 @@
             >
               <Icon
                 :name="item.icon"
-                class="mt-0.5 shrink-0 text-base text-[#FF4D00]"
+                class="mt-0.5 shrink-0 text-base text-[#CF1D1D]"
               />
 
               <span>
@@ -136,7 +144,7 @@
       </div>
 
       <div
-        class="mt-6 grid gap-5 border-y border-white/10 py-5 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-8"
+        class="mt-5 grid gap-4 border-y border-white/10 py-4 sm:mt-6 sm:gap-5 sm:py-5 lg:grid-cols-[1fr_auto] lg:items-center lg:gap-8"
       >
         <div>
           <div class="grid gap-3 md:grid-cols-[0.7fr_1fr] md:items-center">
@@ -145,7 +153,7 @@
                 {{ t("footer.stayReady") }}
               </p>
 
-              <h3 class="mt-1 text-xl font-black text-white sm:text-2xl">
+              <h3 class="mt-1 text-lg font-black text-white sm:text-2xl">
                 {{ t("footer.joinList") }}
               </h3>
 
@@ -166,13 +174,13 @@
                 id="footer-email"
                 v-model="newsletterEmail"
                 type="email"
-                class="premium-input min-w-0 py-3"
+                class="premium-input min-w-0 py-2.5 sm:py-3"
                 :placeholder="t('footer.emailAddress')"
                 autocomplete="email"
               />
 
               <button
-                class="premium-button premium-button-primary min-h-11 px-5"
+                class="premium-button premium-button-primary min-h-10 px-5 sm:min-h-11"
                 type="submit"
               >
                 {{ t("footer.subscribe") }}
@@ -239,6 +247,7 @@ const newsletterSubmitted = ref(false);
 const categoriesStore = useCategoriesStore(usePinia());
 const { locale, t } = useI18n();
 
+const siteLogoSrc = "/logo.png";
 const fallbackCategories = [
   { name: "Gloves", slug: "gloves" },
   { name: "Shorts", slug: "shorts" },
@@ -292,17 +301,12 @@ const socials = [
   {
     label: "Instagram",
     icon: "simple-icons:instagram",
-    href: "https://www.instagram.com/shams_elhawary123/",
+    href: "https://www.instagram.com/vikingclubstore/",
   },
   {
     label: "TikTok",
     icon: "simple-icons:tiktok",
-    href: "https://www.tiktok.com/@the_vikings22?is_from_webapp=1&sender_device=pc",
-  },
-  {
-    label: "YouTube",
-    icon: "simple-icons:youtube",
-    href: "https://youtube.com",
+    href: "https://www.tiktok.com/@the_vikings22",
   },
 ];
 
@@ -340,7 +344,7 @@ onMounted(async () => {
 }
 
 .footer-link:hover {
-  color: #ff4d00;
+  color: #cf1d1d;
   transform: translateX(3px);
 }
 </style>

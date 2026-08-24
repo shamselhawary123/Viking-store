@@ -9,7 +9,7 @@
     </div>
 
     <div v-if="wishlist.items.length === 0" class="premium-panel rounded-2xl p-10 text-center md:p-16">
-      <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
+      <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#CF1D1D]">
         <Icon name="i-heroicons-heart" class="text-4xl" />
       </div>
       <h2 class="mt-6 text-3xl font-black">{{ t('pages.noFavoritesYet') }}</h2>

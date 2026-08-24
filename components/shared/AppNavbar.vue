@@ -4,23 +4,19 @@
   >
     <div class="container-premium">
       <div class="flex h-[76px] items-center justify-between gap-4">
-        <NuxtLink
-          to="/"
-          class="brand-link group"
-          :aria-label="t('nav.home')"
-        >
+        <NuxtLink to="/" class="brand-link group" :aria-label="t('nav.home')">
           <img
-            src="/logo.png"
+            :src="siteLogoSrc"
             alt="Viking Store"
             width="48"
             height="48"
-            class="h-12 w-12 object-contain transition duration-300 group-hover:scale-105"
+            class="h-15 w-17 object-contain transition duration-300 group-hover:scale-105"
             fetchpriority="high"
             decoding="async"
           />
           <!-- <div class="hidden leading-none sm:block">
             <span class="font-display text-[2rem] leading-none text-white">VIKING</span>
-            <span class="ml-1 align-middle text-[0.68rem] font-black uppercase tracking-[0.32em] text-[#FF4D00]">Store</span>
+            <span class="ml-1 align-middle text-[0.68rem] font-black uppercase tracking-[0.32em] text-[#CF1D1D]">Store</span>
           </div> -->
         </NuxtLink>
 
@@ -49,7 +45,7 @@
             <Icon name="i-heroicons-shopping-bag" class="text-xl" />
             <span
               v-if="cartStore.totalItems"
-              class="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#FF4D00] px-1 text-[0.68rem] font-black leading-none text-white shadow-[0_0_18px_rgba(255,77,0,0.55)]"
+              class="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#CF1D1D] px-1 text-[0.68rem] font-black leading-none text-white shadow-[0_0_18px_rgba(207,29,29,0.55)]"
             >
               {{ cartStore.totalItems }}
             </span>
@@ -81,14 +77,14 @@
 
                 <div class="hidden lg:block">
                   <p
-                    class="text-xs font-black uppercase tracking-[0.14em] text-white transition group-hover:text-[#FF4D00]"
+                    class="text-xs font-black uppercase tracking-[0.14em] text-white transition group-hover:text-[#CF1D1D]"
                   >
-                    {{ authStore.profile?.full_name || t('nav.vikingMember') }}
+                    {{ authStore.profile?.full_name || t("nav.vikingMember") }}
                   </p>
                   <p
                     class="mt-0.5 text-[0.68rem] font-bold uppercase tracking-[0.16em] text-neutral-500"
                   >
-                    {{ t('common.account') }}
+                    {{ t("common.account") }}
                   </p>
                 </div>
               </NuxtLink>
@@ -103,9 +99,11 @@
             </template>
 
             <template v-else-if="isAuthReady">
-              <NuxtLink to="/auth/login" class="auth-link">{{ t('nav.login') }}</NuxtLink>
+              <NuxtLink to="/auth/login" class="auth-link">{{
+                t("nav.login")
+              }}</NuxtLink>
               <NuxtLink to="/auth/register" class="auth-link auth-link-primary">
-                {{ t('nav.register') }}
+                {{ t("nav.register") }}
               </NuxtLink>
             </template>
           </div>
@@ -168,12 +166,12 @@
                 />
                 <div class="min-w-0">
                   <p class="truncate font-black text-white">
-                    {{ authStore.profile?.full_name || t('nav.vikingMember') }}
+                    {{ authStore.profile?.full_name || t("nav.vikingMember") }}
                   </p>
                   <p
                     class="text-xs font-bold uppercase tracking-[0.16em] text-neutral-500"
                   >
-                    {{ t('nav.memberAccount') }}
+                    {{ t("nav.memberAccount") }}
                   </p>
                 </div>
               </NuxtLink>
@@ -186,7 +184,7 @@
                   name="i-heroicons-arrow-left-start-on-rectangle"
                   class="text-lg"
                 />
-                {{ t('nav.logout') }}
+                {{ t("nav.logout") }}
               </button>
             </div>
 
@@ -196,14 +194,14 @@
                 class="mobile-action"
                 @click="isMenuOpen = false"
               >
-                {{ t('nav.login') }}
+                {{ t("nav.login") }}
               </NuxtLink>
               <NuxtLink
                 to="/auth/register"
                 class="mobile-action mobile-action-primary"
                 @click="isMenuOpen = false"
               >
-                {{ t('nav.register') }}
+                {{ t("nav.register") }}
               </NuxtLink>
             </div>
           </div>
@@ -225,6 +223,7 @@ const authStore = useAuthStore(pinia);
 const router = useRouter();
 const { t } = useI18n();
 
+const siteLogoSrc = "/logo.png";
 const isMenuOpen = ref(false);
 const isAuthReady = ref(false);
 const navLinks = [
@@ -298,12 +297,12 @@ const handleLogout = () => {
 
 .nav-link:hover {
   background: rgb(255 255 255 / 0.06);
-  color: #ff4d00;
+  color: #cf1d1d;
   transform: translateY(-1px);
 }
 
 .nav-link.router-link-exact-active {
-  background: rgb(255 77 0 / 0.14);
+  background: rgb(207 29 29 / 0.14);
   color: #fff;
 }
 
@@ -314,7 +313,7 @@ const handleLogout = () => {
   left: 1rem;
   height: 2px;
   border-radius: 9999px;
-  background: #ff4d00;
+  background: #cf1d1d;
   content: "";
 }
 
@@ -338,9 +337,9 @@ const handleLogout = () => {
 
 .action-button:hover,
 .profile-button:hover {
-  border-color: rgb(255 77 0 / 0.8);
-  background: rgb(255 77 0 / 0.12);
-  color: #ff4d00;
+  border-color: rgb(207 29 29 / 0.8);
+  background: rgb(207 29 29 / 0.12);
+  color: #cf1d1d;
   transform: translateY(-1px);
 }
 
@@ -359,8 +358,8 @@ const handleLogout = () => {
 }
 
 .profile-pill:hover {
-  border-color: rgb(255 77 0 / 0.65);
-  background: rgb(255 77 0 / 0.1);
+  border-color: rgb(207 29 29 / 0.65);
+  background: rgb(207 29 29 / 0.1);
   transform: translateY(-1px);
 }
 
@@ -392,21 +391,21 @@ const handleLogout = () => {
 
 .auth-link:hover,
 .logout-button:hover {
-  border-color: rgb(255 77 0 / 0.75);
-  background: rgb(255 77 0 / 0.1);
-  color: #ff4d00;
+  border-color: rgb(207 29 29 / 0.75);
+  background: rgb(207 29 29 / 0.1);
+  color: #cf1d1d;
   transform: translateY(-1px);
 }
 
 .auth-link-primary {
-  border-color: rgb(255 77 0 / 0.9);
-  background: #ff4d00;
+  border-color: rgb(207 29 29 / 0.9);
+  background: #cf1d1d;
   color: #fff;
-  box-shadow: 0 14px 34px rgb(255 77 0 / 0.24);
+  box-shadow: 0 14px 34px rgb(207 29 29 / 0.24);
 }
 
 .auth-link-primary:hover {
-  background: #ff5f1a;
+  background: #a81616;
   color: #fff;
 }
 
@@ -428,15 +427,15 @@ const handleLogout = () => {
 }
 
 .mobile-link:hover {
-  border-color: rgb(255 77 0 / 0.65);
-  background: rgb(255 77 0 / 0.1);
-  color: #ff4d00;
+  border-color: rgb(207 29 29 / 0.65);
+  background: rgb(207 29 29 / 0.1);
+  color: #cf1d1d;
   transform: translateX(3px);
 }
 
 .mobile-link.router-link-exact-active {
-  border-color: rgb(255 77 0 / 0.8);
-  background: rgb(255 77 0 / 0.14);
+  border-color: rgb(207 29 29 / 0.8);
+  background: rgb(207 29 29 / 0.14);
   color: #fff;
 }
 
@@ -458,8 +457,8 @@ const handleLogout = () => {
 }
 
 .mobile-action-primary {
-  border-color: rgb(255 77 0 / 0.9);
-  background: #ff4d00;
+  border-color: rgb(207 29 29 / 0.9);
+  background: #cf1d1d;
   color: #fff;
 }
 

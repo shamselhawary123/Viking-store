@@ -39,7 +39,7 @@ export default defineNuxtConfig({
     },
     fetchTimeout: 10000,
     serverBundle: {
-      collections: ["heroicons"],
+      collections: ["heroicons", "simple-icons"],
     },
   },
 

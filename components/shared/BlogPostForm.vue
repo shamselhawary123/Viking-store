@@ -2,14 +2,14 @@
   <form class="space-y-6" @submit.prevent="savePost">
     <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t(mode === "edit" ? "admin.blogEdit" : "admin.blogCreate") }}</p>
+        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#CF1D1D]">{{ t(mode === "edit" ? "admin.blogEdit" : "admin.blogCreate") }}</p>
         <h2 class="mt-2 text-3xl font-black">{{ form.title || t("admin.blogPostDetails") }}</h2>
       </div>
       <div class="flex flex-wrap gap-3">
-        <NuxtLink to="/admin/blog" class="rounded-2xl border border-white/10 px-5 py-3 font-bold transition hover:border-[#FF4D00]">
+        <NuxtLink to="/admin/blog" class="rounded-2xl border border-white/10 px-5 py-3 font-bold transition hover:border-[#CF1D1D]">
           {{ t("common.cancel") }}
         </NuxtLink>
-        <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white transition hover:opacity-90 disabled:opacity-50">
+        <button type="submit" :disabled="saving" class="rounded-2xl bg-[#CF1D1D] px-5 py-3 font-bold text-white transition hover:opacity-90 disabled:opacity-50">
           {{ saving ? t("admin.saving") : t("admin.savePost") }}
         </button>
       </div>
@@ -23,7 +23,7 @@
     </p>
 
     <div class="grid gap-6 xl:grid-cols-[1fr_0.72fr]">
-      <section class="rounded-3xl border border-white/10 bg-[#111111] p-5">
+      <section class="rounded-3xl border border-white/10 bg-[#171717] p-5">
         <h3 class="font-black">{{ t("admin.blogContent") }}</h3>
         <div class="mt-5 grid gap-4 md:grid-cols-2">
           <label class="block">
@@ -46,7 +46,7 @@
       </section>
 
       <aside class="space-y-6">
-        <section class="rounded-3xl border border-white/10 bg-[#111111] p-5">
+        <section class="rounded-3xl border border-white/10 bg-[#171717] p-5">
           <h3 class="font-black">{{ t("admin.publishing") }}</h3>
           <div class="mt-5 grid gap-4">
             <label class="block">
@@ -60,20 +60,20 @@
               <span class="field-label">{{ t("admin.publishedAt") }}</span>
               <input v-model="form.published_at" type="datetime-local" class="field mt-2" />
             </label>
-            <NuxtLink v-if="savedPost?.status === 'published'" :to="`/blog/${savedPost.slug}`" target="_blank" class="rounded-xl border border-white/10 px-4 py-3 text-center text-sm font-bold transition hover:border-[#FF4D00]">
+            <NuxtLink v-if="savedPost?.status === 'published'" :to="`/blog/${savedPost.slug}`" target="_blank" class="rounded-xl border border-white/10 px-4 py-3 text-center text-sm font-bold transition hover:border-[#CF1D1D]">
               {{ t("admin.previewPost") }}
             </NuxtLink>
           </div>
         </section>
 
-        <section class="rounded-3xl border border-white/10 bg-[#111111] p-5">
+        <section class="rounded-3xl border border-white/10 bg-[#171717] p-5">
           <h3 class="font-black">{{ t("admin.blogMedia") }}</h3>
           <div class="mt-5 space-y-4">
             <label class="block">
               <span class="field-label">{{ t("admin.coverImage") }}</span>
               <input v-model="form.cover_image" class="field mt-2" />
             </label>
-            <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-4 py-3 text-sm font-bold transition hover:border-[#FF4D00]">
+            <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-4 py-3 text-sm font-bold transition hover:border-[#CF1D1D]">
               {{ uploadingCover ? t("admin.uploading") : t("admin.uploadCoverImage") }}
               <input type="file" accept="image/*" class="hidden" :disabled="uploadingCover" @change="uploadImage($event, 'cover')" />
             </label>
@@ -81,7 +81,7 @@
           </div>
         </section>
 
-        <section class="rounded-3xl border border-white/10 bg-[#111111] p-5">
+        <section class="rounded-3xl border border-white/10 bg-[#171717] p-5">
           <h3 class="font-black">{{ t("admin.metadata") }}</h3>
           <div class="mt-5 grid gap-4">
             <label class="block">
@@ -95,7 +95,7 @@
           </div>
         </section>
 
-        <section class="rounded-3xl border border-white/10 bg-[#111111] p-5">
+        <section class="rounded-3xl border border-white/10 bg-[#171717] p-5">
           <h3 class="font-black">{{ t("admin.seo") }}</h3>
           <div class="mt-5 grid gap-4">
             <label class="block">
@@ -110,7 +110,7 @@
               <span class="field-label">{{ t("admin.ogImage") }}</span>
               <input v-model="form.og_image" class="field mt-2" />
             </label>
-            <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-4 py-3 text-sm font-bold transition hover:border-[#FF4D00]">
+            <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-4 py-3 text-sm font-bold transition hover:border-[#CF1D1D]">
               {{ uploadingOg ? t("admin.uploading") : t("admin.uploadOgImage") }}
               <input type="file" accept="image/*" class="hidden" :disabled="uploadingOg" @change="uploadImage($event, 'og')" />
             </label>
@@ -287,6 +287,6 @@ const savePost = async () => {
 }
 
 .field:focus {
-  border-color: #ff4d00;
+  border-color: #cf1d1d;
 }
 </style>

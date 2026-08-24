@@ -28,14 +28,14 @@
     </section>
 
     <section class="container-premium pb-24">
-      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <article
           v-for="item in contactCards"
-          :key="item.title"
-          class="premium-panel group rounded-2xl p-6 transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/60"
+          :key="item.titleKey"
+          class="premium-panel group rounded-2xl p-6 transition duration-300 hover:-translate-y-2 hover:border-[#CF1D1D]/60"
         >
           <div
-            class="flex h-12 w-12 items-center justify-center rounded-xl border border-[#FF4D00]/30 bg-[#FF4D00]/10 text-[#FF4D00] transition group-hover:scale-105"
+            class="flex h-12 w-12 items-center justify-center rounded-xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 text-[#CF1D1D] transition group-hover:scale-105"
           >
             <Icon :name="item.icon" class="text-2xl" />
           </div>
@@ -48,7 +48,7 @@
           <a
             v-if="item.href"
             :href="item.href"
-            class="mt-4 inline-flex text-sm font-black text-[#FF4D00] transition hover:text-white"
+            class="mt-4 inline-flex text-sm font-black text-[#CF1D1D] transition hover:text-white"
           >
             {{ item.actionKey ? t(item.actionKey) : item.action }}
           </a>
@@ -142,36 +142,49 @@
       </form>
 
       <div class="space-y-6">
-        <div
-          class="overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f]"
-        >
-          <div class="p-6">
-            <p class="eyebrow">{{ t("pages.findUs") }}</p>
-            <h2 class="mt-3 text-3xl font-black text-white">
-              {{ t("pages.vikingHq") }}
-            </h2>
-            <p class="mt-3 leading-7 text-neutral-400">
-              {{ t("pages.hqText") }}
-            </p>
+        <div class="premium-panel rounded-2xl p-6 md:p-8">
+          <p class="eyebrow">{{ t("pages.findUs") }}</p>
+          <h2 class="mt-3 text-3xl font-black text-white">
+            {{ t("pages.vikingHq") }}
+          </h2>
+          <p class="mt-3 leading-7 text-neutral-400">
+            {{ t("pages.hqText") }}
+          </p>
+
+          <div class="mt-6 grid gap-3">
+            <component
+              :is="item.href ? 'a' : 'div'"
+              v-for="item in contactCards"
+              :key="item.titleKey"
+              :href="item.href"
+              class="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition duration-300 hover:border-[#CF1D1D]/60"
+            >
+              <span
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 text-[#CF1D1D]"
+              >
+                <Icon :name="item.icon" class="text-xl" />
+              </span>
+              <span>
+                <span class="block text-sm font-black text-white">
+                  {{ t(item.titleKey) }}
+                </span>
+                <span class="mt-1 block text-sm text-neutral-400">
+                  {{ item.textKey ? t(item.textKey) : item.text }}
+                </span>
+              </span>
+            </component>
           </div>
-          <iframe
-            title="Viking Store map"
-            src="https://www.google.com/maps?q=Cairo%20Egypt&output=embed"
-            class="h-80 w-full border-0 grayscale invert"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-          />
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
+        <div class="grid grid-cols-3 gap-3">
           <a
             v-for="social in socials"
             :key="social.name"
             :href="social.href"
-            class="rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/60"
+            class="rounded-2xl border border-white/10 bg-white/[0.03] p-4 transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/60"
           >
-            <Icon :name="social.icon" class="text-2xl text-[#FF4D00]" />
-            <p class="mt-4 font-black text-white">{{ social.name }}</p>
+            <Icon :name="social.icon" class="text-2xl text-[#CF1D1D]" />
+            <p class="mt-3 text-sm font-black text-white">{{ social.name }}</p>
           </a>
         </div>
       </div>
@@ -208,7 +221,7 @@
 
     <section class="container-premium pb-28">
       <div
-        class="relative overflow-hidden rounded-2xl border border-[#FF4D00]/30 bg-[#120903] p-8 text-center md:p-12"
+        class="relative overflow-hidden rounded-2xl border border-[#CF1D1D]/30 bg-[#170707] p-8 text-center md:p-12"
       >
         <div class="mx-auto max-w-3xl">
           <p class="eyebrow">{{ t("pages.needHelp") }}</p>
@@ -271,13 +284,6 @@ const contactCards = [
     actionKey: "pages.callNow",
   },
   {
-    icon: "i-heroicons-map-pin",
-    titleKey: "common.address",
-    textKey: "footer.addressValue",
-    href: "https://www.google.com/maps?q=Cairo%20Egypt",
-    actionKey: "pages.openMap",
-  },
-  {
     icon: "i-heroicons-clock",
     titleKey: "footer.workingHours",
     textKey: "footer.workingHoursValue",
@@ -293,17 +299,12 @@ const socials = [
   {
     name: "Instagram",
     icon: "i-heroicons-camera",
-    href: "https://www.instagram.com/shams_elhawary123/",
+    href: "https://www.instagram.com/vikingclubstore/",
   },
   {
     name: "TikTok",
     icon: "i-heroicons-musical-note",
-    href: "https://www.tiktok.com/@the_vikings22?is_from_webapp=1&sender_device=pc",
-  },
-  {
-    name: "YouTube",
-    icon: "i-heroicons-play",
-    href: "https://www.youtube.com",
+    href: "https://www.tiktok.com/@the_vikings22",
   },
 ];
 
@@ -352,6 +353,7 @@ const handleSubmit = () => {
   background: rgba(0, 0, 0, 0.42);
   padding: 1.35rem 1rem 0.55rem;
   color: #ffffff;
+  text-align: start;
   outline: none;
   transition:
     border-color 180ms ease,
@@ -360,8 +362,8 @@ const handleSubmit = () => {
 }
 
 .floating-input:focus {
-  border-color: #ff4d00;
-  box-shadow: 0 0 0 4px rgba(255, 77, 0, 0.12);
+  border-color: #cf1d1d;
+  box-shadow: 0 0 0 4px rgba(207, 29, 29, 0.12);
 }
 
 .field-error {
@@ -371,7 +373,7 @@ const handleSubmit = () => {
 .floating-field span {
   pointer-events: none;
   position: absolute;
-  left: 1rem;
+  inset-inline-start: 1rem;
   top: 1.15rem;
   color: #a3a3a3;
   font-size: 0.875rem;
@@ -384,7 +386,7 @@ const handleSubmit = () => {
 
 .floating-input:focus + span,
 .floating-input:not(:placeholder-shown) + span {
-  color: #ff4d00;
+  color: #cf1d1d;
   font-size: 0.7rem;
   transform: translateY(-0.68rem);
 }

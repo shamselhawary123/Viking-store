@@ -59,8 +59,8 @@
           class="min-h-12 shrink-0 rounded-full border px-5 text-sm font-black uppercase tracking-[0.12em] transition duration-200 hover:-translate-y-0.5"
           :class="
             activeCategory === category
-              ? 'border-[#FF4D00] bg-[#FF4D00]/10 text-[#FF4D00]'
-              : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:border-[#FF4D00]/70 hover:text-white'
+              ? 'border-[#CF1D1D] bg-[#CF1D1D]/10 text-[#CF1D1D]'
+              : 'border-white/10 bg-white/[0.03] text-neutral-400 hover:border-[#CF1D1D]/70 hover:text-white'
           "
           @click="selectCategory(category)"
         >
@@ -100,7 +100,7 @@
             </p>
             <button
               v-if="search || activeCategory !== 'pages.all'"
-              class="text-sm font-black text-[#FF4D00] transition hover:text-white"
+              class="text-sm font-black text-[#CF1D1D] transition hover:text-white"
               @click="resetFilters"
             >
               {{ t("shop.reset") }}
@@ -111,10 +111,10 @@
             <article
               v-for="faq in filteredFaqs"
               :key="faq.question"
-              class="rounded-2xl border bg-white/[0.03] transition duration-300 hover:-translate-y-0.5 hover:border-[#FF4D00]/60"
+              class="rounded-2xl border bg-white/[0.03] transition duration-300 hover:-translate-y-0.5 hover:border-[#CF1D1D]/60"
               :class="
                 openQuestion === faq.questionKey
-                  ? 'border-[#FF4D00]/70'
+                  ? 'border-[#CF1D1D]/70'
                   : 'border-white/10'
               "
             >
@@ -124,7 +124,7 @@
               >
                 <div>
                   <span
-                    class="text-xs font-black uppercase tracking-[0.16em] text-[#FF4D00]"
+                    class="text-xs font-black uppercase tracking-[0.16em] text-[#CF1D1D]"
                     >{{ t(faq.categoryKey) }}</span
                   >
                   <h3 class="mt-2 text-lg font-black text-white md:text-xl">
@@ -133,7 +133,7 @@
                 </div>
                 <Icon
                   name="i-heroicons-chevron-down"
-                  class="shrink-0 text-2xl text-[#FF4D00] transition duration-300"
+                  class="shrink-0 text-2xl text-[#CF1D1D] transition duration-300"
                   :class="{ 'rotate-180': openQuestion === faq.questionKey }"
                 />
               </button>
@@ -152,7 +152,7 @@
           <div v-else class="premium-panel rounded-2xl p-10 text-center">
             <Icon
               name="i-heroicons-magnifying-glass"
-              class="mx-auto text-5xl text-[#FF4D00]"
+              class="mx-auto text-5xl text-[#CF1D1D]"
             />
             <h2 class="mt-5 text-3xl font-black text-white">
               {{ t("pages.noAnswersFound") }}
@@ -167,7 +167,7 @@
 
     <section class="container-premium pb-24">
       <div
-        class="relative overflow-hidden rounded-2xl border border-[#FF4D00]/30 bg-[#120903] p-8 text-center md:p-12"
+        class="relative overflow-hidden rounded-2xl border border-[#CF1D1D]/30 bg-[#170707] p-8 text-center md:p-12"
       >
         <div class="mx-auto max-w-3xl">
           <p class="eyebrow">{{ t("pages.stillNeedHelp") }}</p>

@@ -23,7 +23,7 @@
         </div>
 
         <button
-          class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 transition hover:border-[#FF4D00] hover:text-[#FF4D00]"
+          class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 transition hover:border-[#CF1D1D] hover:text-[#CF1D1D]"
           :aria-label="t('cart.closeCart')"
           @click="cartStore.closeCart()"
         >
@@ -35,7 +35,7 @@
         v-if="!cartStore.items.length"
         class="flex flex-1 flex-col items-center justify-center gap-5 p-6 text-center"
       >
-        <div class="flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#FF4D00]">
+        <div class="flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#CF1D1D]">
           <Icon name="i-heroicons-shopping-bag" class="text-4xl" />
         </div>
         <div>
@@ -92,7 +92,7 @@
                   </button>
                 </div>
 
-                <p class="text-xl font-black text-[#FF4D00]">{{ formatStorePrice(item.price * item.quantity, locale) }}</p>
+                <p class="text-xl font-black text-[#CF1D1D]">{{ formatStorePrice(item.price * item.quantity, locale) }}</p>
               </div>
             </div>
           </div>
@@ -111,7 +111,7 @@
           </div>
           <div class="flex items-center justify-between border-t border-white/10 pt-4">
             <span class="text-lg font-black">{{ t('common.total') }}</span>
-            <span class="text-3xl font-black text-[#FF4D00]">{{ formatStorePrice(cartStore.totalPrice, locale) }}</span>
+            <span class="text-3xl font-black text-[#CF1D1D]">{{ formatStorePrice(cartStore.totalPrice, locale) }}</span>
           </div>
         </div>
 

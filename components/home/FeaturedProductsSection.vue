@@ -1,7 +1,7 @@
 <template>
   <section class="section-premium relative overflow-hidden bg-[#080808]">
     <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,77,0,0.13),transparent_26rem)]"
+      class="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(207,29,29,0.13),transparent_26rem)]"
     />
     <div class="container-premium">
       <div
@@ -27,12 +27,34 @@
         </NuxtLink>
       </div>
 
-      <div class="relative hidden gap-6 sm:grid sm:grid-cols-2 xl:grid-cols-3">
+      <div
+        v-if="pending && !featuredProducts.length"
+        class="relative hidden gap-6 sm:grid sm:grid-cols-2 xl:grid-cols-3"
+        aria-live="polite"
+      >
+        <article
+          v-for="index in 3"
+          :key="index"
+          class="min-h-[30rem] overflow-hidden rounded-2xl border border-white/10 bg-[#171717] shadow-[0_22px_70px_rgba(0,0,0,0.32)]"
+        >
+          <div class="aspect-[4/5] animate-pulse bg-white/[0.04]" />
+          <div class="space-y-4 p-5">
+            <div class="h-3 w-24 animate-pulse rounded-full bg-[#CF1D1D]/25" />
+            <div class="h-6 w-3/4 animate-pulse rounded-full bg-white/10" />
+            <div class="h-10 w-36 animate-pulse rounded-full bg-white/10" />
+          </div>
+        </article>
+      </div>
+
+      <div
+        v-else-if="featuredProducts.length"
+        class="relative hidden gap-6 sm:grid sm:grid-cols-2 xl:grid-cols-3"
+      >
         <article
           v-for="(product, index) in featuredProducts"
           :key="product.id"
           v-reveal="{ delay: index * 90 }"
-          class="group overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-[0_22px_70px_rgba(0,0,0,0.32)] transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/70 hover:shadow-[0_34px_90px_rgba(255,77,0,0.1)]"
+          class="group overflow-hidden rounded-2xl border border-white/10 bg-[#171717] shadow-[0_22px_70px_rgba(0,0,0,0.32)] transition duration-300 hover:-translate-y-2 hover:border-[#CF1D1D]/70 hover:shadow-[0_34px_90px_rgba(207,29,29,0.1)]"
         >
           <NuxtLink :to="`/shop/${product.slug}`" class="block">
             <div class="relative aspect-[4/5] overflow-hidden bg-black">
@@ -50,12 +72,12 @@
               />
               <div
                 v-if="product.isRealBestSeller || product.badge"
-                class="absolute left-4 top-4 rounded-full bg-[#FF4D00] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(255,77,0,0.28)]"
+                class="absolute left-4 top-4 rounded-full bg-[#CF1D1D] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(207,29,29,0.28)]"
               >
                 {{ product.badge || t("home.bestSeller") }}
               </div>
               <button
-                class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#FF4D00] backdrop-blur transition duration-300 hover:scale-105 hover:border-[#FF4D00]"
+                class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#CF1D1D] backdrop-blur transition duration-300 hover:scale-105 hover:border-[#CF1D1D]"
                 :aria-label="
                   wishlistStore.isFavorite(product.id)
                     ? t('shop.removeWishlist')
@@ -85,7 +107,7 @@
                   }}
                 </span>
                 <span
-                  class="flex items-center gap-1 text-[#FF4D00]"
+                  class="flex items-center gap-1 text-[#CF1D1D]"
                   :aria-label="t('shop.ratedFive')"
                 >
                   <Icon
@@ -139,7 +161,7 @@
               </div>
               <NuxtLink
                 :to="`/shop/${product.slug}`"
-                class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#FF4D00] hover:bg-[#FF4D00] hover:text-white"
+                class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#CF1D1D] hover:bg-[#CF1D1D] hover:text-white"
                 :aria-label="t('shop.viewDetails')"
               >
                 <Icon name="i-heroicons-arrow-right" />
@@ -187,7 +209,7 @@
             <article
               v-for="(itemIndex, index) in carousel.loopedIndexes"
               :key="`${index}-${featuredProducts[itemIndex].id}`"
-              class="mobile-carousel-slide group shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-[0_22px_70px_rgba(0,0,0,0.32)] transition duration-300 hover:border-[#FF4D00]/70 hover:shadow-[0_34px_90px_rgba(255,77,0,0.1)]"
+              class="mobile-carousel-slide group shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#171717] shadow-[0_22px_70px_rgba(0,0,0,0.32)] transition duration-300 hover:border-[#CF1D1D]/70 hover:shadow-[0_34px_90px_rgba(207,29,29,0.1)]"
             >
               <NuxtLink :to="`/shop/${featuredProducts[itemIndex].slug}`" class="block">
                 <div class="relative aspect-[4/5] overflow-hidden bg-black">
@@ -205,12 +227,12 @@
                   />
                   <div
                     v-if="featuredProducts[itemIndex].isRealBestSeller || featuredProducts[itemIndex].badge"
-                    class="absolute left-4 top-4 rounded-full bg-[#FF4D00] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(255,77,0,0.28)]"
+                    class="absolute left-4 top-4 rounded-full bg-[#CF1D1D] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(207,29,29,0.28)]"
                   >
                     {{ featuredProducts[itemIndex].badge || t("home.bestSeller") }}
                   </div>
                   <button
-                    class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#FF4D00] backdrop-blur transition duration-300 hover:scale-105 hover:border-[#FF4D00]"
+                    class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#CF1D1D] backdrop-blur transition duration-300 hover:scale-105 hover:border-[#CF1D1D]"
                     :aria-label="
                       wishlistStore.isFavorite(featuredProducts[itemIndex].id)
                         ? t('shop.removeWishlist')
@@ -240,7 +262,7 @@
                       }}
                     </span>
                     <span
-                      class="flex items-center gap-1 text-[#FF4D00]"
+                      class="flex items-center gap-1 text-[#CF1D1D]"
                       :aria-label="t('shop.ratedFive')"
                     >
                       <Icon
@@ -294,7 +316,7 @@
                   </div>
                   <NuxtLink
                     :to="`/shop/${featuredProducts[itemIndex].slug}`"
-                    class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#FF4D00] hover:bg-[#FF4D00] hover:text-white"
+                    class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#CF1D1D] hover:bg-[#CF1D1D] hover:text-white"
                     :aria-label="t('shop.viewDetails')"
                   >
                     <Icon name="i-heroicons-arrow-right" />
@@ -332,7 +354,6 @@
 </template>
 
 <script setup lang="ts">
-import { createClient } from "@supabase/supabase-js";
 import { computed, onMounted } from "vue";
 import { useMobileCarousel } from "../../composables/useMobileCarousel";
 import { useWishlistStore } from "../../stores/wishlist";
@@ -345,23 +366,22 @@ import {
   formatStorePrice,
   getLocalizedCategoryName,
 } from "../../utils/localizationFormat";
-import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { getPublicSupabaseClient } from "../../utils/publicSupabase";
 import { SHOP_PRODUCTS_SELECT } from "../../utils/shopProducts";
 
 const wishlistStore = useWishlistStore(usePinia());
 const { locale, t } = useI18n();
 const config = useRuntimeConfig();
-const supabase = createClient(
+const supabase = getPublicSupabaseClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
-  createPublicSupabaseReadOptions("viking-store-home-best-sellers-readonly"),
 );
 
 onMounted(async () => {
   wishlistStore.loadWishlist();
 });
 
-const { data: bestSellingProducts } = await useAsyncData(
+const { data: bestSellingProducts, pending } = await useLazyAsyncData(
   "home-best-selling-products",
   async () => {
     const { data: bestSellerResults, error: bestSellersError } =
@@ -449,7 +469,7 @@ const carousel = useMobileCarousel(computed(() => featuredProducts.value.length)
   border-radius: 9999px;
   border: 1px solid rgb(255 255 255 / 0.12);
   background: rgb(12 12 12 / 0.82);
-  color: #ff4d00;
+  color: #cf1d1d;
   box-shadow: 0 14px 34px rgb(0 0 0 / 0.32);
   transition:
     transform 180ms ease,
@@ -459,9 +479,9 @@ const carousel = useMobileCarousel(computed(() => featuredProducts.value.length)
 }
 
 .mobile-carousel-arrow:hover {
-  border-color: rgb(255 77 0 / 0.72);
-  background: rgb(255 77 0 / 0.14);
-  box-shadow: 0 16px 38px rgb(255 77 0 / 0.12);
+  border-color: rgb(207 29 29 / 0.72);
+  background: rgb(207 29 29 / 0.14);
+  box-shadow: 0 16px 38px rgb(207 29 29 / 0.12);
 }
 
 .mobile-carousel-arrow:active {
@@ -469,7 +489,7 @@ const carousel = useMobileCarousel(computed(() => featuredProducts.value.length)
 }
 
 .mobile-carousel-arrow:focus-visible {
-  outline: 2px solid #ff4d00;
+  outline: 2px solid #cf1d1d;
   outline-offset: 3px;
 }
 

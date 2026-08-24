@@ -13,7 +13,7 @@ const { locale, t } = useI18n();
 <template>
   <NuxtLink
     :to="`/shop?category=${slug}`"
-    class="group relative block overflow-hidden rounded-2xl border border-white/10 bg-[#111111] transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/70"
+    class="group relative block overflow-hidden rounded-2xl border border-white/10 bg-[#171717] transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/70"
   >
     <div class="aspect-[4/5] overflow-hidden">
       <img
@@ -31,7 +31,7 @@ const { locale, t } = useI18n();
       <p class="eyebrow text-[0.65rem]">{{ t('common.category') }}</p>
       <div class="mt-2 flex items-end justify-between gap-3">
         <h2 class="font-display text-4xl leading-none text-white">{{ getLocalizedCategoryName({ slug, name }, locale) || name }}</h2>
-        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#FF4D00] text-white transition group-hover:translate-x-1">
+        <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#CF1D1D] text-white transition group-hover:translate-x-1">
           <Icon name="i-heroicons-arrow-right" />
         </span>
       </div>

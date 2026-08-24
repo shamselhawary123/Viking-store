@@ -17,10 +17,10 @@
           v-for="(item, index) in testimonials"
           :key="item.name"
           v-reveal="{ delay: index * 90 }"
-          class="premium-panel group rounded-2xl p-7 transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/60"
+          class="premium-panel group rounded-2xl p-7 transition duration-300 hover:-translate-y-2 hover:border-[#CF1D1D]/60"
         >
           <div class="mb-6 flex items-center justify-between">
-            <div class="flex text-[#FF4D00]">
+            <div class="flex text-[#CF1D1D]">
               <Icon
                 v-for="star in 5"
                 :key="star"
@@ -28,7 +28,7 @@
               />
             </div>
             <span
-              class="font-display text-5xl leading-none text-white/10 transition group-hover:text-[#FF4D00]/25"
+              class="font-display text-5xl leading-none text-white/10 transition group-hover:text-[#CF1D1D]/25"
               >"</span
             >
           </div>
@@ -40,7 +40,7 @@
             class="mt-8 flex items-center gap-4 border-t border-white/10 pt-6"
           >
             <div
-              class="flex h-12 w-12 items-center justify-center rounded-full bg-[#FF4D00] font-black text-white"
+              class="flex h-12 w-12 items-center justify-center rounded-full bg-[#CF1D1D] font-black text-white"
             >
               {{ item.name.slice(0, 1) }}
             </div>
@@ -49,7 +49,7 @@
                 {{ item.name }}
               </h3>
 
-              <p class="text-sm text-[#FF4D00]">
+              <p class="text-sm text-[#CF1D1D]">
                 {{ t(item.roleKey) }}
               </p>
             </div>
@@ -94,10 +94,10 @@
             <div
               v-for="(itemIndex, index) in carousel.loopedIndexes"
               :key="`${index}-${testimonials[itemIndex].name}`"
-              class="mobile-carousel-slide premium-panel group shrink-0 rounded-2xl p-7 transition duration-300 hover:border-[#FF4D00]/60"
+              class="mobile-carousel-slide premium-panel group shrink-0 rounded-2xl p-7 transition duration-300 hover:border-[#CF1D1D]/60"
             >
               <div class="mb-6 flex items-center justify-between">
-                <div class="flex text-[#FF4D00]">
+                <div class="flex text-[#CF1D1D]">
                   <Icon
                     v-for="star in 5"
                     :key="star"
@@ -105,7 +105,7 @@
                   />
                 </div>
                 <span
-                  class="font-display text-5xl leading-none text-white/10 transition group-hover:text-[#FF4D00]/25"
+                  class="font-display text-5xl leading-none text-white/10 transition group-hover:text-[#CF1D1D]/25"
                   >"</span
                 >
               </div>
@@ -117,7 +117,7 @@
                 class="mt-8 flex items-center gap-4 border-t border-white/10 pt-6"
               >
                 <div
-                  class="flex h-12 w-12 items-center justify-center rounded-full bg-[#FF4D00] font-black text-white"
+                  class="flex h-12 w-12 items-center justify-center rounded-full bg-[#CF1D1D] font-black text-white"
                 >
                   {{ testimonials[itemIndex].name.slice(0, 1) }}
                 </div>
@@ -126,7 +126,7 @@
                     {{ testimonials[itemIndex].name }}
                   </h3>
 
-                  <p class="text-sm text-[#FF4D00]">
+                  <p class="text-sm text-[#CF1D1D]">
                     {{ t(testimonials[itemIndex].roleKey) }}
                   </p>
                 </div>
@@ -211,7 +211,7 @@ const carousel = useMobileCarousel(computed(() => testimonials.length), { isRtl 
   border-radius: 9999px;
   border: 1px solid rgb(255 255 255 / 0.12);
   background: rgb(12 12 12 / 0.82);
-  color: #ff4d00;
+  color: #cf1d1d;
   box-shadow: 0 14px 34px rgb(0 0 0 / 0.32);
   transition:
     transform 180ms ease,
@@ -221,9 +221,9 @@ const carousel = useMobileCarousel(computed(() => testimonials.length), { isRtl 
 }
 
 .mobile-carousel-arrow:hover {
-  border-color: rgb(255 77 0 / 0.72);
-  background: rgb(255 77 0 / 0.14);
-  box-shadow: 0 16px 38px rgb(255 77 0 / 0.12);
+  border-color: rgb(207 29 29 / 0.72);
+  background: rgb(207 29 29 / 0.14);
+  box-shadow: 0 16px 38px rgb(207 29 29 / 0.12);
 }
 
 .mobile-carousel-arrow:active {
@@ -231,7 +231,7 @@ const carousel = useMobileCarousel(computed(() => testimonials.length), { isRtl 
 }
 
 .mobile-carousel-arrow:focus-visible {
-  outline: 2px solid #ff4d00;
+  outline: 2px solid #cf1d1d;
   outline-offset: 3px;
 }
 

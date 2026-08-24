@@ -20,12 +20,12 @@ describe("admin coupon helpers", () => {
   });
 
   it("validates coupon form values against database constraints", () => {
-    assert.equal(validateCouponForm({ code: "", name: "Sale", discount_type: "percentage", discount_value: 10 }), "Code is required.");
-    assert.equal(validateCouponForm({ code: "SALE", name: "", discount_type: "percentage", discount_value: 10 }), "Name is required.");
-    assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "percentage", discount_value: 0 }), "Discount value must be greater than 0.");
-    assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "percentage", discount_value: 101 }), "Percentage discount cannot exceed 100.");
-    assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "fixed_amount", discount_value: 10, minimum_order_amount: -1 }), "Minimum order amount must be zero or more.");
-    assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "percentage", discount_value: 10, starts_at: "2026-08-13T10:00", expires_at: "2026-08-12T10:00" }), "Expiration date must be after the start date.");
+    assert.equal(validateCouponForm({ code: "", name: "Sale", discount_type: "percentage", discount_value: 10 }), "admin.couponCodeRequired");
+    assert.equal(validateCouponForm({ code: "SALE", name: "", discount_type: "percentage", discount_value: 10 }), "admin.couponNameRequired");
+    assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "percentage", discount_value: 0 }), "admin.couponDiscountValueInvalid");
+    assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "percentage", discount_value: 101 }), "admin.couponPercentMax");
+    assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "fixed_amount", discount_value: 10, minimum_order_amount: -1 }), "admin.couponMinimumInvalid");
+    assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "percentage", discount_value: 10, starts_at: "2026-08-13T10:00", expires_at: "2026-08-12T10:00" }), "admin.couponDateRangeInvalid");
     assert.equal(validateCouponForm({ code: "SALE", name: "Sale", discount_type: "fixed_amount", discount_value: 10 }), "");
   });
 

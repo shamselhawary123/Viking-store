@@ -1,10 +1,10 @@
 <template>
   <section class="relative min-h-[calc(100dvh-5rem)] overflow-hidden bg-black">
     <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,rgba(255,77,0,0.26),transparent_28rem),radial-gradient(circle_at_12%_70%,rgba(255,255,255,0.08),transparent_22rem)]"
+      class="absolute inset-0 bg-[radial-gradient(circle_at_72%_18%,rgba(207,29,29,0.26),transparent_28rem),radial-gradient(circle_at_12%_70%,rgba(255,255,255,0.08),transparent_22rem)]"
     />
     <div
-      class="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,77,0,0.08)_0_1px,transparent_1px_120px)] opacity-25"
+      class="absolute inset-0 bg-[linear-gradient(120deg,rgba(207,29,29,0.08)_0_1px,transparent_1px_120px)] opacity-25"
     />
     <div
       class="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black via-black/80 to-transparent"
@@ -15,7 +15,7 @@
     >
       <div class="reveal-up pt-4 text-center lg:text-start">
         <p class="eyebrow inline-flex items-center gap-3">
-          <span class="h-px w-10 bg-[#FF4D00]" />
+          <span class="h-px w-10 bg-[#CF1D1D]" />
           {{ t("home.heroEyebrow") }}
         </p>
         <h1
@@ -23,7 +23,7 @@
         >
           {{ t("home.heroTitle") }}
           <span
-            class="block text-[#FF4D00] drop-shadow-[0_0_34px_rgba(255,77,0,0.22)]"
+            class="block text-[#CF1D1D] drop-shadow-[0_0_34px_rgba(207,29,29,0.22)]"
             >{{ t("home.heroAccent") }}</span
           >
         </h1>
@@ -59,7 +59,7 @@
             v-for="link in categoryLinks"
             :key="link.slug"
             :to="buildShopCategoryUrl(link.slug)"
-            class="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-neutral-300 transition hover:border-[#FF4D00] hover:text-[#FF4D00]"
+            class="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-black uppercase tracking-[0.14em] text-neutral-300 transition hover:border-[#CF1D1D] hover:text-[#CF1D1D]"
           >
             {{ t(link.labelKey) }}
           </NuxtLink>
@@ -69,7 +69,7 @@
           <div
             v-for="stat in stats"
             :key="stat.label"
-            class="rounded-2xl border border-white/10 bg-white/[0.045] p-4 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/50"
+            class="rounded-2xl border border-white/10 bg-white/[0.045] p-4 backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/50"
           >
             <p class="font-display text-4xl leading-none text-white">
               {{ stat.value }}
@@ -85,10 +85,10 @@
 
       <div class="relative min-h-[25rem] reveal-slide lg:min-h-[44rem]">
         <div
-          class="absolute inset-6 rounded-full bg-[#FF4D00]/15 blur-[100px]"
+          class="absolute inset-6 rounded-full bg-[#CF1D1D]/15 blur-[100px]"
         />
         <div
-          class="absolute right-4 top-12 h-24 w-24 rounded-full border border-[#FF4D00]/25"
+          class="absolute right-4 top-12 h-24 w-24 rounded-full border border-[#CF1D1D]/25"
         />
         <div
           class="absolute bottom-16 left-4 h-32 w-32 rounded-full border border-white/10"
@@ -106,7 +106,7 @@
           class="absolute bottom-7 left-4 z-20 rounded-2xl border border-white/10 bg-black/75 p-4 shadow-[0_20px_60px_rgba(0,0,0,0.45)] backdrop-blur md:left-10"
         >
           <p
-            class="text-xs font-black uppercase tracking-[0.22em] text-[#FF4D00]"
+            class="text-xs font-black uppercase tracking-[0.22em] text-[#CF1D1D]"
           >
             {{ t("home.proGrade") }}
           </p>
@@ -119,7 +119,7 @@
         >
           <p class="font-display text-4xl leading-none text-white">4.8</p>
           <p
-            class="text-xs font-black uppercase tracking-[0.16em] text-[#FF4D00]"
+            class="text-xs font-black uppercase tracking-[0.16em] text-[#CF1D1D]"
           >
             {{ t("home.fighterRating") }}
           </p>
@@ -129,7 +129,7 @@
 
     <!-- <div class="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 text-neutral-500 md:flex">
       <span class="text-xs font-bold uppercase tracking-[0.3em]">Scroll</span>
-      <span class="h-10 w-px animate-bounce bg-[#FF4D00]" />
+      <span class="h-10 w-px animate-bounce bg-[#CF1D1D]" />
     </div> -->
   </section>
 </template>

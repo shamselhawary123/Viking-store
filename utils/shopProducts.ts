@@ -1,4 +1,4 @@
-export const SHOP_DEFAULT_MAX_PRICE = 10000;
+export const SHOP_DEFAULT_MAX_PRICE = 25000;
 
 export const SHOP_PRODUCTS_SELECT = `
   *,
@@ -17,4 +17,19 @@ export const isWithinShopPriceLimit = (
 ) => {
   if (maxPrice >= defaultMaxPrice) return true;
   return Number(price || 0) <= maxPrice;
+};
+
+export const sortShopProducts = <T extends { price?: number | string | null }>(
+  products: T[],
+  sortBy: string,
+) => {
+  if (sortBy === "low") {
+    return [...products].sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
+  }
+
+  if (sortBy === "high") {
+    return [...products].sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
+  }
+
+  return products;
 };

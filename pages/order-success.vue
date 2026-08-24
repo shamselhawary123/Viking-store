@@ -23,7 +23,7 @@
 
         <div class="mx-auto mt-8 max-w-md rounded-2xl border border-white/10 bg-black/40 p-5">
           <p class="text-sm font-black uppercase tracking-[0.18em] text-neutral-500">{{ t('orders.orderNumber') }}</p>
-          <p class="mt-2 break-all text-2xl font-black text-[#FF4D00]">{{ orderNumber }}</p>
+          <p class="mt-2 break-all text-2xl font-black text-[#CF1D1D]">{{ orderNumber }}</p>
         </div>
 
         <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">

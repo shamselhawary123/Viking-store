@@ -26,7 +26,7 @@
         decoding="async"
       />
       <div
-        class="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]"
+        class="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#CF1D1D]"
       >
         <Icon name="i-heroicons-shopping-bag" class="text-4xl" />
       </div>
@@ -52,7 +52,7 @@
             :class="{ active: checkoutMode === 'guest' }"
             @click="checkoutMode = 'guest'"
           >
-            <Icon name="i-heroicons-user" class="text-3xl text-[#FF4D00]" />
+            <Icon name="i-heroicons-user" class="text-3xl text-[#CF1D1D]" />
             <span class="mt-4 block text-2xl font-black text-white">{{
               t("checkout.guestTitle")
             }}</span>
@@ -68,7 +68,7 @@
           >
             <Icon
               name="i-heroicons-identification"
-              class="text-3xl text-[#FF4D00]"
+              class="text-3xl text-[#CF1D1D]"
             />
             <span class="mt-4 block text-2xl font-black text-white">{{
               t("checkout.accountTitle")
@@ -106,7 +106,7 @@
         <div v-else class="premium-panel rounded-2xl p-6 md:p-8">
           <div class="mb-7 flex items-start gap-4">
             <div
-              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#FF4D00]/30 bg-[#FF4D00]/10 text-[#FF4D00]"
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 text-[#CF1D1D]"
             >
               <Icon name="i-heroicons-map-pin" class="text-2xl" />
             </div>
@@ -182,11 +182,11 @@
 
         <div v-if="canSubmit" class="premium-panel rounded-2xl p-6 md:p-8">
           <div
-            class="flex items-center gap-4 rounded-2xl border border-[#FF4D00] bg-[#FF4D00]/10 p-5"
+            class="flex items-center gap-4 rounded-2xl border border-[#CF1D1D] bg-[#CF1D1D]/10 p-5"
           >
             <Icon
               name="i-heroicons-banknotes"
-              class="text-3xl text-[#FF4D00]"
+              class="text-3xl text-[#CF1D1D]"
             />
             <div>
               <p class="font-black text-white">
@@ -339,7 +339,7 @@
               class="flex justify-between border-t border-white/10 pt-6 text-2xl font-black"
             >
               <span>{{ t("common.total") }}</span
-              ><span class="text-[#FF4D00]">{{
+              ><span class="text-[#CF1D1D]">{{
                 formatStorePrice(displayTotal, locale)
               }}</span>
             </div>
@@ -518,13 +518,13 @@ const handleCheckout = async () => {
 
 .checkout-choice:hover,
 .checkout-choice.active {
-  border-color: rgba(255, 77, 0, 0.75);
-  background: rgba(255, 77, 0, 0.08);
+  border-color: rgba(207, 29, 29, 0.75);
+  background: rgba(207, 29, 29, 0.08);
   transform: translateY(-2px);
 }
 
 .checkout-choice.active {
-  box-shadow: 0 0 0 4px rgba(255, 77, 0, 0.1);
+  box-shadow: 0 0 0 4px rgba(207, 29, 29, 0.1);
 }
 
 .floating-field {
@@ -548,8 +548,8 @@ const handleCheckout = async () => {
 }
 
 .floating-input:focus {
-  border-color: #ff4d00;
-  box-shadow: 0 0 0 4px rgba(255, 77, 0, 0.12);
+  border-color: #cf1d1d;
+  box-shadow: 0 0 0 4px rgba(207, 29, 29, 0.12);
 }
 
 .floating-input:invalid:not(:placeholder-shown) {
@@ -572,7 +572,7 @@ const handleCheckout = async () => {
 
 .floating-input:focus + span,
 .floating-input:not(:placeholder-shown) + span {
-  color: #ff4d00;
+  color: #cf1d1d;
   font-size: 0.7rem;
   transform: translateY(-0.68rem);
 }
@@ -595,7 +595,7 @@ const handleCheckout = async () => {
 }
 
 .coupon-input:focus {
-  border-color: #ff4d00;
-  box-shadow: 0 0 0 4px rgba(255, 77, 0, 0.12);
+  border-color: #cf1d1d;
+  box-shadow: 0 0 0 4px rgba(207, 29, 29, 0.12);
 }
 </style>

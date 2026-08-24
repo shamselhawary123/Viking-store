@@ -2,39 +2,39 @@
   <section class="space-y-6">
     <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">Promotions</p>
-        <h2 class="mt-2 text-3xl font-black">Coupons</h2>
+        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t("admin.promotions") }}</p>
+        <h2 class="mt-2 text-3xl font-black">{{ t("admin.coupons") }}</h2>
       </div>
 
       <button class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white transition hover:opacity-90" @click="openCreate">
-        Add Coupon
+        {{ t("admin.addCoupon") }}
       </button>
     </div>
 
     <div class="grid gap-3 rounded-3xl border border-white/10 bg-[#111111] p-4 md:grid-cols-[1fr_11rem_12rem_12rem_10rem]">
-      <input v-model="search" type="search" placeholder="Search code or name..." class="field" />
+      <input v-model="search" type="search" :placeholder="t('admin.searchCoupons')" class="field" />
       <select v-model="activeFilter" class="field">
-        <option value="all">All states</option>
-        <option value="active">Active</option>
-        <option value="inactive">Inactive</option>
+        <option value="all">{{ t("admin.allStates") }}</option>
+        <option value="active">{{ t("common.active") }}</option>
+        <option value="inactive">{{ t("common.inactive") }}</option>
       </select>
       <select v-model="typeFilter" class="field">
-        <option value="all">All discounts</option>
-        <option value="percentage">Percentage</option>
-        <option value="fixed_amount">Fixed amount</option>
+        <option value="all">{{ t("admin.allDiscounts") }}</option>
+        <option value="percentage">{{ t("admin.discountTypes.percentage") }}</option>
+        <option value="fixed_amount">{{ t("admin.discountTypes.fixed_amount") }}</option>
       </select>
       <select v-model="lifecycleFilter" class="field">
-        <option value="all">Any timing</option>
-        <option value="active">Live</option>
-        <option value="scheduled">Scheduled</option>
-        <option value="expired">Expired</option>
-        <option value="inactive">Inactive</option>
+        <option value="all">{{ t("admin.anyTiming") }}</option>
+        <option value="active">{{ t("admin.live") }}</option>
+        <option value="scheduled">{{ t("admin.scheduled") }}</option>
+        <option value="expired">{{ t("admin.expired") }}</option>
+        <option value="inactive">{{ t("admin.inactive") }}</option>
       </select>
       <select v-model="sortBy" class="field">
-        <option value="newest">Newest</option>
-        <option value="oldest">Oldest</option>
-        <option value="code">Code</option>
-        <option value="usage">Usage</option>
+        <option value="newest">{{ t("admin.newest") }}</option>
+        <option value="oldest">{{ t("admin.oldest") }}</option>
+        <option value="code">{{ t("admin.code") }}</option>
+        <option value="usage">{{ t("admin.usage") }}</option>
       </select>
     </div>
 
@@ -46,22 +46,22 @@
     </p>
 
     <div class="overflow-hidden rounded-3xl border border-white/10 bg-[#111111]">
-      <div class="overflow-x-auto">
+      <div class="hidden overflow-x-auto md:block">
         <table class="w-full min-w-[1480px] text-left text-sm">
           <thead class="bg-black text-gray-500">
             <tr>
-              <th class="px-5 py-4">Coupon</th>
-              <th class="px-5 py-4">Discount</th>
-              <th class="px-5 py-4">Minimum</th>
-              <th class="px-5 py-4">Max Discount</th>
-              <th class="px-5 py-4">Starts</th>
-              <th class="px-5 py-4">Expires</th>
-              <th class="px-5 py-4">State</th>
-              <th class="px-5 py-4">Usage</th>
-              <th class="px-5 py-4">Limits</th>
-              <th class="px-5 py-4">Restrictions</th>
-              <th class="px-5 py-4">Created</th>
-              <th class="px-5 py-4 text-right">Actions</th>
+              <th class="px-5 py-4">{{ t("admin.coupon") }}</th>
+              <th class="px-5 py-4">{{ t("admin.discountType") }}</th>
+              <th class="px-5 py-4">{{ t("admin.minimum") }}</th>
+              <th class="px-5 py-4">{{ t("admin.maxDiscount") }}</th>
+              <th class="px-5 py-4">{{ t("admin.starts") }}</th>
+              <th class="px-5 py-4">{{ t("admin.expires") }}</th>
+              <th class="px-5 py-4">{{ t("admin.state") }}</th>
+              <th class="px-5 py-4">{{ t("admin.usage") }}</th>
+              <th class="px-5 py-4">{{ t("admin.limits") }}</th>
+              <th class="px-5 py-4">{{ t("admin.restrictions") }}</th>
+              <th class="px-5 py-4">{{ t("common.created") }}</th>
+              <th class="px-5 py-4 text-right">{{ t("common.actions") }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/10">
@@ -73,7 +73,7 @@
               </td>
               <td class="px-5 py-4">
                 <p class="font-black">{{ formatCouponDiscount(coupon) }}</p>
-                <p class="mt-1 text-xs capitalize text-gray-500">{{ coupon.discount_type?.replace("_", " ") }}</p>
+                <p class="mt-1 text-xs text-gray-500">{{ discountTypeLabel(coupon.discount_type) }}</p>
               </td>
               <td class="px-5 py-4 text-gray-300">{{ formatCurrency(coupon.minimum_order_amount) }}</td>
               <td class="px-5 py-4 text-gray-300">{{ coupon.maximum_discount_amount ? formatCurrency(coupon.maximum_discount_amount) : "-" }}</td>
@@ -86,23 +86,23 @@
                   :class="statusClass(coupon)"
                   @click="toggleActive(coupon)"
                 >
-                  {{ getCouponLifecycleStatus(coupon) }}
+                  {{ couponLifecycleLabel(coupon) }}
                 </button>
               </td>
               <td class="px-5 py-4 font-black">{{ getCouponUsageCount(coupon) }}</td>
               <td class="px-5 py-4 text-gray-300">
-                <p>Total: {{ coupon.max_total_uses ?? "Unlimited" }}</p>
-                <p class="mt-1">Per user: {{ coupon.max_uses_per_user ?? "Unlimited" }}</p>
+                <p>{{ t("admin.totalLimit", { value: coupon.max_total_uses ?? t("admin.unlimited") }) }}</p>
+                <p class="mt-1">{{ t("admin.perUserLimit", { value: coupon.max_uses_per_user ?? t("admin.unlimited") }) }}</p>
               </td>
-              <td class="px-5 py-4 text-gray-300">{{ getCouponRestrictionSummary(coupon) }}</td>
+              <td class="px-5 py-4 text-gray-300">{{ couponRestrictionSummary(coupon) }}</td>
               <td class="px-5 py-4 text-gray-400">{{ formatDate(coupon.created_at) }}</td>
               <td class="px-5 py-4">
                 <div class="flex justify-end gap-2">
                   <button class="rounded-xl border border-white/10 px-4 py-2 font-bold transition hover:border-[#FF4D00]" @click="openEdit(coupon)">
-                    Edit
+                    {{ t("common.edit") }}
                   </button>
                   <button class="rounded-xl border border-red-500/40 px-4 py-2 font-bold text-red-400 transition hover:bg-red-500 hover:text-white" @click="deleteCoupon(coupon)">
-                    Delete
+                    {{ t("common.delete") }}
                   </button>
                 </div>
               </td>
@@ -111,99 +111,144 @@
         </table>
       </div>
 
+      <div class="grid gap-3 p-3 md:hidden">
+        <article v-for="coupon in visibleCoupons" :key="coupon.id" class="admin-mobile-card rounded-2xl border border-white/10 bg-black p-4">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-black text-[#FF4D00]">{{ coupon.code }}</p>
+              <p class="mt-1 truncate font-bold">{{ coupon.name }}</p>
+              <p v-if="coupon.description" class="mt-1 line-clamp-2 text-xs text-gray-500">{{ coupon.description }}</p>
+            </div>
+            <button
+              :disabled="savingId === coupon.id"
+              class="shrink-0 rounded-full border px-3 py-1 text-xs font-black transition disabled:opacity-50"
+              :class="statusClass(coupon)"
+              @click="toggleActive(coupon)"
+            >
+              {{ couponLifecycleLabel(coupon) }}
+            </button>
+          </div>
+
+          <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+            <div class="rounded-xl border border-white/10 bg-[#111111] p-3">
+              <p class="text-xs text-gray-500">{{ t("admin.discountType") }}</p>
+              <p class="mt-1 font-black">{{ formatCouponDiscount(coupon) }}</p>
+            </div>
+            <div class="rounded-xl border border-white/10 bg-[#111111] p-3">
+              <p class="text-xs text-gray-500">{{ t("admin.usage") }}</p>
+              <p class="mt-1 font-black">{{ getCouponUsageCount(coupon) }}</p>
+            </div>
+          </div>
+
+          <div class="mt-3 text-xs text-gray-400">
+            <p>{{ t("admin.minimum") }}: {{ formatCurrency(coupon.minimum_order_amount) }}</p>
+            <p class="mt-1">{{ t("admin.restrictions") }}: {{ couponRestrictionSummary(coupon) }}</p>
+          </div>
+
+          <div class="mt-3 flex justify-end gap-2">
+            <button class="min-h-11 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]" @click="openEdit(coupon)">
+              {{ t("common.edit") }}
+            </button>
+            <button class="min-h-11 rounded-xl border border-red-500/40 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500 hover:text-white" @click="deleteCoupon(coupon)">
+              {{ t("common.delete") }}
+            </button>
+          </div>
+        </article>
+      </div>
+
       <div class="flex flex-col gap-3 border-t border-white/10 p-4 md:flex-row md:items-center md:justify-between">
-        <p class="text-sm text-gray-500">Showing {{ visibleCoupons.length }} of {{ filteredCoupons.length }}</p>
+        <p class="text-sm text-gray-500">{{ t("admin.showingCount", { visible: visibleCoupons.length, total: filteredCoupons.length }) }}</p>
         <button v-if="visibleCoupons.length < filteredCoupons.length" class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]" @click="limit += pageSize">
-          Load More
+          {{ t("admin.loadMore") }}
         </button>
       </div>
 
-      <p v-if="loading" class="p-6 text-sm text-gray-500">Loading coupons...</p>
-      <p v-else-if="!filteredCoupons.length" class="p-6 text-sm text-gray-500">No coupons found.</p>
+      <p v-if="loading" class="p-6 text-sm text-gray-500">{{ t("admin.loadingCoupons") }}</p>
+      <p v-else-if="!filteredCoupons.length" class="p-6 text-sm text-gray-500">{{ t("admin.noCoupons") }}</p>
     </div>
 
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <form class="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-white/10 bg-[#111111] p-6" @submit.prevent="saveCoupon">
+      <form class="max-h-[calc(100dvh-1rem)] w-full max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-[#111111] p-4 sm:rounded-3xl sm:p-6" @submit.prevent="saveCoupon">
         <div class="flex items-center justify-between gap-4">
           <div>
-            <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ editingId ? "Edit Coupon" : "Create Coupon" }}</p>
-            <h3 class="mt-2 text-2xl font-black">{{ form.code || "Coupon Details" }}</h3>
+            <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ editingId ? t("admin.editCoupon") : t("admin.createCoupon") }}</p>
+            <h3 class="mt-2 text-2xl font-black">{{ form.code || t("admin.couponDetails") }}</h3>
           </div>
-          <button type="button" class="text-gray-400 hover:text-white" @click="closeModal">Close</button>
+          <button type="button" class="text-gray-400 hover:text-white" @click="closeModal">{{ t("admin.modalClose") }}</button>
         </div>
 
         <div class="mt-6 grid gap-5 lg:grid-cols-[1fr_0.9fr]">
           <section class="rounded-2xl border border-white/10 bg-black p-5">
-            <h4 class="font-black">Configuration</h4>
+            <h4 class="font-black">{{ t("admin.configuration") }}</h4>
             <div class="mt-4 grid gap-4 md:grid-cols-2">
               <label class="block">
-                <span class="field-label">Code</span>
+                <span class="field-label">{{ t("admin.code") }}</span>
                 <input v-model="form.code" required class="field mt-2 uppercase" @blur="form.code = normalizeCouponCode(form.code)" />
               </label>
               <label class="block">
-                <span class="field-label">Name</span>
+                <span class="field-label">{{ t("common.name") }}</span>
                 <input v-model="form.name" required class="field mt-2" />
               </label>
               <label class="block">
-                <span class="field-label">Discount Type</span>
+                <span class="field-label">{{ t("admin.discountType") }}</span>
                 <select v-model="form.discount_type" class="field mt-2">
-                  <option value="percentage">Percentage</option>
-                  <option value="fixed_amount">Fixed amount</option>
+                  <option value="percentage">{{ t("admin.discountTypes.percentage") }}</option>
+                  <option value="fixed_amount">{{ t("admin.discountTypes.fixed_amount") }}</option>
                 </select>
               </label>
               <label class="block">
-                <span class="field-label">Discount Value (% or EGP)</span>
+                <span class="field-label">{{ t("admin.discountValue") }}</span>
                 <input v-model.number="form.discount_value" required type="number" min="0" step="0.01" class="field mt-2" />
               </label>
               <label class="block">
-                <span class="field-label">Minimum Order (EGP)</span>
+                <span class="field-label">{{ t("admin.minimumOrder") }}</span>
                 <input v-model.number="form.minimum_order_amount" type="number" min="0" step="0.01" class="field mt-2" />
               </label>
               <label class="block">
-                <span class="field-label">Maximum Discount (EGP)</span>
+                <span class="field-label">{{ t("admin.maximumDiscount") }}</span>
                 <input v-model.number="form.maximum_discount_amount" :disabled="form.discount_type !== 'percentage'" type="number" min="0" step="0.01" class="field mt-2 disabled:opacity-40" />
               </label>
               <label class="block">
-                <span class="field-label">Starts At</span>
+                <span class="field-label">{{ t("admin.startsAt") }}</span>
                 <input v-model="form.starts_at" type="datetime-local" class="field mt-2" />
               </label>
               <label class="block">
-                <span class="field-label">Expires At</span>
+                <span class="field-label">{{ t("admin.expiresAt") }}</span>
                 <input v-model="form.expires_at" type="datetime-local" class="field mt-2" />
               </label>
               <label class="block">
-                <span class="field-label">Max Total Uses</span>
+                <span class="field-label">{{ t("admin.maxTotalUses") }}</span>
                 <input v-model.number="form.max_total_uses" type="number" min="0" step="1" class="field mt-2" />
               </label>
               <label class="block">
-                <span class="field-label">Max Uses Per User</span>
+                <span class="field-label">{{ t("admin.maxUsesPerUser") }}</span>
                 <input v-model.number="form.max_uses_per_user" type="number" min="0" step="1" class="field mt-2" />
               </label>
               <label class="flex items-center gap-3 md:col-span-2">
                 <input v-model="form.active" type="checkbox" class="h-4 w-4 accent-[#FF4D00]" />
-                <span class="font-bold text-gray-300">Active</span>
+                <span class="font-bold text-gray-300">{{ t("common.active") }}</span>
               </label>
               <label class="block md:col-span-2">
-                <span class="field-label">Description</span>
+                <span class="field-label">{{ t("admin.description") }}</span>
                 <textarea v-model="form.description" rows="4" class="field mt-2" />
               </label>
             </div>
           </section>
 
           <section class="rounded-2xl border border-white/10 bg-black p-5">
-            <h4 class="font-black">Restrictions</h4>
+            <h4 class="font-black">{{ t("admin.restrictions") }}</h4>
             <div class="mt-4 grid gap-3">
               <label class="restriction-option">
                 <input v-model="restrictionMode" type="radio" value="all" class="accent-[#FF4D00]" />
-                <span>All products</span>
+                <span>{{ t("admin.allProducts") }}</span>
               </label>
               <label class="restriction-option">
                 <input v-model="restrictionMode" type="radio" value="products" class="accent-[#FF4D00]" />
-                <span>Specific products</span>
+                <span>{{ t("admin.specificProducts") }}</span>
               </label>
               <label class="restriction-option">
                 <input v-model="restrictionMode" type="radio" value="categories" class="accent-[#FF4D00]" />
-                <span>Specific categories</span>
+                <span>{{ t("admin.specificCategories") }}</span>
               </label>
             </div>
 
@@ -212,7 +257,7 @@
                 <input v-model="selectedProductIds" type="checkbox" :value="product.id" class="accent-[#FF4D00]" />
                 <span>{{ product.title }}</span>
               </label>
-              <p v-if="!products.length" class="text-sm text-gray-500">No products found.</p>
+              <p v-if="!products.length" class="text-sm text-gray-500">{{ t("admin.noProducts") }}</p>
             </div>
 
             <div v-if="restrictionMode === 'categories'" class="mt-5 max-h-72 space-y-2 overflow-y-auto pr-1">
@@ -220,7 +265,7 @@
                 <input v-model="selectedCategoryIds" type="checkbox" :value="category.id" class="accent-[#FF4D00]" />
                 <span>{{ category.name }}</span>
               </label>
-              <p v-if="!categories.length" class="text-sm text-gray-500">No categories found.</p>
+              <p v-if="!categories.length" class="text-sm text-gray-500">{{ t("admin.noCategories") }}</p>
             </div>
           </section>
         </div>
@@ -228,9 +273,9 @@
         <p v-if="modalError" class="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ modalError }}</p>
 
         <div class="mt-6 flex flex-col justify-end gap-3 sm:flex-row">
-          <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">Cancel</button>
+          <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">{{ t("common.cancel") }}</button>
           <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
-            {{ saving ? "Saving..." : "Save Coupon" }}
+            {{ saving ? t("admin.saving") : t("admin.saveCoupon") }}
           </button>
         </div>
       </form>
@@ -247,7 +292,6 @@ import {
   formatCouponDiscount,
   getCouponLifecycleStatus,
   getCouponRestrictionMode,
-  getCouponRestrictionSummary,
   getCouponUsageCount,
   normalizeCouponCode,
   validateCouponForm,
@@ -292,6 +336,7 @@ type CouponRow = {
 };
 
 const supabase = useSupabase();
+const { t } = useI18n();
 const coupons = ref<CouponRow[]>([]);
 const products = ref<ProductRow[]>([]);
 const categories = ref<CategoryRow[]>([]);
@@ -387,6 +432,21 @@ const statusClass = (coupon: CouponRow) => {
   return "border-red-400/30 bg-red-400/10 text-red-300";
 };
 
+const discountTypeLabel = (type: AdminCouponDiscountType) =>
+  t(`admin.discountTypes.${type}`);
+
+const couponLifecycleLabel = (coupon: CouponRow) =>
+  t(`admin.couponLifecycle.${getCouponLifecycleStatus(coupon)}`);
+
+const couponRestrictionSummary = (coupon: CouponRow) => {
+  const productCount = coupon.coupon_products?.length || 0;
+  const categoryCount = coupon.coupon_categories?.length || 0;
+
+  if (productCount) return t("admin.restrictionsCount.products", { count: productCount });
+  if (categoryCount) return t("admin.restrictionsCount.categories", { count: categoryCount });
+  return t("admin.restrictionsCount.all");
+};
+
 const loadData = async () => {
   loading.value = true;
   setMessage("error", "");
@@ -480,7 +540,7 @@ const saveRestrictions = async (couponId: string) => {
 const validateUniqueCode = () => {
   const code = normalizeCouponCode(form.value.code);
   const duplicate = coupons.value.find((coupon) => coupon.code.toUpperCase() === code && coupon.id !== editingId.value);
-  return duplicate ? "Coupon code already exists." : "";
+  return duplicate ? "admin.couponCodeExists" : "";
 };
 
 const saveCoupon = async () => {
@@ -494,7 +554,7 @@ const saveCoupon = async () => {
       validateUniqueCode();
 
     if (validationError) {
-      modalError.value = validationError;
+      modalError.value = validationError.startsWith("admin.") ? t(validationError) : validationError;
       return;
     }
 
@@ -518,9 +578,9 @@ const saveCoupon = async () => {
     await saveRestrictions(couponId);
     await loadData();
     closeModal();
-    setMessage("success", "Coupon saved.");
+    setMessage("success", t("admin.couponSaved"));
   } catch (error: unknown) {
-    modalError.value = error instanceof Error ? error.message : "Unable to save coupon";
+    modalError.value = error instanceof Error ? error.message : t("admin.couponSaveFailed");
   } finally {
     saving.value = false;
   }
@@ -537,7 +597,7 @@ const toggleActive = async (coupon: CouponRow) => {
     setMessage("error", error.message);
   } else {
     coupon.active = nextActive;
-    setMessage("success", `Coupon ${nextActive ? "activated" : "deactivated"}.`);
+    setMessage("success", nextActive ? t("admin.couponActivated") : t("admin.couponDeactivated"));
   }
 
   savingId.value = null;
@@ -545,11 +605,11 @@ const toggleActive = async (coupon: CouponRow) => {
 
 const deleteCoupon = async (coupon: CouponRow) => {
   if (!canDeleteCoupon(coupon)) {
-    setMessage("error", "This coupon has redemption history. Deactivate it instead of deleting it.");
+    setMessage("error", t("admin.couponUsedDeleteBlocked"));
     return;
   }
 
-  if (!confirm(`Delete coupon ${coupon.code}? This cannot be undone.`)) return;
+  if (!confirm(t("admin.deleteCouponConfirm", { code: coupon.code }))) return;
 
   const { error } = await supabase.from("coupons").delete().eq("id", coupon.id);
   if (error) {
@@ -558,7 +618,7 @@ const deleteCoupon = async (coupon: CouponRow) => {
   }
 
   coupons.value = coupons.value.filter((item) => item.id !== coupon.id);
-  setMessage("success", "Coupon deleted.");
+  setMessage("success", t("admin.couponDeleted"));
 };
 
 onMounted(loadData);

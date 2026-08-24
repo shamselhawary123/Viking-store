@@ -14,7 +14,7 @@
           decoding="async"
         />
         <div
-          class="absolute inset-0 bg-[radial-gradient(circle_at_72%_45%,rgba(255,77,0,0.28),transparent_26rem)]"
+          class="absolute inset-0 bg-[radial-gradient(circle_at_72%_45%,rgba(207,29,29,0.28),transparent_26rem)]"
         />
         <div
           class="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/50"
@@ -46,9 +46,9 @@
             <div
               v-for="stat in stats"
               :key="stat.titleKey"
-              class="rounded-2xl border border-white/10 bg-white/[0.055] p-5 text-center backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/50"
+              class="rounded-2xl border border-white/10 bg-white/[0.055] p-5 text-center backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/50"
             >
-              <h3 class="font-display text-5xl leading-none text-[#FF4D00]">
+              <h3 class="font-display text-5xl leading-none text-[#CF1D1D]">
                 {{ stat.number }}
               </h3>
               <p
