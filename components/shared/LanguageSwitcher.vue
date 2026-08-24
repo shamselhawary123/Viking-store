@@ -56,7 +56,7 @@ const switchLocale = async (code: "en" | "ar") => {
 }
 
 .language-option.active {
-  background: #ff4d00;
+  background: #cf1d1d;
   color: #fff;
 }
 </style>

@@ -45,7 +45,7 @@
             </span>
           </div>
 
-          <section class="mt-10 rounded-2xl border border-[#FF4D00]/30 bg-[#FF4D00]/10 p-6">
+          <section class="mt-10 rounded-2xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 p-6">
             <p class="eyebrow">{{ t("blog.storeCtaEyebrow") }}</p>
             <h2 class="mt-3 text-3xl font-black text-white">{{ t("blog.storeCtaTitle") }}</h2>
             <p class="mt-3 leading-7 text-neutral-300">{{ t("blog.storeCtaText") }}</p>
@@ -90,13 +90,13 @@
           <NuxtLink to="/blog" class="premium-link">{{ t("blog.viewAllArticles") }}</NuxtLink>
         </div>
         <div class="grid gap-6 md:grid-cols-3">
-          <article v-for="item in relatedPosts" :key="item.id" class="overflow-hidden rounded-2xl border border-white/10 bg-[#111111]">
+          <article v-for="item in relatedPosts" :key="item.id" class="overflow-hidden rounded-2xl border border-white/10 bg-[#171717]">
             <NuxtLink :to="`/blog/${item.slug}`" class="block overflow-hidden bg-black">
               <img :src="item.cover_image || '/train-hard.png'" :alt="item.title" width="420" height="260" class="h-48 w-full object-cover transition duration-700 hover:scale-105" loading="lazy" decoding="async" />
             </NuxtLink>
             <div class="p-5">
-              <p class="text-xs font-black uppercase tracking-[0.18em] text-[#FF4D00]">{{ item.category || t("blog.editorial") }}</p>
-              <NuxtLink :to="`/blog/${item.slug}`" class="mt-2 block text-xl font-black leading-tight text-white transition hover:text-[#FF4D00]">
+              <p class="text-xs font-black uppercase tracking-[0.18em] text-[#CF1D1D]">{{ item.category || t("blog.editorial") }}</p>
+              <NuxtLink :to="`/blog/${item.slug}`" class="mt-2 block text-xl font-black leading-tight text-white transition hover:text-[#CF1D1D]">
                 {{ item.title }}
               </NuxtLink>
             </div>
@@ -108,7 +108,6 @@
 </template>
 
 <script setup lang="ts">
-import { createClient } from "@supabase/supabase-js";
 import { computed } from "vue";
 import {
   buildBlogCanonicalUrl,
@@ -119,7 +118,7 @@ import {
   renderSafeBlogContent,
   type BlogPostLike,
 } from "../../utils/blog";
-import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { getPublicSupabaseClient } from "../../utils/publicSupabase";
 import {
   buildShopCategoryUrl,
   getCategorySeoIntent,
@@ -136,10 +135,9 @@ const { t, locale } = useI18n();
 const config = useRuntimeConfig();
 const siteUrl = normalizeSiteUrl(String(config.public.siteUrl || ""));
 const slug = String(route.params.slug || "");
-const supabase = createClient(
+const supabase = getPublicSupabaseClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
-  createPublicSupabaseReadOptions("viking-store-blog-detail-readonly"),
 );
 
 const { data: post } = await useAsyncData(`blog-post-${slug}`, async () => {
@@ -254,7 +252,7 @@ useHead(() => ({
 }
 
 .blog-content :deep(a) {
-  color: #ff4d00;
+  color: #cf1d1d;
   font-weight: 800;
 }
 </style>

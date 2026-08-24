@@ -1,7 +1,7 @@
 <template>
   <section class="min-h-screen bg-black">
     <div class="relative overflow-hidden border-b border-white/10">
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,77,0,0.22),transparent_32rem)]" />
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(207,29,29,0.22),transparent_32rem)]" />
 
       <div class="container-premium relative py-14">
         <div v-if="profile" class="flex flex-col items-center gap-6 md:flex-row md:items-center">
@@ -11,11 +11,11 @@
               alt="Profile avatar"
               width="128"
               height="128"
-              class="h-32 w-32 rounded-full border-4 border-[#FF4D00] object-cover shadow-[0_0_40px_rgba(255,77,0,0.28)]"
+              class="h-32 w-32 rounded-full border-4 border-[#CF1D1D] object-cover shadow-[0_0_40px_rgba(207,29,29,0.28)]"
               loading="lazy"
               decoding="async"
             />
-            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#FF4D00] px-4 py-1 text-xs font-black uppercase tracking-[0.16em]">
+            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-[#CF1D1D] px-4 py-1 text-xs font-black uppercase tracking-[0.16em]">
               {{ t('profile.member') }}
             </div>
           </div>
@@ -36,7 +36,7 @@
       <div class="grid gap-5 md:grid-cols-3">
         <div v-for="stat in stats" :key="stat.label" class="premium-panel rounded-2xl p-6">
           <p class="text-sm font-black uppercase tracking-[0.18em] text-neutral-500">{{ stat.label }}</p>
-          <h3 class="mt-3 text-2xl font-black" :class="stat.accent ? 'text-[#FF4D00]' : 'text-white'">{{ stat.value }}</h3>
+          <h3 class="mt-3 text-2xl font-black" :class="stat.accent ? 'text-[#CF1D1D]' : 'text-white'">{{ stat.value }}</h3>
         </div>
       </div>
 

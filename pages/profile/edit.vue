@@ -4,7 +4,7 @@
       class="relative overflow-hidden border-b border-white/10 bg-gradient-to-r from-[#1a1a1a] via-black to-[#1a1a1a]"
     >
       <div
-        class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#FF4D0030,transparent_40%)]"
+        class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#CF1D1D30,transparent_40%)]"
       ></div>
 
       <div class="relative mx-auto max-w-6xl px-6 py-12">
@@ -20,7 +20,7 @@
 
     <div class="mx-auto mt-10 max-w-5xl px-6">
       <div
-        class="rounded-3xl border border-white/10 bg-[#111111] p-8 shadow-2xl"
+        class="rounded-3xl border border-white/10 bg-[#171717] p-8 shadow-2xl"
       >
         <!-- Avatar -->
 
@@ -31,7 +31,7 @@
               alt=""
               width="160"
               height="160"
-              class="h-40 w-40 rounded-full border-4 border-[#FF4D00] object-cover shadow-[0_0_40px_rgba(255,77,0,.4)]"
+              class="h-40 w-40 rounded-full border-4 border-[#CF1D1D] object-cover shadow-[0_0_40px_rgba(207,29,29,.4)]"
               loading="lazy"
               decoding="async"
             />
@@ -63,7 +63,7 @@
 
             <input
               v-model="form.full_name"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#CF1D1D]"
             />
           </div>
 
@@ -72,7 +72,7 @@
 
             <input
               v-model="form.phone"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#CF1D1D]"
             />
           </div>
 
@@ -81,7 +81,7 @@
 
             <select
               v-model="form.gender"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#CF1D1D]"
             >
               <option value="Male">{{ t('auth.male') }}</option>
               <option value="Female">{{ t('auth.female') }}</option>
@@ -93,7 +93,7 @@
 
             <input
               v-model="form.city"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#CF1D1D]"
             />
           </div>
 
@@ -102,7 +102,7 @@
 
             <input
               v-model="form.country"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#CF1D1D]"
             />
           </div>
 
@@ -113,7 +113,7 @@
 
             <input
               v-model="form.postal_code"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#CF1D1D]"
             />
           </div>
         </div>
@@ -123,7 +123,7 @@
 
           <input
             v-model="form.address"
-            class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#FF4D00]"
+            class="h-14 w-full rounded-2xl border border-white/10 bg-black px-4 text-white outline-none focus:border-[#CF1D1D]"
           />
         </div>
 
@@ -133,7 +133,7 @@
           <textarea
             v-model="form.bio"
             rows="5"
-            class="w-full rounded-2xl border border-white/10 bg-black p-4 text-white outline-none focus:border-[#FF4D00]"
+            class="w-full rounded-2xl border border-white/10 bg-black p-4 text-white outline-none focus:border-[#CF1D1D]"
           />
         </div>
 
@@ -143,14 +143,14 @@
           <button
             @click="handleUpdate"
             :disabled="loading"
-            class="flex-1 rounded-2xl bg-[#FF4D00] py-4 font-bold text-white transition hover:scale-[1.02] disabled:opacity-50"
+            class="flex-1 rounded-2xl bg-[#CF1D1D] py-4 font-bold text-white transition hover:scale-[1.02] disabled:opacity-50"
           >
             {{ loading ? t('profile.saving') : t('profile.saveChanges') }}
           </button>
 
           <button
             @click="$router.back()"
-            class="flex-1 rounded-2xl border border-white/10 bg-[#111111] py-4 font-bold text-white transition hover:border-[#FF4D00]"
+            class="flex-1 rounded-2xl border border-white/10 bg-[#171717] py-4 font-bold text-white transition hover:border-[#CF1D1D]"
           >
             {{ t('common.cancel') }}
           </button>

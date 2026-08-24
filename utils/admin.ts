@@ -12,6 +12,20 @@ export type AdminOrderStatus = (typeof ADMIN_ORDER_STATUSES)[number];
 
 export const ADMIN_REVENUE_ORDER_STATUSES = ["delivered"] as const;
 
+export const adminOrderStatusLabelKey = (status?: string | null) => {
+  const normalized = String(status || "pending").toLowerCase();
+  return ADMIN_ORDER_STATUSES.includes(normalized as AdminOrderStatus)
+    ? `admin.status.${normalized}`
+    : "admin.status.pending";
+};
+
+export const adminPaymentStatusLabelKey = (status?: string | null) => {
+  const normalized = String(status || "unpaid").toLowerCase();
+  return ["paid", "unpaid"].includes(normalized)
+    ? `admin.paymentStatusValues.${normalized}`
+    : `admin.paymentStatusValues.${normalized}`;
+};
+
 type AdminOrderFilterInput = {
   search: string;
   status: string;
@@ -108,6 +122,103 @@ export const buildProductPayload = (form: {
   category_id: form.category_id,
   cover_image: form.cover_image,
 });
+
+export type ProductMoveDirection = "up" | "down";
+
+type ProductOrderingInput = {
+  id: number;
+  shop_position?: number | string | null;
+};
+
+export const sortProductsByShopPosition = <T extends ProductOrderingInput>(products: T[]) =>
+  [...products].sort((a, b) => {
+    const aPosition = Number(a.shop_position ?? Number.MAX_SAFE_INTEGER);
+    const bPosition = Number(b.shop_position ?? Number.MAX_SAFE_INTEGER);
+
+    if (aPosition !== bPosition) return aPosition - bPosition;
+    return Number(a.id || 0) - Number(b.id || 0);
+  });
+
+export const getAdjacentProductForMove = <T extends ProductOrderingInput>(
+  products: T[],
+  productId: number,
+  direction: ProductMoveDirection,
+) => {
+  const ordered = sortProductsByShopPosition(products);
+  const index = ordered.findIndex((product) => product.id === productId);
+  if (index === -1) return null;
+
+  return direction === "up" ? ordered[index - 1] || null : ordered[index + 1] || null;
+};
+
+export const getProductMoveState = <T extends ProductOrderingInput>(
+  products: T[],
+  productId: number,
+) => ({
+  canMoveUp: Boolean(getAdjacentProductForMove(products, productId, "up")),
+  canMoveDown: Boolean(getAdjacentProductForMove(products, productId, "down")),
+});
+
+export const PRODUCT_DRAG_DISABLED_MESSAGE =
+  "Clear filters and load all products to reorder the full shop catalog.";
+
+type ProductDragOrderingState = {
+  search: string;
+  categoryFilter: number;
+  stockFilter: string;
+  sortBy: string;
+  reorderListLoaded?: boolean;
+  reorderListFailed?: boolean;
+};
+
+export const isProductReorderMode = (state: Pick<ProductDragOrderingState, "search" | "categoryFilter" | "stockFilter" | "sortBy">) =>
+  !state.search.trim() &&
+  state.categoryFilter === 0 &&
+  state.stockFilter === "all" &&
+  state.sortBy === "manual";
+
+export const isProductDragOrderingDisabled = (state: ProductDragOrderingState) =>
+  Boolean(state.search.trim()) ||
+  state.categoryFilter !== 0 ||
+  state.stockFilter !== "all" ||
+  state.sortBy !== "manual" ||
+  state.reorderListLoaded !== true ||
+  state.reorderListFailed === true;
+
+export const getProductDragReorder = <T extends ProductOrderingInput>(
+  products: T[],
+  productId: number,
+  targetIndex: number,
+) => {
+  const ordered = sortProductsByShopPosition(products);
+  const sourceIndex = ordered.findIndex((product) => product.id === productId);
+  if (sourceIndex === -1) {
+    return {
+      reorderedProducts: ordered,
+      previousProductId: null as number | null,
+      nextProductId: null as number | null,
+    };
+  }
+
+  const draggedProduct = ordered[sourceIndex];
+  const withoutDragged = ordered.filter((product) => product.id !== productId);
+  const safeTargetIndex = Math.max(0, Math.min(targetIndex, withoutDragged.length));
+  const reorderedProducts = [...withoutDragged];
+  reorderedProducts.splice(safeTargetIndex, 0, draggedProduct);
+  const finalIndex = reorderedProducts.findIndex((product) => product.id === productId);
+
+  return {
+    reorderedProducts,
+    previousProductId: reorderedProducts[finalIndex - 1]?.id ?? null,
+    nextProductId: reorderedProducts[finalIndex + 1]?.id ?? null,
+  };
+};
+
+export const getOptimisticShopPositions = <T extends ProductOrderingInput>(products: T[]) =>
+  products.map((product, index) => ({
+    ...product,
+    shop_position: (index + 1) * 1000,
+  }));
 
 export const buildProductImagePath = (fileName: string, timestamp = Date.now()) => {
   const safeName = fileName

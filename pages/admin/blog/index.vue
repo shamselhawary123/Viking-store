@@ -27,7 +27,7 @@
     <p v-if="errorMessage" class="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">{{ errorMessage }}</p>
 
     <div class="overflow-hidden rounded-3xl border border-white/10 bg-[#111111]">
-      <div class="overflow-x-auto">
+      <div class="hidden overflow-x-auto md:block">
         <table class="w-full min-w-[1040px] text-left text-sm">
           <thead class="bg-black text-gray-500">
             <tr>
@@ -79,6 +79,43 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="grid gap-3 p-3 md:hidden">
+        <article v-for="post in visiblePosts" :key="post.id" class="admin-mobile-card rounded-2xl border border-white/10 bg-black p-4">
+          <div class="flex gap-3">
+            <img :src="post.cover_image || '/logo.png'" alt="" class="h-14 w-14 shrink-0 rounded-xl object-cover" loading="lazy" decoding="async" />
+            <div class="min-w-0 flex-1">
+              <p class="truncate font-black text-white">{{ post.title }}</p>
+              <p class="mt-1 truncate text-xs text-gray-500">{{ post.slug }}</p>
+              <p class="mt-1 text-sm text-gray-400">{{ post.category || "-" }}</p>
+            </div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+            <button
+              class="rounded-full border px-3 py-1 font-black transition disabled:opacity-50"
+              :class="post.status === 'published' ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-yellow-400/30 bg-yellow-400/10 text-yellow-200'"
+              :disabled="savingId === post.id"
+              @click="togglePublish(post)"
+            >
+              {{ t(post.status === "published" ? "blog.published" : "blog.draft") }}
+            </button>
+            <span>{{ formatBlogDate(post.created_at, locale) }}</span>
+          </div>
+
+          <div class="mt-3 flex flex-wrap justify-end gap-2">
+            <NuxtLink v-if="post.status === 'published'" :to="`/blog/${post.slug}`" target="_blank" class="min-h-11 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]">
+              {{ t("admin.preview") }}
+            </NuxtLink>
+            <NuxtLink :to="`/admin/blog/${post.id}/edit`" class="min-h-11 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]">
+              {{ t("common.edit") }}
+            </NuxtLink>
+            <button class="min-h-11 rounded-xl border border-red-500/40 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500 hover:text-white" @click="deletePost(post)">
+              {{ t("common.delete") }}
+            </button>
+          </div>
+        </article>
       </div>
 
       <div class="flex flex-col gap-3 border-t border-white/10 p-4 md:flex-row md:items-center md:justify-between">

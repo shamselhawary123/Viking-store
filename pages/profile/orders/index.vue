@@ -11,7 +11,7 @@
     </div>
 
     <div v-else-if="orders.length === 0" class="premium-panel rounded-2xl p-10 text-center md:p-16">
-      <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
+      <div class="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-black text-[#CF1D1D]">
         <Icon name="i-heroicons-archive-box" class="text-4xl" />
       </div>
       <h2 class="mt-6 text-3xl font-black text-white">{{ t('profile.noOrdersYet') }}</h2>
@@ -24,7 +24,7 @@
         v-for="order in orders"
         :key="order.id"
         :to="`/profile/orders/${order.id}`"
-        class="premium-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-[#FF4D00]/70"
+        class="premium-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-[#CF1D1D]/70"
       >
         <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -39,7 +39,7 @@
 
           <div class="text-left lg:text-right">
             <p class="text-sm text-neutral-500">{{ t('common.total') }}</p>
-            <h2 class="text-4xl font-black text-[#FF4D00]">{{ formatStorePrice(order.total_price, locale) }}</h2>
+            <h2 class="text-4xl font-black text-[#CF1D1D]">{{ formatStorePrice(order.total_price, locale) }}</h2>
             <span class="mt-4 inline-flex items-center gap-2 text-sm font-black text-white">
               {{ t('common.details') }}
               <Icon name="i-heroicons-arrow-right" />

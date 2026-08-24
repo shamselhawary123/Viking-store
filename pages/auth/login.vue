@@ -20,7 +20,7 @@
         <div class="absolute inset-0 bg-black/60" />
 
         <div class="absolute bottom-16 left-10 max-w-md">
-          <p class="mb-4 text-sm uppercase tracking-[0.4em] text-[#FF4D00]">
+          <p class="mb-4 text-sm uppercase tracking-[0.4em] text-[#CF1D1D]">
             Viking Store
           </p>
 
@@ -48,7 +48,7 @@
                 v-model="email"
                 type="email"
                 :placeholder="t('auth.emailAddress')"
-                class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
               />
 
               <p v-if="errors.email" class="mt-2 text-sm text-red-500">
@@ -62,7 +62,7 @@
                 v-model="password"
                 type="password"
                 :placeholder="t('common.password')"
-                class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
               />
 
               <p v-if="errors.password" class="mt-2 text-sm text-red-500">
@@ -82,7 +82,7 @@
             <div class="flex items-center justify-between">
               <NuxtLink
                 to="/auth/forgot-password"
-                class="text-sm text-gray-400 hover:text-[#FF4D00]"
+                class="text-sm text-gray-400 hover:text-[#CF1D1D]"
               >
                 {{ t('auth.forgotPassword') }}
               </NuxtLink>
@@ -92,7 +92,7 @@
             <button
               type="submit"
               :disabled="loading"
-              class="h-14 w-full rounded-2xl bg-[#FF4D00] text-lg font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+              class="h-14 w-full rounded-2xl bg-[#CF1D1D] text-lg font-bold text-white transition hover:opacity-90 disabled:opacity-50"
             >
               {{ loading ? t('auth.loggingIn') : t('auth.login') }}
             </button>
@@ -101,7 +101,7 @@
             <button
               type="button"
               @click="continueWithGoogle"
-              class="flex h-14 w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-[#111111] font-semibold text-white transition hover:border-[#FF4D00]"
+              class="flex h-14 w-full items-center justify-center gap-3 rounded-2xl border border-white/10 bg-[#171717] font-semibold text-white transition hover:border-[#CF1D1D]"
             >
               <img
                 src="https://cdn-icons-png.flaticon.com/512/300/300221.png"
@@ -122,7 +122,7 @@
 
               <NuxtLink
                 to="/auth/register"
-                class="font-bold text-white hover:text-[#FF4D00]"
+                class="font-bold text-white hover:text-[#CF1D1D]"
               >
                 {{ t('auth.register') }}
               </NuxtLink>

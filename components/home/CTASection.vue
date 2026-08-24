@@ -2,10 +2,10 @@
   <section class="bg-black py-24">
     <div class="container-premium">
       <div
-        class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#111111] px-6 py-20 text-center shadow-[0_30px_110px_rgba(0,0,0,0.5)] md:px-10"
+        class="relative overflow-hidden rounded-2xl border border-white/10 bg-[#171717] px-6 py-20 text-center shadow-[0_30px_110px_rgba(0,0,0,0.5)] md:px-10"
       >
         <img src="/train-hard.png" alt="" width="900" height="900" class="absolute inset-y-0 left-1/2 h-full w-full -translate-x-1/2 object-contain opacity-20" loading="lazy" decoding="async" />
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,77,0,0.22),transparent_30rem)]" />
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(207,29,29,0.22),transparent_30rem)]" />
         <div class="absolute inset-0 bg-black/55" />
         <div class="relative">
       <p class="eyebrow">{{ t('home.readyToFight') }}</p>

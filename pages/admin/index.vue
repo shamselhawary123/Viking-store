@@ -1,5 +1,5 @@
 <template>
-  <section class="space-y-8">
+  <section class="space-y-6 lg:space-y-8">
     <div>
       <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t('admin.overview') }}</p>
       <h2 class="mt-2 text-3xl font-black">{{ t('admin.dashboardHome') }}</h2>
@@ -9,13 +9,13 @@
       {{ errorMessage }}
     </p>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      <div v-for="card in statCards" :key="card.labelKey" class="rounded-3xl border border-white/10 bg-[#111111] p-6">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
+      <div v-for="card in statCards" :key="card.labelKey" class="rounded-2xl border border-white/10 bg-[#111111] p-4 sm:rounded-3xl sm:p-6">
         <div class="flex items-center justify-between gap-4">
           <p class="text-sm text-gray-400">{{ t(card.labelKey) }}</p>
-          <Icon :name="card.icon" class="text-2xl text-[#FF4D00]" />
+          <Icon :name="card.icon" class="hidden text-2xl text-[#FF4D00] sm:block" />
         </div>
-        <h3 class="mt-4 text-3xl font-black">{{ card.value }}</h3>
+        <h3 class="mt-3 break-words text-2xl font-black sm:mt-4 sm:text-3xl">{{ card.value }}</h3>
       </div>
     </div>
 
@@ -31,7 +31,7 @@
           </NuxtLink>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="hidden overflow-x-auto md:block">
           <table class="w-full min-w-[760px] text-left text-sm">
             <thead class="bg-black text-gray-500">
               <tr>
@@ -58,6 +58,24 @@
           </table>
         </div>
 
+        <div class="grid gap-3 p-4 md:hidden">
+          <article v-for="order in recentOrders" :key="order.id" class="admin-mobile-card rounded-2xl border border-white/10 bg-black p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="font-black">#{{ getAdminOrderLabel(order) }}</p>
+                <p class="mt-1 truncate text-sm text-gray-400">{{ getOrderCustomer(order).name }}</p>
+              </div>
+              <p class="shrink-0 font-black text-[#FF4D00]">{{ formatCurrency(order.total_price) }}</p>
+            </div>
+            <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+              <span class="rounded-full border border-[#FF4D00]/30 bg-[#FF4D00]/10 px-3 py-1 font-black text-[#FF4D00]">
+                {{ t(statusLabelKey(order.status)) }}
+              </span>
+              <span>{{ formatDate(order.created_at) }}</span>
+            </div>
+          </article>
+        </div>
+
         <p v-if="loading && !recentOrders.length" class="p-6 text-sm text-gray-500">{{ t('admin.loadingOrders') }}</p>
         <p v-else-if="!recentOrders.length" class="p-6 text-sm text-gray-500">{{ t('admin.noOrders') }}</p>
       </section>
@@ -73,7 +91,7 @@
           </NuxtLink>
         </div>
 
-        <div class="overflow-x-auto">
+        <div class="hidden overflow-x-auto md:block">
           <table class="w-full min-w-[700px] text-left text-sm">
             <thead class="bg-black text-gray-500">
               <tr>
@@ -95,6 +113,22 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="grid gap-3 p-4 md:hidden">
+          <article v-for="product in recentProducts" :key="product.id" class="admin-mobile-card rounded-2xl border border-white/10 bg-black p-4">
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <p class="truncate font-black">{{ product.title || t('admin.untitledProduct') }}</p>
+                <p class="mt-1 truncate text-xs text-gray-500">{{ product.slug }}</p>
+              </div>
+              <p class="shrink-0 font-black text-[#FF4D00]">{{ formatCurrency(product.price) }}</p>
+            </div>
+            <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-gray-400">
+              <span>{{ product.categories?.name || t('admin.uncategorized') }}</span>
+              <span>{{ formatDate(product.created_at) }}</span>
+            </div>
+          </article>
         </div>
 
         <p v-if="loading && !recentProducts.length" class="p-6 text-sm text-gray-500">{{ t('admin.loadingProducts') }}</p>

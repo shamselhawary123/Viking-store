@@ -20,7 +20,7 @@
         <div class="absolute inset-0 bg-black/50" />
 
         <div class="absolute bottom-16 left-10 max-w-md">
-          <p class="mb-4 text-sm uppercase tracking-[0.4em] text-[#FF4D00]">
+          <p class="mb-4 text-sm uppercase tracking-[0.4em] text-[#CF1D1D]">
             Viking Store
           </p>
 
@@ -56,7 +56,7 @@
 
               <div>
                 <label
-                  class="inline-flex cursor-pointer items-center rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white"
+                  class="inline-flex cursor-pointer items-center rounded-2xl bg-[#CF1D1D] px-5 py-3 font-bold text-white"
                 >
                   {{ t('auth.uploadAvatar') }}
 
@@ -75,7 +75,7 @@
               v-model="form.fullName"
               type="text"
               :placeholder="t('common.fullName')"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
               required
             />
 
@@ -84,7 +84,7 @@
               v-model="form.email"
               type="email"
               :placeholder="t('auth.emailAddress')"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
               required
             />
 
@@ -94,13 +94,13 @@
                 v-model="form.phone"
                 type="text"
                 :placeholder="t('auth.phoneNumber')"
-                class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
 
               <select
                 v-model="form.gender"
-                class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               >
                 <option value="">{{ t('auth.selectGender') }}</option>
@@ -116,7 +116,7 @@
               v-model="form.address"
               type="text"
               :placeholder="t('common.address')"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+              class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
               required
             />
 
@@ -126,7 +126,7 @@
                 v-model="form.city"
                 type="text"
                 :placeholder="t('common.city')"
-                class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
 
@@ -134,7 +134,7 @@
                 v-model="form.country"
                 type="text"
                 :placeholder="t('auth.country')"
-                class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
 
@@ -142,7 +142,7 @@
                 v-model="form.postalCode"
                 type="text"
                 :placeholder="t('auth.postalCode')"
-                class="h-14 rounded-2xl border border-white/10 bg-[#111111] px-5 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
               />
             </div>
 
@@ -151,7 +151,7 @@
               v-model="form.bio"
               rows="4"
               :placeholder="t('auth.shortBio')"
-              class="w-full rounded-2xl border border-white/10 bg-[#111111] p-5 text-white outline-none transition focus:border-[#FF4D00]"
+              class="w-full rounded-2xl border border-white/10 bg-[#171717] p-5 text-white outline-none transition focus:border-[#CF1D1D]"
             />
 
             <!-- Password -->
@@ -160,7 +160,7 @@
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
                 :placeholder="t('common.password')"
-                class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 pr-20 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 pr-20 text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
 
@@ -178,7 +178,7 @@
                 v-model="form.confirmPassword"
                 :type="showPassword ? 'text' : 'password'"
                 :placeholder="t('auth.confirmPassword')"
-                class="h-14 w-full rounded-2xl border border-white/10 bg-[#111111] px-5 pr-20 text-white outline-none transition focus:border-[#FF4D00]"
+                class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 pr-20 text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
             </div>
@@ -194,7 +194,7 @@
             <button
               type="submit"
               :disabled="loading"
-              class="h-14 w-full rounded-2xl bg-[#FF4D00] text-lg font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+              class="h-14 w-full rounded-2xl bg-[#CF1D1D] text-lg font-bold text-white transition hover:opacity-90 disabled:opacity-50"
             >
               {{ loading ? t('auth.creating') : t('auth.createAccount') }}
             </button>
@@ -204,7 +204,7 @@
 
               <NuxtLink
                 to="/auth/login"
-                class="font-bold text-white hover:text-[#FF4D00]"
+                class="font-bold text-white hover:text-[#CF1D1D]"
               >
                 {{ t('auth.login') }}
               </NuxtLink>

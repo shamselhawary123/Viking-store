@@ -17,7 +17,7 @@
           :key="category.id"
           v-reveal="{ delay: index * 90 }"
           :to="buildShopCategoryUrl(category.slug)"
-          class="group flex h-[25rem] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/70 hover:shadow-[0_30px_90px_rgba(255,77,0,0.12)]"
+          class="group flex h-[25rem] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#171717] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:-translate-y-2 hover:border-[#CF1D1D]/70 hover:shadow-[0_30px_90px_rgba(207,29,29,0.12)]"
         >
           <div class="relative h-[70%] overflow-hidden bg-black">
             <img
@@ -40,7 +40,7 @@
                 >{{ t("home.proGear") }}</span
               >
               <span
-                class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]"
+                class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white transition duration-300 group-hover:border-[#CF1D1D] group-hover:bg-[#CF1D1D]"
               >
                 <Icon name="i-heroicons-arrow-right" />
               </span>
@@ -51,7 +51,7 @@
           >
             <div>
               <h3
-                class="font-display text-3xl leading-none text-white transition duration-300 group-hover:text-[#FF4D00]"
+                class="font-display text-3xl leading-none text-white transition duration-300 group-hover:text-[#CF1D1D]"
               >
                 {{ getLocalizedCategoryName(category, locale) || category.name }}
               </h3>
@@ -60,7 +60,7 @@
               </p>
             </div>
             <p
-              class="mt-4 inline-flex w-fit items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
+              class="mt-4 inline-flex w-fit items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#CF1D1D]"
             >
               {{ t("home.explore") }}
             </p>
@@ -112,7 +112,7 @@
               v-for="(itemIndex, index) in carousel.loopedIndexes"
               :key="`${index}-${visibleCategories[itemIndex].id}`"
               :to="buildShopCategoryUrl(visibleCategories[itemIndex].slug)"
-              class="mobile-carousel-slide group flex h-[25rem] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111111] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:border-[#FF4D00]/70 hover:shadow-[0_30px_90px_rgba(255,77,0,0.12)]"
+              class="mobile-carousel-slide group flex h-[25rem] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#171717] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:border-[#CF1D1D]/70 hover:shadow-[0_30px_90px_rgba(207,29,29,0.12)]"
             >
               <div class="relative h-[70%] overflow-hidden bg-black">
                 <img
@@ -135,7 +135,7 @@
                     >{{ t("home.proGear") }}</span
                   >
                   <span
-                    class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white transition duration-300 group-hover:border-[#FF4D00] group-hover:bg-[#FF4D00]"
+                    class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-black/55 text-white transition duration-300 group-hover:border-[#CF1D1D] group-hover:bg-[#CF1D1D]"
                   >
                     <Icon name="i-heroicons-arrow-right" />
                   </span>
@@ -146,7 +146,7 @@
               >
                 <div>
                   <h3
-                    class="font-display text-3xl leading-none text-white transition duration-300 group-hover:text-[#FF4D00]"
+                    class="font-display text-3xl leading-none text-white transition duration-300 group-hover:text-[#CF1D1D]"
                   >
                     {{
                       getLocalizedCategoryName(
@@ -160,7 +160,7 @@
                   </p>
                 </div>
                 <p
-                  class="mt-4 inline-flex w-fit items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#FF4D00]"
+                  class="mt-4 inline-flex w-fit items-center gap-2 text-sm font-black uppercase tracking-[0.18em] text-[#CF1D1D]"
                 >
                   {{ t("home.explore") }}
                 </p>
@@ -249,7 +249,7 @@ onMounted(async () => {
   border-radius: 9999px;
   border: 1px solid rgb(255 255 255 / 0.12);
   background: rgb(12 12 12 / 0.82);
-  color: #ff4d00;
+  color: #cf1d1d;
   box-shadow: 0 14px 34px rgb(0 0 0 / 0.32);
   transition:
     transform 180ms ease,
@@ -259,9 +259,9 @@ onMounted(async () => {
 }
 
 .mobile-carousel-arrow:hover {
-  border-color: rgb(255 77 0 / 0.72);
-  background: rgb(255 77 0 / 0.14);
-  box-shadow: 0 16px 38px rgb(255 77 0 / 0.12);
+  border-color: rgb(207 29 29 / 0.72);
+  background: rgb(207 29 29 / 0.14);
+  box-shadow: 0 16px 38px rgb(207 29 29 / 0.12);
 }
 
 .mobile-carousel-arrow:active {
@@ -269,7 +269,7 @@ onMounted(async () => {
 }
 
 .mobile-carousel-arrow:focus-visible {
-  outline: 2px solid #ff4d00;
+  outline: 2px solid #cf1d1d;
   outline-offset: 3px;
 }
 

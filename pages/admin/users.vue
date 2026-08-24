@@ -2,11 +2,11 @@
   <section class="space-y-6">
     <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">Customers</p>
-        <h2 class="mt-2 text-3xl font-black">Users</h2>
+        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t("admin.customers") }}</p>
+        <h2 class="mt-2 text-3xl font-black">{{ t("admin.users") }}</h2>
       </div>
 
-      <input v-model="search" type="search" placeholder="Search name, email, phone..." class="field md:max-w-sm" />
+      <input v-model="search" type="search" :placeholder="t('admin.searchUsers')" class="field md:max-w-sm" />
     </div>
 
     <p v-if="successMessage" class="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-4 text-sm text-emerald-300">
@@ -20,16 +20,16 @@
     </p>
 
     <div class="overflow-hidden rounded-3xl border border-white/10 bg-[#111111]">
-      <div class="overflow-x-auto">
+      <div class="hidden overflow-x-auto md:block">
         <table class="w-full min-w-[1120px] text-left text-sm">
           <thead class="bg-black text-gray-500">
             <tr>
-              <th class="px-5 py-4">User</th>
-              <th class="px-5 py-4">Phone</th>
-              <th class="px-5 py-4">Role</th>
-              <th class="px-5 py-4">State</th>
-              <th class="px-5 py-4">Joined</th>
-              <th class="px-5 py-4 text-right">Actions</th>
+              <th class="px-5 py-4">{{ t("admin.user") }}</th>
+              <th class="px-5 py-4">{{ t("common.phone") }}</th>
+              <th class="px-5 py-4">{{ t("admin.role") }}</th>
+              <th class="px-5 py-4">{{ t("admin.state") }}</th>
+              <th class="px-5 py-4">{{ t("admin.joined") }}</th>
+              <th class="px-5 py-4 text-right">{{ t("common.actions") }}</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-white/10">
@@ -38,7 +38,7 @@
                 <div class="flex items-center gap-3">
                   <img :src="user.avatar || avatarUrl(user)" alt="" class="h-11 w-11 rounded-full object-cover" />
                   <div>
-                    <p class="font-bold">{{ user.full_name || "User" }}</p>
+                    <p class="font-bold">{{ user.full_name || t("admin.user") }}</p>
                     <p class="text-xs text-gray-500">{{ user.email || "-" }}</p>
                   </div>
                 </div>
@@ -51,19 +51,19 @@
                   class="rounded-xl border border-white/10 bg-black px-3 py-2 text-[#FF4D00] outline-none disabled:opacity-50"
                   @change="updateRole(user, ($event.target as HTMLSelectElement).value)"
                 >
-                  <option v-for="role in ADMIN_USER_ROLES" :key="role" :value="role">{{ role }}</option>
+                  <option v-for="role in ADMIN_USER_ROLES" :key="role" :value="role">{{ t(`admin.roles.${role}`) }}</option>
                 </select>
               </td>
               <td class="px-5 py-4">
                 <span class="rounded-full border px-3 py-1 text-xs font-black" :class="userStateClass(user)">
-                  {{ getAdminUserState(user) }}
+                  {{ t(`admin.userState.${getAdminUserState(user)}`) }}
                 </span>
               </td>
               <td class="px-5 py-4 text-gray-500">{{ formatDate(user.created_at) }}</td>
               <td class="px-5 py-4">
                 <div class="flex justify-end gap-2">
                   <button class="rounded-xl border border-white/10 px-3 py-2 font-bold transition hover:border-[#FF4D00]" @click="openDetails(user)">
-                    Details
+                    {{ t("common.details") }}
                   </button>
                   <button
                     v-if="getAdminUserState(user) === 'Active'"
@@ -71,7 +71,7 @@
                     class="rounded-xl border border-yellow-500/40 px-3 py-2 font-bold text-yellow-300 transition hover:bg-yellow-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
                     @click="runUserAction(user, 'suspend')"
                   >
-                    Suspend
+                    {{ t("admin.suspend") }}
                   </button>
                   <button
                     v-else
@@ -79,14 +79,14 @@
                     class="rounded-xl border border-emerald-500/40 px-3 py-2 font-bold text-emerald-300 transition hover:bg-emerald-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
                     @click="runUserAction(user, 'reactivate')"
                   >
-                    Reactivate
+                    {{ t("admin.reactivate") }}
                   </button>
                   <button
                     :disabled="!canRunAdminUserAction(currentAdminId, user.id, 'delete') || savingUserId === user.id"
                     class="rounded-xl border border-red-500/40 px-3 py-2 font-bold text-red-400 transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                     @click="runUserAction(user, 'delete')"
                   >
-                    Delete
+                    {{ t("common.delete") }}
                   </button>
                 </div>
               </td>
@@ -95,37 +95,100 @@
         </table>
       </div>
 
-      <p v-if="loading" class="p-6 text-sm text-gray-500">Loading users...</p>
-      <p v-else-if="!filteredUsers.length" class="p-6 text-sm text-gray-500">No users found.</p>
+      <div class="grid gap-3 p-3 md:hidden">
+        <article v-for="user in filteredUsers" :key="user.id" class="admin-mobile-card rounded-2xl border border-white/10 bg-black p-4">
+          <div class="flex gap-3">
+            <img :src="user.avatar || avatarUrl(user)" alt="" class="h-12 w-12 shrink-0 rounded-full object-cover" />
+            <div class="min-w-0 flex-1">
+              <p class="truncate font-black">{{ user.full_name || t("admin.user") }}</p>
+              <p class="mt-1 truncate text-xs text-gray-500">{{ user.email || "-" }}</p>
+              <p class="mt-1 text-sm text-gray-400">{{ user.phone || "-" }}</p>
+            </div>
+            <span class="h-fit rounded-full border px-3 py-1 text-xs font-black" :class="userStateClass(user)">
+              {{ t(`admin.userState.${getAdminUserState(user)}`) }}
+            </span>
+          </div>
+
+          <div class="mt-3 grid grid-cols-2 gap-2 text-sm">
+            <label class="block rounded-xl border border-white/10 bg-[#111111] p-3">
+              <span class="text-xs text-gray-500">{{ t("admin.role") }}</span>
+              <select
+                :value="user.role || 'customer'"
+                :disabled="savingUserId === user.id"
+                class="mt-2 w-full rounded-xl border border-white/10 bg-black px-3 py-2 text-[#FF4D00] outline-none disabled:opacity-50"
+                @change="updateRole(user, ($event.target as HTMLSelectElement).value)"
+              >
+                <option v-for="role in ADMIN_USER_ROLES" :key="role" :value="role">{{ t(`admin.roles.${role}`) }}</option>
+              </select>
+            </label>
+            <div class="rounded-xl border border-white/10 bg-[#111111] p-3">
+              <p class="text-xs text-gray-500">{{ t("admin.joined") }}</p>
+              <p class="mt-2 font-bold text-gray-200">{{ formatDate(user.created_at) }}</p>
+            </div>
+          </div>
+
+          <div class="mt-3 flex flex-wrap justify-end gap-2">
+            <button class="min-h-11 rounded-xl border border-white/10 px-3 py-2 text-sm font-bold transition hover:border-[#FF4D00]" @click="openDetails(user)">
+              {{ t("common.details") }}
+            </button>
+            <button
+              v-if="getAdminUserState(user) === 'Active'"
+              :disabled="!canRunAdminUserAction(currentAdminId, user.id, 'suspend') || savingUserId === user.id"
+              class="min-h-11 rounded-xl border border-yellow-500/40 px-3 py-2 text-sm font-bold text-yellow-300 transition hover:bg-yellow-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+              @click="runUserAction(user, 'suspend')"
+            >
+              {{ t("admin.suspend") }}
+            </button>
+            <button
+              v-else
+              :disabled="savingUserId === user.id"
+              class="min-h-11 rounded-xl border border-emerald-500/40 px-3 py-2 text-sm font-bold text-emerald-300 transition hover:bg-emerald-500 hover:text-black disabled:cursor-not-allowed disabled:opacity-40"
+              @click="runUserAction(user, 'reactivate')"
+            >
+              {{ t("admin.reactivate") }}
+            </button>
+            <button
+              :disabled="!canRunAdminUserAction(currentAdminId, user.id, 'delete') || savingUserId === user.id"
+              class="min-h-11 rounded-xl border border-red-500/40 px-3 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500 hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+              @click="runUserAction(user, 'delete')"
+            >
+              {{ t("common.delete") }}
+            </button>
+          </div>
+        </article>
+      </div>
+
+      <p v-if="loading" class="p-6 text-sm text-gray-500">{{ t("admin.loadingUsers") }}</p>
+      <p v-else-if="!filteredUsers.length" class="p-6 text-sm text-gray-500">{{ t("admin.noUsers") }}</p>
     </div>
 
     <div v-if="selectedUser" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div class="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-white/10 bg-[#111111] p-6">
+      <div class="max-h-[calc(100dvh-1rem)] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/10 bg-[#111111] p-4 sm:rounded-3xl sm:p-6">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">User Details</p>
-            <h3 class="mt-2 text-2xl font-black">{{ selectedUser.full_name || "User" }}</h3>
+            <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t("admin.userDetails") }}</p>
+            <h3 class="mt-2 text-2xl font-black">{{ selectedUser.full_name || t("admin.user") }}</h3>
           </div>
-          <button class="text-gray-400 hover:text-white" @click="selectedUser = null">Close</button>
+          <button class="text-gray-400 hover:text-white" @click="selectedUser = null">{{ t("admin.modalClose") }}</button>
         </div>
 
         <div class="mt-6 flex items-center gap-4 rounded-2xl bg-black p-5">
           <img :src="selectedUser.avatar || avatarUrl(selectedUser)" alt="" class="h-20 w-20 rounded-full object-cover" />
           <div>
-            <p class="text-xl font-black">{{ selectedUser.full_name || "User" }}</p>
+            <p class="text-xl font-black">{{ selectedUser.full_name || t("admin.user") }}</p>
             <p class="mt-1 text-gray-500">{{ selectedUser.email || "-" }}</p>
           </div>
         </div>
 
         <div class="mt-5 grid gap-4 sm:grid-cols-2">
-          <InfoBlock label="Phone" :value="selectedUser.phone || '-'" />
-          <InfoBlock label="Role" :value="selectedUser.role || 'customer'" />
-          <InfoBlock label="State" :value="getAdminUserState(selectedUser)" />
-          <InfoBlock label="Created" :value="formatDate(selectedUser.created_at)" />
-          <InfoBlock label="City" :value="selectedUser.city || '-'" />
-          <InfoBlock label="Country" :value="selectedUser.country || '-'" />
-          <InfoBlock label="Address" :value="selectedUser.address || '-'" />
-          <InfoBlock label="Postal Code" :value="selectedUser.postal_code || '-'" />
+          <InfoBlock :label="t('common.phone')" :value="selectedUser.phone || '-'" />
+          <InfoBlock :label="t('admin.role')" :value="t(`admin.roles.${selectedUser.role || 'customer'}`)" />
+          <InfoBlock :label="t('admin.state')" :value="t(`admin.userState.${getAdminUserState(selectedUser)}`)" />
+          <InfoBlock :label="t('common.created')" :value="formatDate(selectedUser.created_at)" />
+          <InfoBlock :label="t('common.city')" :value="selectedUser.city || '-'" />
+          <InfoBlock :label="t('auth.country')" :value="selectedUser.country || '-'" />
+          <InfoBlock :label="t('common.address')" :value="selectedUser.address || '-'" />
+          <InfoBlock :label="t('admin.postalCode')" :value="selectedUser.postal_code || '-'" />
         </div>
       </div>
     </div>
@@ -180,6 +243,7 @@ const InfoBlock = defineComponent({
 });
 
 const supabase = useSupabase();
+const { t } = useI18n();
 const users = ref<UserRow[]>([]);
 const selectedUser = ref<UserRow | null>(null);
 const currentAdminId = ref<string | null>(null);
@@ -219,7 +283,7 @@ const loadAuthStates = async () => {
   });
 
   if (error) {
-    authStateWarning.value = error.message || "Auth account state is unavailable until the admin-users Edge Function is deployed.";
+    authStateWarning.value = error.message || t("admin.authStateUnavailable");
     return;
   }
 
@@ -272,7 +336,7 @@ const updateRole = async (user: UserRow, role: string) => {
     user.role = previousRole;
     setMessage("error", error.message);
   } else {
-    setMessage("success", "User role updated.");
+    setMessage("success", t("admin.userRoleUpdated"));
   }
 
   savingUserId.value = null;
@@ -280,12 +344,13 @@ const updateRole = async (user: UserRow, role: string) => {
 
 const runUserAction = async (user: UserRow, action: Exclude<AdminUserAction, "list">) => {
   if (!canRunAdminUserAction(currentAdminId.value, user.id, action)) {
-    setMessage("error", "You cannot suspend or delete your own admin account.");
+    setMessage("error", t("admin.selfActionBlocked"));
     return;
   }
 
-  const label = user.full_name || user.email || "this user";
-  if (!confirm(`${action === "delete" ? "Delete" : action} ${label}?`)) return;
+  const label = user.full_name || user.email || t("admin.thisUser");
+  const actionLabel = action === "delete" ? t("common.delete") : t(`admin.${action}`);
+  if (!confirm(t("admin.userActionConfirm", { action: actionLabel, name: label }))) return;
 
   savingUserId.value = user.id;
   setMessage("error", "");
@@ -313,7 +378,7 @@ const runUserAction = async (user: UserRow, action: Exclude<AdminUserAction, "li
     }
   }
 
-  setMessage("success", `User ${action === "delete" ? "deleted" : action === "suspend" ? "suspended" : "reactivated"}.`);
+  setMessage("success", t("admin.userActionDone", { action: actionLabel }));
   savingUserId.value = null;
 };
 

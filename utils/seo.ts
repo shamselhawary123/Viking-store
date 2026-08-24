@@ -345,6 +345,9 @@ export const publicSitemapEntries = (siteUrl: string): SitemapEntry[] => [
   { loc: buildCanonicalUrl(siteUrl, "/about") },
   { loc: buildCanonicalUrl(siteUrl, "/contact") },
   { loc: buildCanonicalUrl(siteUrl, "/faq") },
+  { loc: buildCanonicalUrl(siteUrl, "/privacy-policy") },
+  { loc: buildCanonicalUrl(siteUrl, "/terms") },
+  { loc: buildCanonicalUrl(siteUrl, "/cookies") },
 ];
 
 export const escapeXml = (value: string) =>

@@ -37,7 +37,7 @@
             :key="post.id"
             v-reveal="{ delay: index * 90 }"
             :to="`/blog/${post.slug}`"
-            class="group relative min-h-[18rem] overflow-hidden rounded-2xl border border-white/10 bg-[#111111] transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/70"
+            class="group relative min-h-[18rem] overflow-hidden rounded-2xl border border-white/10 bg-[#171717] transition duration-300 hover:-translate-y-2 hover:border-[#CF1D1D]/70"
           >
             <img
               :src="post.cover_image || '/train-hard.png'"
@@ -53,7 +53,7 @@
             />
             <div class="absolute inset-x-5 bottom-5">
               <p
-                class="text-xs font-black uppercase tracking-[0.2em] text-[#FF4D00]"
+                class="text-xs font-black uppercase tracking-[0.2em] text-[#CF1D1D]"
               >
                 {{ post.category || t("home.blogSection.article") }}
               </p>
@@ -83,7 +83,7 @@
                 v-if="currentPost"
                 :key="currentPost.id"
                 :to="`/blog/${currentPost.slug}`"
-                class="block overflow-hidden rounded-2xl border border-white/10 bg-[#111111]"
+                class="block overflow-hidden rounded-2xl border border-white/10 bg-[#171717]"
               >
                 <img
                   :src="currentPost.cover_image || '/train-hard.png'"
@@ -96,7 +96,7 @@
                 />
                 <div class="p-5">
                   <p
-                    class="text-xs font-black uppercase tracking-[0.2em] text-[#FF4D00]"
+                    class="text-xs font-black uppercase tracking-[0.2em] text-[#CF1D1D]"
                   >
                     {{ currentPost.category || t("home.blogSection.article") }}
                   </p>
@@ -117,7 +117,7 @@
           <div class="mt-5 flex items-center justify-center gap-4">
             <button
               type="button"
-              class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#FF4D00] hover:text-[#FF4D00]"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#CF1D1D] hover:text-[#CF1D1D]"
               :aria-label="t('home.blogSection.previous')"
               @click="goPrevious"
             >
@@ -130,7 +130,7 @@
             </span>
             <button
               type="button"
-              class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#FF4D00] hover:text-[#FF4D00]"
+              class="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white transition hover:border-[#CF1D1D] hover:text-[#CF1D1D]"
               :aria-label="t('home.blogSection.next')"
               @click="goNext"
             >
@@ -153,10 +153,9 @@
 </template>
 
 <script setup lang="ts">
-import { createClient } from "@supabase/supabase-js";
 import { computed, ref } from "vue";
 import type { BlogPostLike } from "../../utils/blog";
-import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { getPublicSupabaseClient } from "../../utils/publicSupabase";
 
 type HomeBlogPost = BlogPostLike & {
   id: number | string;
@@ -167,13 +166,12 @@ const config = useRuntimeConfig();
 const activeIndex = ref(0);
 const touchStartX = ref(0);
 const slideDirection = ref<"next" | "previous">("next");
-const supabase = createClient(
+const supabase = getPublicSupabaseClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
-  createPublicSupabaseReadOptions("viking-store-home-blog-readonly"),
 );
 
-const { data, pending } = await useAsyncData("home-blog-posts", async () => {
+const { data, pending } = await useLazyAsyncData("home-blog-posts", async () => {
   const { data: posts, error } = await supabase
     .from("blog_posts")
     .select(

@@ -18,7 +18,7 @@
           </div>
           <div>
             <p class="text-sm text-neutral-500">{{ t('common.status') }}</p>
-            <h2 class="mt-2 font-black capitalize text-[#FF4D00]">{{ t(`orders.${order.status}`) }}</h2>
+            <h2 class="mt-2 font-black capitalize text-[#CF1D1D]">{{ t(`orders.${order.status}`) }}</h2>
           </div>
           <div>
             <p class="text-sm text-neutral-500">{{ t('common.total') }}</p>
@@ -40,7 +40,7 @@
                   <span>{{ t('shop.quantity') }}: {{ item.quantity }}</span>
                 </div>
               </div>
-              <h3 class="text-2xl font-black text-[#FF4D00]">{{ formatStorePrice(item.product_price, locale) }}</h3>
+              <h3 class="text-2xl font-black text-[#CF1D1D]">{{ formatStorePrice(item.product_price, locale) }}</h3>
             </div>
           </div>
         </article>

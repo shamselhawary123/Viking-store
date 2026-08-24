@@ -1,7 +1,7 @@
 <template>
   <NuxtLink
     :to="`/shop/${product.slug}`"
-    class="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/70 hover:shadow-[0_24px_70px_rgba(0,0,0,0.45)]"
+    class="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#171717] transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/70 hover:shadow-[0_24px_70px_rgba(0,0,0,0.45)]"
   >
     <div class="relative aspect-[4/5] overflow-hidden bg-black">
       <img
@@ -16,7 +16,7 @@
       <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/20" />
 
       <button
-        class="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#FF4D00] backdrop-blur transition hover:scale-105 hover:border-[#FF4D00] active:scale-95"
+        class="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#CF1D1D] backdrop-blur transition hover:scale-105 hover:border-[#CF1D1D] active:scale-95"
         :aria-label="wishlistStore.isFavorite(product.id) ? t('shop.removeWishlist') : t('shop.addWishlist')"
         @click.prevent="wishlistStore.toggleWishlist(product)"
       >
@@ -25,7 +25,7 @@
 
       <div
         v-if="product.badge"
-        class="absolute left-4 top-4 rounded-full bg-[#FF4D00] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white"
+        class="absolute left-4 top-4 rounded-full bg-[#CF1D1D] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white"
       >
         {{ product.badge }}
       </div>
@@ -55,7 +55,7 @@
             {{ formatStorePrice(product.old_price || product.oldPrice, locale) }}
           </span>
         </div>
-        <div class="flex text-[#FF4D00]" :aria-label="t('shop.ratedFive')">
+        <div class="flex text-[#CF1D1D]" :aria-label="t('shop.ratedFive')">
           <Icon v-for="star in 5" :key="star" name="i-heroicons-star-solid" class="text-sm" />
         </div>
       </div>

@@ -607,7 +607,187 @@
     "blogTitleRequired": "Title is required.",
     "blogSlugRequired": "Slug is required.",
     "blogContentRequired": "Content is required.",
-    "blogStatusRequired": "Status must be draft or published."
+    "blogStatusRequired": "Status must be draft or published.",
+    "catalog": "Catalog",
+    "customers": "Customers",
+    "promotions": "Promotions",
+    "storeSection": "Store",
+    "storeSettings": "Store Settings",
+    "settingsTableConnected": "Connected to the Supabase settings table.",
+    "setting": "Setting",
+    "noSettings": "No settings found.",
+    "allStates": "All states",
+    "allDiscounts": "All discounts",
+    "anyTiming": "Any timing",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "code": "Code",
+    "usage": "Usage",
+    "coupon": "Coupon",
+    "minimum": "Minimum",
+    "maxDiscount": "Max Discount",
+    "starts": "Starts",
+    "expires": "Expires",
+    "state": "State",
+    "limits": "Limits",
+    "couponDetails": "Coupon Details",
+    "editCoupon": "Edit Coupon",
+    "createCoupon": "Create Coupon",
+    "discountType": "Discount Type",
+    "discountValue": "Discount Value (% or EGP)",
+    "minimumOrder": "Minimum Order (EGP)",
+    "maximumDiscount": "Maximum Discount (EGP)",
+    "startsAt": "Starts At",
+    "expiresAt": "Expires At",
+    "maxTotalUses": "Max Total Uses",
+    "maxUsesPerUser": "Max Uses Per User",
+    "description": "Description",
+    "percentage": "Percentage",
+    "fixedAmount": "Fixed amount",
+    "totalLimit": "Total: {value}",
+    "perUserLimit": "Per user: {value}",
+    "unlimited": "Unlimited",
+    "couponSaved": "Coupon saved.",
+    "couponDeleted": "Coupon deleted.",
+    "couponActivated": "Coupon activated.",
+    "couponDeactivated": "Coupon deactivated.",
+    "couponUsedDeleteBlocked": "This coupon has redemption history. Deactivate it instead of deleting it.",
+    "deleteCouponConfirm": "Delete coupon {code}? This cannot be undone.",
+    "couponCodeExists": "Coupon code already exists.",
+    "couponCodeRequired": "Code is required.",
+    "couponNameRequired": "Name is required.",
+    "couponDiscountTypeInvalid": "Discount type is invalid.",
+    "couponDiscountValueInvalid": "Discount value must be greater than 0.",
+    "couponPercentMax": "Percentage discount cannot exceed 100.",
+    "couponMinimumInvalid": "Minimum order amount must be zero or more.",
+    "couponMaximumInvalid": "Maximum discount amount must be zero or more.",
+    "couponMaxTotalInvalid": "Maximum total uses must be zero or more.",
+    "couponMaxPerUserInvalid": "Maximum uses per user must be zero or more.",
+    "couponDateRangeInvalid": "Expiration date must be after the start date.",
+    "couponSaveFailed": "Unable to save coupon.",
+    "saveCoupon": "Save Coupon",
+    "loadingCoupons": "Loading coupons...",
+    "allStatesFilter": "All states",
+    "live": "Live",
+    "scheduled": "Scheduled",
+    "expired": "Expired",
+    "inactive": "Inactive",
+    "discountTypes": {
+      "percentage": "Percentage",
+      "fixed_amount": "Fixed amount"
+    },
+    "couponLifecycle": {
+      "active": "Live",
+      "scheduled": "Scheduled",
+      "expired": "Expired",
+      "inactive": "Inactive"
+    },
+    "restrictionsCount": {
+      "all": "All products",
+      "products": "{count} product | {count} products",
+      "categories": "{count} category | {count} categories"
+    },
+    "drag": "Drag",
+    "manualOrder": "Manual Order",
+    "allStatusesFilter": "All Statuses",
+    "priceLow": "Price Low",
+    "priceHigh": "Price High",
+    "inStock": "In stock",
+    "outOfStock": "Out of stock",
+    "orderOnly": "Order only",
+    "loadingFullOrder": "Loading full product order...",
+    "unableLoadFullOrder": "Unable to load full product order.",
+    "dragProduct": "Drag {title} to reorder",
+    "moveProductUp": "Move {title} up",
+    "moveProductDown": "Move {title} down",
+    "showingLoadedOrders": "Showing {visible} of {total} loaded orders",
+    "showingCount": "Showing {visible} of {total}",
+    "productDetails": "Product Details",
+    "editProduct": "Edit Product",
+    "createProduct": "Create Product",
+    "productName": "Name",
+    "slug": "Slug",
+    "oldPrice": "Old Price (EGP)",
+    "selectCategory": "Select category",
+    "sizes": "Sizes",
+    "addSize": "Add Size",
+    "sizePlaceholder": "S, M, L, XL...",
+    "noSizes": "No sizes configured.",
+    "colorsImages": "Colors & Images",
+    "addColor": "Add Color",
+    "colorName": "Color Name",
+    "colorPlaceholder": "Black",
+    "colorValue": "Value",
+    "selectImages": "Select Images",
+    "main": "Main",
+    "noColors": "Add at least one color before uploading images.",
+    "saveProduct": "Save Product",
+    "savingProduct": "Saving...",
+    "productSaved": "Product saved.",
+    "deleteProductConfirm": "Delete {title}? This cannot be undone.",
+    "unableSaveProduct": "Unable to save product",
+    "unableDeleteProduct": "Unable to delete product",
+    "unableReorderProduct": "Unable to reorder product",
+    "productNameRequired": "Product name is required.",
+    "productSlugRequired": "Product slug is required.",
+    "categoryRequired": "Category is required.",
+    "priceInvalid": "Price must be zero or more.",
+    "duplicateSizes": "Duplicate sizes are not allowed.",
+    "colorValueRequired": "Color value is required for {name}.",
+    "addCategory": "Add Category",
+    "editCategory": "Edit Category",
+    "imageUrl": "Image URL",
+    "saveCategory": "Save Category",
+    "noCategories": "No categories found.",
+    "deleteCategoryConfirm": "Delete {name}?",
+    "unableSaveCategory": "Unable to save category",
+    "customer": "Customer",
+    "authenticated": "Authenticated",
+    "reorderDisabled": "Clear filters and load all products to reorder the full shop catalog.",
+    "orderDetails": "Order Details",
+    "orderNumber": "Order Number",
+    "paymentMethod": "Payment Method",
+    "items": "Items",
+    "qty": "Qty",
+    "productId": "Product ID",
+    "loadingOrderItems": "Loading order items...",
+    "noOrderItems": "No order items found.",
+    "orderUpdated": "Order #{order} updated.",
+    "loadingUsers": "Loading users...",
+    "user": "User",
+    "joined": "Joined",
+    "userDetails": "User Details",
+    "role": "Role",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "postalCode": "Postal Code",
+    "authStateUnavailable": "Auth account state is unavailable until the admin-users Edge Function is deployed.",
+    "selfActionBlocked": "You cannot suspend or delete your own admin account.",
+    "userRoleUpdated": "User role updated.",
+    "userActionConfirm": "{action} {name}?",
+    "thisUser": "this user",
+    "userActionDone": "User {action}.",
+    "roles": {
+      "customer": "Customer",
+      "admin": "Admin"
+    },
+    "userState": {
+      "Active": "Active",
+      "Suspended": "Suspended"
+    },
+    "status": {
+      "pending": "Pending",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "paymentStatus": "Payment Status",
+    "orderStatus": "Order Status",
+    "paymentStatusValues": {
+      "paid": "Paid",
+      "unpaid": "Unpaid"
+    }
   },
   "pages": {
     "about": "About",
@@ -626,9 +806,9 @@
     "message": "Message",
     "completeFields": "Please complete every field with a valid email address.",
     "messageReady": "Message ready. Connect a backend email service to send it.",
-    "findUs": "Find Us",
-    "vikingHq": "Viking HQ",
-    "hqText": "Visit our combat gear support desk and showroom location.",
+    "findUs": "Online Support",
+    "vikingHq": "Help From Viking Store",
+    "hqText": "Contact us online for product questions, order support, sizing help, and general inquiries.",
     "faqPreview": "FAQ Preview",
     "quickAnswers": "QUICK ANSWERS",
     "viewFaq": "View FAQ",
@@ -682,7 +862,7 @@
     "answers": "Answers",
     "sendEmail": "Send Email",
     "callNow": "Call Now",
-    "openMap": "Open Map",
+    "openMap": "Contact Online",
     "supportReplyQ": "How fast does support reply?",
     "supportReplyA": "Most messages are reviewed during working hours, with order and delivery questions prioritized.",
     "sizeHelpQ": "Can you help me choose a size?",
@@ -731,6 +911,160 @@
     "shopByDiscipline": "Shop by discipline",
     "categoriesLead": "Find the right gear for striking, sparring, conditioning, and daily fight camp work."
   },
+  "legal": {
+    "eyebrow": "Legal",
+    "onThisPage": "On this page",
+    "lastUpdated": "Last updated: August 24, 2026",
+    "privacy": {
+      "title": "Privacy Policy",
+      "lead": "This page explains what Viking Store collects when you browse, create an account, place an order, contact support, or use store features.",
+      "sections": [
+        {
+          "id": "information",
+          "title": "Information we collect",
+          "body": [
+            "When you create an account or verify your email, we use Supabase Auth and may store profile details such as your name, email, phone, gender, address, city, country, postal code, bio, and avatar.",
+            "When you place an order, we collect the details needed to process it, including cart items, selected sizes or colors, delivery/contact details, notes, coupon information when used, payment method, and order status.",
+            "When you submit a product review, we store the product, your user ID, rating, comment, and review timestamps. Public review displays do not expose your email address."
+          ]
+        },
+        {
+          "id": "use",
+          "title": "How we use information",
+          "body": [
+            "We use this information to run the store, create and manage accounts, process orders, support guest and authenticated checkout, show order history, handle reviews, and respond to support requests.",
+            "Product prices and order totals are handled in EGP. Cash on delivery is currently part of the checkout flow."
+          ]
+        },
+        {
+          "id": "storage",
+          "title": "Storage and service providers",
+          "body": [
+            "Viking Store uses Supabase for authentication, profile data, order data, product data, reviews, and uploaded images where applicable.",
+            "The browser may store essential local data such as cart items, wishlist items, pending registration profile details during OTP verification, and the viking_locale language preference cookie.",
+            "We did not identify advertising pixels or analytics trackers in the current storefront code. If those services are added later, this policy should be updated."
+          ]
+        },
+        {
+          "id": "sharing",
+          "title": "Sharing",
+          "body": [
+            "We do not sell customer personal information.",
+            "We may share only the information needed with providers that help operate the store, such as hosting, database, authentication, storage, delivery, support, or legal/compliance services."
+          ]
+        },
+        {
+          "id": "security-rights",
+          "title": "Security and your choices",
+          "body": [
+            "We use reasonable technical controls for account and order handling, but no online system can be guaranteed to be completely secure.",
+            "You can update your profile from your account, clear browser storage for local cart/wishlist/language data, or contact Viking Store support to ask about your account or order information."
+          ]
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms & Conditions",
+      "lead": "These terms explain the basic rules for using Viking Store, browsing products, creating an account, and placing orders.",
+      "sections": [
+        {
+          "id": "use",
+          "title": "Using the store",
+          "body": [
+            "You may browse Viking Store as a guest. Some features, such as saved profile details, order history, and writing product reviews, require an authenticated account.",
+            "You are responsible for providing accurate account, delivery, and contact information when using the store."
+          ]
+        },
+        {
+          "id": "products-pricing",
+          "title": "Products, pricing, and availability",
+          "body": [
+            "Product information, images, stock, categories, sizes, colors, prices, and sale prices are shown from the store catalog and may change over time.",
+            "Prices are stored and displayed in EGP. A product being visible in the store does not guarantee availability until the order is reviewed or processed."
+          ]
+        },
+        {
+          "id": "orders-payment",
+          "title": "Orders and payment",
+          "body": [
+            "Checkout supports guest orders and authenticated account orders. The secure order flow recalculates product totals and coupon discounts on the server side before an order is created.",
+            "Cash on delivery is currently supported in checkout. Payment status, order status, shipping details, and order items are recorded with the order."
+          ]
+        },
+        {
+          "id": "coupons-returns",
+          "title": "Coupons, shipping, and returns",
+          "body": [
+            "Coupons, when available, are validated against their active dates, limits, product/category restrictions, and order requirements.",
+            "Shipping and return handling should be confirmed through Viking Store support or the FAQ. This page does not set fixed delivery fees, delivery timelines, or return periods beyond what is already shown elsewhere on the site."
+          ]
+        },
+        {
+          "id": "content",
+          "title": "Reviews and content",
+          "body": [
+            "Authenticated users may submit one review per product. Reviews should be honest, relevant, and not abusive or misleading.",
+            "Viking Store may remove content that breaks store rules, creates operational issues, or is legally unsafe."
+          ]
+        },
+        {
+          "id": "changes-contact",
+          "title": "Changes and contact",
+          "body": [
+            "We may update these terms as the store changes. Continued use of Viking Store means you accept the current version.",
+            "For questions about orders, products, returns, or these terms, contact Viking Store through the support details shown on the site."
+          ]
+        }
+      ]
+    },
+    "cookies": {
+      "title": "Cookie Policy",
+      "lead": "This page explains the cookies and browser storage Viking Store uses for core store behavior and preferences.",
+      "sections": [
+        {
+          "id": "what",
+          "title": "What cookies and local storage are",
+          "body": [
+            "Cookies and browser storage help the site remember essential information in your browser, such as language, cart state, wishlist state, and account/session behavior.",
+            "Some storage is required for the store to work correctly. Disabling it may affect login, checkout, cart, wishlist, or language preference behavior."
+          ]
+        },
+        {
+          "id": "essential",
+          "title": "Essential store storage",
+          "body": [
+            "Supabase Auth manages authentication/session behavior for account login, registration, OTP verification, and protected account features.",
+            "The cart and wishlist are saved locally in your browser so your selected gear can stay available between page visits.",
+            "During email OTP registration, pending profile information is kept temporarily in browser storage until profile persistence succeeds."
+          ]
+        },
+        {
+          "id": "preferences",
+          "title": "Preferences",
+          "body": [
+            "The viking_locale cookie stores your selected language so Arabic or English stays active after refreshes and future visits.",
+            "Theme or color-mode preferences may also be stored by the site UI where applicable."
+          ]
+        },
+        {
+          "id": "analytics",
+          "title": "Analytics and advertising",
+          "body": [
+            "The current storefront code does not include confirmed advertising pixels or analytics trackers such as Google Analytics or Meta Pixel.",
+            "If analytics or advertising tools are added later, this policy should be updated to explain what is used and why."
+          ]
+        },
+        {
+          "id": "manage",
+          "title": "Managing browser storage",
+          "body": [
+            "You can clear cookies and site data from your browser settings. Clearing storage may sign you out and remove local cart, wishlist, or language preferences.",
+            "For questions about site storage, contact Viking Store through the support details shown on the site."
+          ]
+        }
+      ]
+    }
+  },
   "seo": {
     "homeTitle": "Viking Store Egypt | Combat Sports & Martial Arts Gear",
     "homeDescription": "Shop Viking Store in Egypt for boxing gloves, MMA gloves, kickboxing gear, martial arts equipment, and daily combat-sports training essentials.",
@@ -743,7 +1077,13 @@
     "contactTitle": "Contact Viking Store",
     "contactDescription": "Contact Viking Store for help with combat gear, sizing, orders, delivery, and product support.",
     "faqTitle": "Viking Store FAQ",
-    "faqDescription": "Find answers about Viking Store orders, shipping, returns, payments, accounts, sizing, and combat gear."
+    "faqDescription": "Find answers about Viking Store orders, shipping, returns, payments, accounts, sizing, and combat gear.",
+    "privacyTitle": "Privacy Policy | Viking Store",
+    "privacyDescription": "Learn how Viking Store handles account, profile, order, checkout, review, and browser storage information.",
+    "termsTitle": "Terms & Conditions | Viking Store",
+    "termsDescription": "Read the basic Viking Store terms for browsing, accounts, products, pricing, checkout, coupons, reviews, and support.",
+    "cookiesTitle": "Cookie Policy | Viking Store",
+    "cookiesDescription": "Learn how Viking Store uses cookies and browser storage for language preference, auth sessions, cart, wishlist, and checkout."
   },
   "aboutData": {
     "origin": "Origin",

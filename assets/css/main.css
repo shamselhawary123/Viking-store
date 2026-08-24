@@ -9,7 +9,7 @@ html {
 }
 
 ::selection {
-  background: rgba(255, 77, 0, 0.35);
+  background: rgba(207, 29, 29, 0.35);
   color: #ffffff;
 }
 
@@ -18,10 +18,10 @@ body {
   background:
     radial-gradient(
       circle at top left,
-      rgba(255, 77, 0, 0.13),
+      rgba(207, 29, 29, 0.13),
       transparent 34rem
     ),
-    linear-gradient(180deg, #080808 0%, #030303 42%, #090909 100%);
+    linear-gradient(180deg, #070707 0%, #030303 42%, #090909 100%);
   color: #ffffff;
   font-family: "Inter", sans-serif;
   text-rendering: optimizeLegibility;
@@ -68,7 +68,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #ff4d00;
+  outline: 2px solid #cf1d1d;
   outline-offset: 3px;
 }
 
@@ -86,7 +86,7 @@ textarea:focus-visible {
 }
 
 .eyebrow {
-  color: #ff4d00;
+  color: #cf1d1d;
   font-size: 1.75rem;
   font-weight: 800;
   letter-spacing: 0.28em;
@@ -107,7 +107,7 @@ textarea:focus-visible {
       rgba(255, 255, 255, 0.06),
       rgba(255, 255, 255, 0.015)
     ),
-    #101010;
+    #171717;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
 }
 
@@ -133,9 +133,13 @@ textarea:focus-visible {
 }
 
 .premium-button-primary {
-  background: #ff4d00;
+  background: #cf1d1d;
   color: #ffffff;
-  box-shadow: 0 18px 45px rgba(255, 77, 0, 0.26);
+  box-shadow: 0 18px 45px rgba(207, 29, 29, 0.26);
+}
+
+.premium-button-primary:hover {
+  background: #a81616;
 }
 
 .premium-button-secondary {
@@ -145,8 +149,8 @@ textarea:focus-visible {
 }
 
 .premium-button-secondary:hover {
-  border-color: rgba(255, 77, 0, 0.75);
-  color: #ff4d00;
+  border-color: rgba(207, 29, 29, 0.75);
+  color: #cf1d1d;
 }
 
 .premium-input {
@@ -165,8 +169,8 @@ textarea:focus-visible {
 }
 
 .premium-input:focus {
-  border-color: #ff4d00;
-  box-shadow: 0 0 0 4px rgba(255, 77, 0, 0.12);
+  border-color: #cf1d1d;
+  box-shadow: 0 0 0 4px rgba(207, 29, 29, 0.12);
 }
 
 .premium-link {
@@ -175,7 +179,7 @@ textarea:focus-visible {
 }
 
 .premium-link:hover {
-  color: #ff4d00;
+  color: #cf1d1d;
 }
 
 .premium-divider {
@@ -183,7 +187,7 @@ textarea:focus-visible {
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 77, 0, 0.55),
+    rgba(207, 29, 29, 0.55),
     transparent
   );
 }

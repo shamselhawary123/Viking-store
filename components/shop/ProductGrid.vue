@@ -4,7 +4,7 @@
       <button
         v-for="filter in activeFilters"
         :key="filter.key"
-        class="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#FF4D00]/30 bg-[#FF4D00]/10 px-4 py-2 text-sm font-bold text-[#FF4D00] transition duration-200 hover:-translate-y-0.5 hover:border-[#FF4D00]"
+        class="inline-flex min-h-10 items-center gap-2 rounded-full border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 px-4 py-2 text-sm font-bold text-[#CF1D1D] transition duration-200 hover:-translate-y-0.5 hover:border-[#CF1D1D]"
         @click="filter.clear"
       >
         {{ filter.label }}
@@ -20,7 +20,7 @@
     </div>
 
     <div v-if="productsStore.loading" class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
-      <div v-for="i in 9" :key="i" class="overflow-hidden rounded-2xl border border-white/10 bg-[#111111]">
+      <div v-for="i in 9" :key="i" class="overflow-hidden rounded-2xl border border-white/10 bg-[#171717]">
         <div class="aspect-[4/5] animate-pulse bg-white/10" />
         <div class="space-y-4 p-5">
           <div class="h-3 w-24 animate-pulse rounded bg-white/10" />
@@ -45,7 +45,7 @@
     </div>
 
     <div v-else class="premium-panel rounded-2xl px-6 py-20 text-center">
-      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#CF1D1D]">
         <Icon name="i-heroicons-magnifying-glass" class="text-3xl" />
       </div>
       <h2 class="mt-6 text-3xl font-black text-white">{{ t('shop.noProducts') }}</h2>
@@ -64,7 +64,7 @@ import { computed, ref, watch } from "vue";
 import { useShopStore } from "../../stores/shop";
 import { useProductsStore } from "../../stores/products";
 import { formatStorePrice } from "../../utils/localizationFormat";
-import { SHOP_DEFAULT_MAX_PRICE, isWithinShopPriceLimit } from "../../utils/shopProducts";
+import { SHOP_DEFAULT_MAX_PRICE, isWithinShopPriceLimit, sortShopProducts } from "../../utils/shopProducts";
 
 const productsStore = useProductsStore(usePinia());
 const { locale, t } = useI18n();
@@ -90,15 +90,7 @@ const filteredProducts = computed(() => {
 
   result = result.filter((product) => isWithinShopPriceLimit(product.price, shopStore.maxPrice));
 
-  if (shopStore.sortBy === "low") {
-    result.sort((a, b) => a.price - b.price);
-  }
-
-  if (shopStore.sortBy === "high") {
-    result.sort((a, b) => b.price - a.price);
-  }
-
-  return result;
+  return sortShopProducts(result, shopStore.sortBy);
 });
 
 const visibleProducts = computed(() => filteredProducts.value.slice(0, visibleCount.value));

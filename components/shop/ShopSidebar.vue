@@ -24,7 +24,7 @@
       </div>
 
       <button
-        class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 transition hover:border-[#FF4D00] hover:text-[#FF4D00] lg:hidden"
+        class="flex h-11 w-11 items-center justify-center rounded-full border border-white/10 transition hover:border-[#CF1D1D] hover:text-[#CF1D1D] lg:hidden"
         :aria-label="t('shop.closeFilters')"
         @click="shopStore.mobileFiltersOpen = false"
       >
@@ -52,7 +52,7 @@
     <div>
       <button class="flex min-h-11 w-full items-center justify-between" @click="categoriesOpen = !categoriesOpen">
         <h3 class="text-sm font-black uppercase tracking-[0.16em] text-white">{{ t('nav.categories') }}</h3>
-        <Icon name="i-heroicons-chevron-down" class="text-[#FF4D00] transition duration-300" :class="{ 'rotate-180': categoriesOpen }" />
+        <Icon name="i-heroicons-chevron-down" class="text-[#CF1D1D] transition duration-300" :class="{ 'rotate-180': categoriesOpen }" />
       </button>
 
       <div v-show="categoriesOpen" class="mt-4 grid gap-2">
@@ -62,8 +62,8 @@
           class="flex min-h-12 w-full items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-bold transition duration-200 active:scale-[0.99]"
           :class="
             shopStore.selectedCategory === category.slug
-              ? 'border-[#FF4D00] bg-[#FF4D00]/10 text-[#FF4D00] shadow-[0_0_0_3px_rgba(255,77,0,0.08)]'
-              : 'border-white/10 bg-black/20 text-neutral-300 hover:-translate-y-0.5 hover:border-[#FF4D00] hover:text-white'
+              ? 'border-[#CF1D1D] bg-[#CF1D1D]/10 text-[#CF1D1D] shadow-[0_0_0_3px_rgba(207,29,29,0.08)]'
+              : 'border-white/10 bg-black/20 text-neutral-300 hover:-translate-y-0.5 hover:border-[#CF1D1D] hover:text-white'
           "
           @click="selectCategory(category.slug)"
         >
@@ -76,9 +76,9 @@
     <div>
       <div class="mb-4 flex items-center justify-between">
         <h3 class="text-sm font-black uppercase tracking-[0.16em] text-white">{{ t('shop.maxPrice') }}</h3>
-        <span class="font-black text-[#FF4D00]">{{ priceLabel }}</span>
+        <span class="font-black text-[#CF1D1D]">{{ priceLabel }}</span>
       </div>
-      <input v-model="shopStore.maxPrice" type="range" min="0" :max="SHOP_DEFAULT_MAX_PRICE" step="10" class="w-full accent-[#FF4D00]" />
+      <input v-model="shopStore.maxPrice" type="range" min="0" :max="SHOP_DEFAULT_MAX_PRICE" step="10" class="w-full accent-[#CF1D1D]" />
       <div class="mt-2 flex justify-between text-xs text-neutral-500">
         <span>{{ formatStorePrice(0, locale) }}</span>
         <span>{{ t('shop.any') }}</span>
@@ -91,7 +91,7 @@
         {{ t('shop.reset') }}
       </button>
       <button
-        class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#FF4D00] px-5 py-3 font-extrabold text-white shadow-[0_18px_45px_rgba(255,77,0,0.26)] transition duration-200 hover:-translate-y-0.5 active:scale-[0.98] lg:hidden"
+        class="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#CF1D1D] px-5 py-3 font-extrabold text-white shadow-[0_18px_45px_rgba(207,29,29,0.26)] transition duration-200 hover:-translate-y-0.5 active:scale-[0.98] lg:hidden"
         @click="shopStore.mobileFiltersOpen = false"
       >
         {{ t('shop.applyFilters') }}

@@ -2,53 +2,53 @@
   <section class="space-y-6">
     <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
-        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">Catalog</p>
-        <h2 class="mt-2 text-3xl font-black">Categories</h2>
+        <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ t("admin.catalog") }}</p>
+        <h2 class="mt-2 text-3xl font-black">{{ t("admin.categories") }}</h2>
       </div>
 
       <button class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white transition hover:opacity-90" @click="openCreate">
-        Add Category
+        {{ t("admin.addCategory") }}
       </button>
     </div>
 
-    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <article v-for="category in categories" :key="category.id" class="overflow-hidden rounded-3xl border border-white/10 bg-[#111111]">
-        <img :src="category.image || '/logo.png'" :alt="category.name" class="h-44 w-full object-cover" />
-        <div class="p-5">
+    <div class="grid gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+      <article v-for="category in categories" :key="category.id" class="admin-mobile-card overflow-hidden rounded-2xl border border-white/10 bg-[#111111] sm:rounded-3xl">
+        <img :src="category.image || '/logo.png'" :alt="category.name" class="h-36 w-full object-cover sm:h-44" />
+        <div class="p-4 sm:p-5">
           <h3 class="text-xl font-black">{{ category.name }}</h3>
           <p class="mt-2 text-sm text-gray-500">{{ category.slug }}</p>
-          <div class="mt-5 flex gap-2">
-            <button class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]" @click="openEdit(category)">
-              Edit
+          <div class="mt-5 flex flex-wrap gap-2">
+            <button class="min-h-11 rounded-xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]" @click="openEdit(category)">
+              {{ t("common.edit") }}
             </button>
-            <button class="rounded-xl border border-red-500/40 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500 hover:text-white" @click="deleteCategory(category)">
-              Delete
+            <button class="min-h-11 rounded-xl border border-red-500/40 px-4 py-2 text-sm font-bold text-red-400 transition hover:bg-red-500 hover:text-white" @click="deleteCategory(category)">
+              {{ t("common.delete") }}
             </button>
           </div>
         </div>
       </article>
     </div>
 
-    <p v-if="!loading && !categories.length" class="text-sm text-gray-500">No categories found.</p>
+    <p v-if="!loading && !categories.length" class="text-sm text-gray-500">{{ t("admin.noCategories") }}</p>
 
     <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <form class="w-full max-w-xl rounded-3xl border border-white/10 bg-[#111111] p-6" @submit.prevent="saveCategory">
+      <form class="max-h-[calc(100dvh-1rem)] w-full max-w-xl overflow-y-auto rounded-2xl border border-white/10 bg-[#111111] p-4 sm:rounded-3xl sm:p-6" @submit.prevent="saveCategory">
         <div class="flex items-center justify-between gap-4">
-          <h3 class="text-2xl font-black">{{ editingId ? "Edit Category" : "Add Category" }}</h3>
-          <button type="button" class="text-gray-400 hover:text-white" @click="closeModal">Close</button>
+          <h3 class="text-2xl font-black">{{ editingId ? t("admin.editCategory") : t("admin.addCategory") }}</h3>
+          <button type="button" class="text-gray-400 hover:text-white" @click="closeModal">{{ t("admin.modalClose") }}</button>
         </div>
 
         <div class="mt-6 space-y-4">
           <label class="block">
-            <span class="field-label">Name</span>
+            <span class="field-label">{{ t("common.name") }}</span>
             <input v-model="form.name" required class="field mt-2" />
           </label>
           <label class="block">
-            <span class="field-label">Slug</span>
+            <span class="field-label">{{ t("admin.slug") }}</span>
             <input v-model="form.slug" required class="field mt-2" />
           </label>
           <label class="block">
-            <span class="field-label">Image URL</span>
+            <span class="field-label">{{ t("admin.imageUrl") }}</span>
             <input v-model="form.image" class="field mt-2" />
           </label>
         </div>
@@ -56,9 +56,9 @@
         <p v-if="errorMessage" class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ errorMessage }}</p>
 
         <div class="mt-6 flex justify-end gap-3">
-          <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">Cancel</button>
+          <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">{{ t("common.cancel") }}</button>
           <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
-            {{ saving ? "Saving..." : "Save Category" }}
+            {{ saving ? t("admin.saving") : t("admin.saveCategory") }}
           </button>
         </div>
       </form>
@@ -82,6 +82,7 @@ type CategoryRow = {
 };
 
 const supabase = useSupabase();
+const { t } = useI18n();
 const categories = ref<CategoryRow[]>([]);
 const loading = ref(true);
 const saving = ref(false);
@@ -163,14 +164,14 @@ const saveCategory = async () => {
     await loadCategories();
     closeModal();
   } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : "Unable to save category";
+    errorMessage.value = error instanceof Error ? error.message : t("admin.unableSaveCategory");
   } finally {
     saving.value = false;
   }
 };
 
 const deleteCategory = async (category: CategoryRow) => {
-  if (!confirm(`Delete ${category.name}?`)) return;
+  if (!confirm(t("admin.deleteCategoryConfirm", { name: category.name }))) return;
 
   const { error } = await supabase.from("categories").delete().eq("id", category.id);
   if (error) {

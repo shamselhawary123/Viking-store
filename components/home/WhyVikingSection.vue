@@ -14,9 +14,9 @@
           v-for="(item, index) in features"
           :key="item.titleKey"
           v-reveal="{ delay: index * 90 }"
-          class="premium-panel group rounded-2xl p-6 transition duration-300 hover:-translate-y-2 hover:border-[#FF4D00]/60 hover:shadow-[0_30px_90px_rgba(255,77,0,0.1)]"
+          class="premium-panel group rounded-2xl p-6 transition duration-300 hover:-translate-y-2 hover:border-[#CF1D1D]/60 hover:shadow-[0_30px_90px_rgba(207,29,29,0.1)]"
         >
-          <div class="mb-7 flex h-14 w-14 items-center justify-center rounded-xl bg-[#FF4D00]/10 text-[#FF4D00] transition duration-300 group-hover:scale-110 group-hover:bg-[#FF4D00] group-hover:text-white">
+          <div class="mb-7 flex h-14 w-14 items-center justify-center rounded-xl bg-[#CF1D1D]/10 text-[#CF1D1D] transition duration-300 group-hover:scale-110 group-hover:bg-[#CF1D1D] group-hover:text-white">
             <Icon :name="item.icon" class="text-3xl" />
           </div>
           <h3 class="text-2xl font-black text-white">{{ t(item.titleKey) }}</h3>
@@ -61,9 +61,9 @@
             <article
               v-for="(itemIndex, index) in carousel.loopedIndexes"
               :key="`${index}-${features[itemIndex].titleKey}`"
-              class="mobile-carousel-slide premium-panel group shrink-0 rounded-2xl p-6 transition duration-300 hover:border-[#FF4D00]/60 hover:shadow-[0_30px_90px_rgba(255,77,0,0.1)]"
+              class="mobile-carousel-slide premium-panel group shrink-0 rounded-2xl p-6 transition duration-300 hover:border-[#CF1D1D]/60 hover:shadow-[0_30px_90px_rgba(207,29,29,0.1)]"
             >
-              <div class="mb-7 flex h-14 w-14 items-center justify-center rounded-xl bg-[#FF4D00]/10 text-[#FF4D00] transition duration-300 group-hover:scale-110 group-hover:bg-[#FF4D00] group-hover:text-white">
+              <div class="mb-7 flex h-14 w-14 items-center justify-center rounded-xl bg-[#CF1D1D]/10 text-[#CF1D1D] transition duration-300 group-hover:scale-110 group-hover:bg-[#CF1D1D] group-hover:text-white">
                 <Icon :name="features[itemIndex].icon" class="text-3xl" />
               </div>
               <h3 class="text-2xl font-black text-white">{{ t(features[itemIndex].titleKey) }}</h3>
@@ -158,7 +158,7 @@ const carousel = useMobileCarousel(computed(() => features.length), { isRtl });
   border-radius: 9999px;
   border: 1px solid rgb(255 255 255 / 0.12);
   background: rgb(12 12 12 / 0.82);
-  color: #ff4d00;
+  color: #cf1d1d;
   box-shadow: 0 14px 34px rgb(0 0 0 / 0.32);
   transition:
     transform 180ms ease,
@@ -168,9 +168,9 @@ const carousel = useMobileCarousel(computed(() => features.length), { isRtl });
 }
 
 .mobile-carousel-arrow:hover {
-  border-color: rgb(255 77 0 / 0.72);
-  background: rgb(255 77 0 / 0.14);
-  box-shadow: 0 16px 38px rgb(255 77 0 / 0.12);
+  border-color: rgb(207 29 29 / 0.72);
+  background: rgb(207 29 29 / 0.14);
+  box-shadow: 0 16px 38px rgb(207 29 29 / 0.12);
 }
 
 .mobile-carousel-arrow:active {
@@ -178,7 +178,7 @@ const carousel = useMobileCarousel(computed(() => features.length), { isRtl });
 }
 
 .mobile-carousel-arrow:focus-visible {
-  outline: 2px solid #ff4d00;
+  outline: 2px solid #cf1d1d;
   outline-offset: 3px;
 }
 

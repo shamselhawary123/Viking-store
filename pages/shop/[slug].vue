@@ -3,7 +3,7 @@
     <div class="grid grid-cols-1 gap-10 lg:grid-cols-[1.08fr_0.92fr] xl:gap-14">
       <div class="space-y-4 reveal-up">
         <div
-          class="group relative cursor-zoom-in overflow-hidden rounded-2xl border border-white/10 bg-[#111111] shadow-[0_32px_90px_rgba(0,0,0,0.38)]"
+          class="group relative cursor-zoom-in overflow-hidden rounded-2xl border border-white/10 bg-[#171717] shadow-[0_32px_90px_rgba(0,0,0,0.38)]"
           @click="openLightbox"
           @mousemove="handleZoomMove"
           @mouseleave="resetZoom"
@@ -24,13 +24,13 @@
           />
           <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/20 opacity-80" />
           <button
-            class="absolute bottom-5 right-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/70 text-white backdrop-blur transition duration-200 hover:scale-105 hover:border-[#FF4D00] hover:text-[#FF4D00]"
+            class="absolute bottom-5 right-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-black/70 text-white backdrop-blur transition duration-200 hover:scale-105 hover:border-[#CF1D1D] hover:text-[#CF1D1D]"
             :aria-label="t('shop.enlargeImage')"
             @click.stop="openLightbox"
           >
             <Icon name="i-heroicons-magnifying-glass-plus" class="text-xl" />
           </button>
-          <div v-if="product.badge" class="absolute left-5 top-5 rounded-full bg-[#FF4D00] px-4 py-2 text-xs font-black uppercase tracking-[0.16em]">
+          <div v-if="product.badge" class="absolute left-5 top-5 rounded-full bg-[#CF1D1D] px-4 py-2 text-xs font-black uppercase tracking-[0.16em]">
             {{ product.badge }}
           </div>
         </div>
@@ -39,8 +39,8 @@
           <button
             v-for="(image, index) in galleryImages"
             :key="image"
-            class="relative overflow-hidden rounded-xl border bg-[#111111] transition duration-300 hover:-translate-y-0.5"
-            :class="selectedImage === image ? 'border-[#FF4D00] shadow-[0_0_0_3px_rgba(255,77,0,0.16)]' : 'border-white/10 hover:border-[#FF4D00]/70'"
+            class="relative overflow-hidden rounded-xl border bg-[#171717] transition duration-300 hover:-translate-y-0.5"
+            :class="selectedImage === image ? 'border-[#CF1D1D] shadow-[0_0_0_3px_rgba(207,29,29,0.16)]' : 'border-white/10 hover:border-[#CF1D1D]/70'"
             :aria-label="t('shop.viewProductImage', { title: product.title })"
             @click="selectImage(index)"
           >
@@ -67,7 +67,7 @@
           </div>
 
           <div class="flex flex-wrap items-center gap-3 text-sm">
-            <div class="flex text-[#FF4D00]" :aria-label="t('shop.averageRatingAria', { rating: reviewSummary.displayAverage })">
+            <div class="flex text-[#CF1D1D]" :aria-label="t('shop.averageRatingAria', { rating: reviewSummary.displayAverage })">
               <Icon v-for="star in starNumbers" :key="star" :name="star <= filledReviewStars ? 'i-heroicons-star-solid' : 'i-heroicons-star'" />
             </div>
             <span class="font-bold text-white">{{ reviewSummary.displayAverage }}</span>
@@ -78,7 +78,7 @@
             <div class="flex flex-wrap items-center gap-4">
               <span class="text-4xl font-black text-white">{{ formatStorePrice(product.price, locale) }}</span>
               <span v-if="oldPrice" class="text-2xl text-neutral-500 line-through">{{ formatStorePrice(oldPrice, locale) }}</span>
-              <span v-if="discountPercent" class="rounded-full bg-[#FF4D00] px-3 py-1 text-sm font-black text-white">
+              <span v-if="discountPercent" class="rounded-full bg-[#CF1D1D] px-3 py-1 text-sm font-black text-white">
                 -{{ discountPercent }}%
               </span>
               <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-sm font-bold text-emerald-300">
@@ -119,7 +119,7 @@
                 v-for="color in product.product_colors"
                 :key="color.id"
                 class="flex h-12 w-12 items-center justify-center rounded-full border-2 transition duration-300 hover:-translate-y-0.5 hover:scale-105"
-                :class="selectedColor?.id === color.id ? 'border-[#FF4D00] bg-white/10 shadow-[0_0_0_4px_rgba(255,77,0,0.14)]' : 'border-white/15 hover:border-[#FF4D00]/70'"
+                :class="selectedColor?.id === color.id ? 'border-[#CF1D1D] bg-white/10 shadow-[0_0_0_4px_rgba(207,29,29,0.14)]' : 'border-white/15 hover:border-[#CF1D1D]/70'"
                 :aria-label="t('shop.selectColor', { color: color.name })"
                 @click="changeColor(color)"
               >
@@ -138,9 +138,9 @@
                 class="min-h-12 min-w-[74px] rounded-xl border px-5 py-3 font-black transition duration-200 disabled:cursor-not-allowed"
                 :class="
                   selectedSize === size.size
-                    ? 'border-[#FF4D00] bg-[#FF4D00] text-white shadow-[0_14px_34px_rgba(255,77,0,0.22)]'
+                    ? 'border-[#CF1D1D] bg-[#CF1D1D] text-white shadow-[0_14px_34px_rgba(207,29,29,0.22)]'
                     : size.in_stock
-                      ? 'border-white/10 bg-white/[0.03] hover:-translate-y-0.5 hover:border-[#FF4D00]'
+                      ? 'border-white/10 bg-white/[0.03] hover:-translate-y-0.5 hover:border-[#CF1D1D]'
                       : 'border-white/5 bg-white/[0.02] text-neutral-600 line-through'
                 "
                 @click="selectedSize = size.size"
@@ -173,7 +173,7 @@
               {{ buyLoading ? t('shop.loading') : t('shop.buyNow') }}
             </button>
             <button
-              class="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-xl text-white transition duration-200 hover:-translate-y-0.5 hover:border-[#FF4D00] hover:text-[#FF4D00] active:scale-95"
+              class="flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-xl text-white transition duration-200 hover:-translate-y-0.5 hover:border-[#CF1D1D] hover:text-[#CF1D1D] active:scale-95"
               :aria-label="wishlistStore.isFavorite(product.id) ? t('shop.removeWishlist') : t('shop.addWishlist')"
               @click="wishlistStore.toggleWishlist(product)"
             >
@@ -182,8 +182,8 @@
           </div>
 
           <div class="grid grid-cols-2 gap-3 border-t border-white/10 pt-7">
-            <div v-for="feature in trustFeatures" :key="feature.titleKey" class="rounded-xl border border-white/10 bg-white/[0.03] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-[#FF4D00]/55">
-              <Icon :name="feature.icon" class="text-2xl text-[#FF4D00]" />
+            <div v-for="feature in trustFeatures" :key="feature.titleKey" class="rounded-xl border border-white/10 bg-white/[0.03] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-[#CF1D1D]/55">
+              <Icon :name="feature.icon" class="text-2xl text-[#CF1D1D]" />
               <h3 class="mt-3 font-black">{{ t(feature.titleKey) }}</h3>
               <p class="mt-1 text-sm leading-6 text-neutral-400">{{ t(feature.labelKey) }}</p>
             </div>
@@ -200,7 +200,7 @@
             <span class="text-5xl font-black text-white">{{ reviewSummary.displayAverage }}</span>
             <span class="pb-2 text-neutral-400">{{ t('shop.outOfFive') }}</span>
           </div>
-          <div class="mt-3 flex text-xl text-[#FF4D00]">
+          <div class="mt-3 flex text-xl text-[#CF1D1D]">
             <Icon v-for="star in starNumbers" :key="star" :name="star <= filledReviewStars ? 'i-heroicons-star-solid' : 'i-heroicons-star'" />
           </div>
           <p class="mt-2 text-sm text-neutral-400">{{ t('shop.reviews', { count: reviewSummary.total }) }}</p>
@@ -209,7 +209,7 @@
             <div v-for="rating in REVIEW_RATINGS" :key="rating" class="grid grid-cols-[3rem_1fr_2.5rem] items-center gap-3 text-sm">
               <span class="font-bold text-white">{{ rating }} {{ t('shop.starShort') }}</span>
               <div class="h-2 overflow-hidden rounded-full bg-white/10">
-                <div class="h-full rounded-full bg-[#FF4D00]" :style="{ width: ratingDistributionPercent(rating) }" />
+                <div class="h-full rounded-full bg-[#CF1D1D]" :style="{ width: ratingDistributionPercent(rating) }" />
               </div>
               <span class="text-right text-neutral-500">{{ reviewSummary.distribution[rating] }}</span>
             </div>
@@ -220,13 +220,13 @@
               <div v-if="currentUserReview && !editingReview" class="space-y-4">
                 <div>
                   <p class="text-sm font-bold text-neutral-400">{{ t('shop.yourReview') }}</p>
-                  <div class="mt-2 flex text-[#FF4D00]">
+                  <div class="mt-2 flex text-[#CF1D1D]">
                     <Icon v-for="star in starNumbers" :key="star" :name="star <= currentUserReview.rating ? 'i-heroicons-star-solid' : 'i-heroicons-star'" />
                   </div>
                   <p class="mt-3 leading-7 text-neutral-300">{{ currentUserReview.comment }}</p>
                 </div>
                 <div class="flex flex-wrap gap-3">
-                  <button type="button" class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-white transition hover:border-[#FF4D00]" @click="startEditReview">
+                  <button type="button" class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold text-white transition hover:border-[#CF1D1D]" @click="startEditReview">
                     {{ t('shop.editReview') }}
                   </button>
                   <button type="button" class="rounded-xl border border-red-500/40 px-4 py-2 text-sm font-bold text-red-300 transition hover:bg-red-500 hover:text-white" :disabled="deletingReview" @click="deleteReview">
@@ -239,7 +239,7 @@
                 <h3 class="text-xl font-black text-white">{{ editingReview ? t('shop.editReview') : t('shop.writeReview') }}</h3>
                 <div>
                   <label class="text-sm font-bold text-neutral-400">{{ t('shop.yourRating') }}</label>
-                  <div class="mt-2 flex gap-1 text-2xl text-[#FF4D00]">
+                  <div class="mt-2 flex gap-1 text-2xl text-[#CF1D1D]">
                     <button v-for="star in starNumbers" :key="star" type="button" class="transition hover:scale-110" :aria-label="t('shop.selectRating', { rating: star })" @click="reviewRating = star">
                       <Icon :name="star <= reviewRating ? 'i-heroicons-star-solid' : 'i-heroicons-star'" />
                     </button>
@@ -251,7 +251,7 @@
                     id="review-comment"
                     v-model="reviewComment"
                     rows="4"
-                    class="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-[#FF4D00]"
+                    class="mt-2 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none transition focus:border-[#CF1D1D]"
                     :placeholder="t('shop.reviewPlaceholder')"
                   />
                 </div>
@@ -287,7 +287,7 @@
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p class="font-black text-white">{{ review.reviewerName }}</p>
-                  <div class="mt-1 flex text-sm text-[#FF4D00]">
+                  <div class="mt-1 flex text-sm text-[#CF1D1D]">
                     <Icon v-for="star in starNumbers" :key="star" :name="star <= review.rating ? 'i-heroicons-star-solid' : 'i-heroicons-star'" />
                   </div>
                 </div>
@@ -307,7 +307,7 @@
           v-for="tab in tabs"
           :key="tab.key"
           class="min-h-12 rounded-xl px-4 py-3 text-sm font-black transition duration-200"
-          :class="activeTab === tab.key ? 'bg-[#FF4D00] text-white' : 'text-neutral-400 hover:bg-white/[0.05] hover:text-white'"
+          :class="activeTab === tab.key ? 'bg-[#CF1D1D] text-white' : 'text-neutral-400 hover:bg-white/[0.05] hover:text-white'"
           @click="activeTab = tab.key"
         >
           {{ t(tab.labelKey) }}
@@ -360,7 +360,7 @@
 
   <div v-else-if="!loading && !product" class="container-premium flex min-h-[60vh] items-center justify-center py-20 text-center">
     <div class="premium-panel rounded-2xl p-10">
-      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#CF1D1D]">
         <Icon name="i-heroicons-exclamation-triangle" class="text-3xl" />
       </div>
       <h2 class="mt-6 text-4xl font-black">{{ t('shop.productNotFound') }}</h2>
@@ -381,7 +381,7 @@
   </div>
 
   <div v-if="isLightboxOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4" @click="isLightboxOpen = false">
-    <button class="absolute right-5 top-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:border-[#FF4D00] hover:text-[#FF4D00]" :aria-label="t('common.close')" @click="isLightboxOpen = false">
+    <button class="absolute right-5 top-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:border-[#CF1D1D] hover:text-[#CF1D1D]" :aria-label="t('common.close')" @click="isLightboxOpen = false">
       <Icon name="i-heroicons-x-mark" class="text-2xl" />
     </button>
     <img :src="selectedImage" :alt="productImageAlt" width="960" height="1120" class="max-h-[88vh] max-w-full rounded-2xl object-contain" decoding="async" @click.stop />
@@ -389,14 +389,13 @@
 </template>
 
 <script setup lang="ts">
-import { createClient } from "@supabase/supabase-js";
 import { computed, ref, onBeforeUnmount, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useCartStore } from "../../stores/cart";
 import { useProductsStore } from "../../stores/products";
 import { useWishlistStore } from "../../stores/wishlist";
 import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
-import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { getPublicSupabaseClient } from "../../utils/publicSupabase";
 import { SHOP_PRODUCTS_SELECT } from "../../utils/shopProducts";
 import {
   buildBreadcrumbStructuredData,
@@ -471,10 +470,9 @@ let pendingZoomOrigin = "center center";
 const addLoading = ref(false);
 const buyLoading = ref(false);
 const starNumbers = [1, 2, 3, 4, 5];
-const seoSupabase = createClient(
+const seoSupabase = getPublicSupabaseClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
-  createPublicSupabaseReadOptions("viking-store-shop-product-seo-readonly"),
 );
 
 const { data: initialProduct } = await useAsyncData(`shop-product-seo-${slug}`, async () => {
@@ -887,7 +885,7 @@ const handleTouchEnd = (event: TouchEvent) => {
   }, 120);
 };
 
-const colorValue = (color: any) => color.value || color.hex || color.color || color.name || "#111111";
+const colorValue = (color: any) => color.value || color.hex || color.color || color.name || "#171717";
 
 const decreaseQty = () => {
   if (quantity.value > 1) {

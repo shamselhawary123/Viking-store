@@ -18,7 +18,7 @@
       <p v-if="pending" class="premium-panel rounded-2xl p-6 text-neutral-400">{{ t("common.loading") }}</p>
       <p v-else-if="error" class="rounded-2xl border border-red-500/30 bg-red-500/10 p-5 text-red-200">{{ t("blog.loadFailed") }}</p>
       <div v-else-if="posts.length" class="space-y-12">
-        <article class="grid overflow-hidden rounded-2xl border border-white/10 bg-[#111111] md:grid-cols-[1.1fr_0.9fr]">
+        <article class="grid overflow-hidden rounded-2xl border border-white/10 bg-[#171717] md:grid-cols-[1.1fr_0.9fr]">
           <NuxtLink :to="`/blog/${featuredPost.slug}`" class="block overflow-hidden bg-black">
             <img
               :src="featuredPost.cover_image || '/train-hard.png'"
@@ -33,7 +33,7 @@
           </NuxtLink>
           <div class="flex flex-col justify-center p-6 md:p-8">
             <p class="eyebrow">{{ featuredPost.category || t("blog.featured") }}</p>
-            <NuxtLink :to="`/blog/${featuredPost.slug}`" class="mt-4 block text-4xl font-black leading-tight text-white transition hover:text-[#FF4D00] md:text-5xl">
+            <NuxtLink :to="`/blog/${featuredPost.slug}`" class="mt-4 block text-4xl font-black leading-tight text-white transition hover:text-[#CF1D1D] md:text-5xl">
               {{ featuredPost.title }}
             </NuxtLink>
             <p class="mt-4 leading-8 text-neutral-400">{{ featuredPost.excerpt }}</p>
@@ -53,7 +53,7 @@
             <h2 class="text-lg font-black text-white">{{ t("blog.categories") }}</h2>
             <button
               class="w-full rounded-xl border px-4 py-3 text-left text-sm font-bold transition"
-              :class="selectedCategory === 'all' ? 'border-[#FF4D00] bg-[#FF4D00] text-white' : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-[#FF4D00]'"
+              :class="selectedCategory === 'all' ? 'border-[#CF1D1D] bg-[#CF1D1D] text-white' : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-[#CF1D1D]'"
               @click="selectedCategory = 'all'"
             >
               {{ t("common.all") }}
@@ -62,7 +62,7 @@
               v-for="category in categories"
               :key="category"
               class="w-full rounded-xl border px-4 py-3 text-left text-sm font-bold transition"
-              :class="selectedCategory === category ? 'border-[#FF4D00] bg-[#FF4D00] text-white' : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-[#FF4D00]'"
+              :class="selectedCategory === category ? 'border-[#CF1D1D] bg-[#CF1D1D] text-white' : 'border-white/10 bg-white/[0.03] text-neutral-300 hover:border-[#CF1D1D]'"
               @click="selectedCategory = category"
             >
               {{ category }}
@@ -75,7 +75,7 @@
               <p class="text-sm text-neutral-500">{{ t("blog.articleCount", { count: filteredPosts.length }) }}</p>
             </div>
             <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-              <article v-for="post in filteredPosts" :key="post.id" class="overflow-hidden rounded-2xl border border-white/10 bg-[#111111] transition duration-300 hover:-translate-y-1 hover:border-[#FF4D00]/60">
+              <article v-for="post in filteredPosts" :key="post.id" class="overflow-hidden rounded-2xl border border-white/10 bg-[#171717] transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/60">
                 <NuxtLink :to="`/blog/${post.slug}`" class="block overflow-hidden bg-black">
                   <img
                     :src="post.cover_image || '/train-hard.png'"
@@ -88,8 +88,8 @@
                   />
                 </NuxtLink>
                 <div class="p-5">
-                  <p class="text-xs font-black uppercase tracking-[0.18em] text-[#FF4D00]">{{ post.category || t("blog.editorial") }}</p>
-                  <NuxtLink :to="`/blog/${post.slug}`" class="mt-3 block text-2xl font-black leading-tight text-white transition hover:text-[#FF4D00]">
+                  <p class="text-xs font-black uppercase tracking-[0.18em] text-[#CF1D1D]">{{ post.category || t("blog.editorial") }}</p>
+                  <NuxtLink :to="`/blog/${post.slug}`" class="mt-3 block text-2xl font-black leading-tight text-white transition hover:text-[#CF1D1D]">
                     {{ post.title }}
                   </NuxtLink>
                   <p class="mt-3 line-clamp-3 leading-7 text-neutral-400">{{ post.excerpt }}</p>
@@ -114,10 +114,9 @@
 </template>
 
 <script setup lang="ts">
-import { createClient } from "@supabase/supabase-js";
 import { computed, ref } from "vue";
 import { calculateReadingTime, formatBlogDate, type BlogPostLike } from "../../utils/blog";
-import { createPublicSupabaseReadOptions } from "../../utils/publicSupabase";
+import { getPublicSupabaseClient } from "../../utils/publicSupabase";
 import { buildCanonicalUrl, normalizeSiteUrl } from "../../utils/seo";
 
 type BlogPostRow = BlogPostLike & {
@@ -130,10 +129,9 @@ const siteUrl = normalizeSiteUrl(String(config.public.siteUrl || ""));
 const canonicalUrl = computed(() => buildCanonicalUrl(siteUrl, "/blog"));
 const selectedCategory = ref("all");
 
-const supabase = createClient(
+const supabase = getPublicSupabaseClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
-  createPublicSupabaseReadOptions("viking-store-blog-index-readonly"),
 );
 
 const { data, pending, error } = await useAsyncData("published-blog-posts", async () => {

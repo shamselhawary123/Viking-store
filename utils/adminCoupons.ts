@@ -67,27 +67,27 @@ export const validateCouponForm = (form: AdminCouponForm) => {
   const maxTotalUses = optionalNumber(form.max_total_uses);
   const maxUsesPerUser = optionalNumber(form.max_uses_per_user);
 
-  if (!code) return "Code is required.";
-  if (!String(form.name || "").trim()) return "Name is required.";
+  if (!code) return "admin.couponCodeRequired";
+  if (!String(form.name || "").trim()) return "admin.couponNameRequired";
   if (!ADMIN_COUPON_DISCOUNT_TYPES.includes(form.discount_type as AdminCouponDiscountType)) {
-    return "Discount type is invalid.";
+    return "admin.couponDiscountTypeInvalid";
   }
   if (!Number.isFinite(discountValue) || discountValue <= 0) {
-    return "Discount value must be greater than 0.";
+    return "admin.couponDiscountValueInvalid";
   }
   if (form.discount_type === "percentage" && discountValue > 100) {
-    return "Percentage discount cannot exceed 100.";
+    return "admin.couponPercentMax";
   }
-  if (minimumOrderAmount < 0) return "Minimum order amount must be zero or more.";
+  if (minimumOrderAmount < 0) return "admin.couponMinimumInvalid";
   if (maximumDiscountAmount !== null && maximumDiscountAmount < 0) {
-    return "Maximum discount amount must be zero or more.";
+    return "admin.couponMaximumInvalid";
   }
-  if (maxTotalUses !== null && maxTotalUses < 0) return "Maximum total uses must be zero or more.";
+  if (maxTotalUses !== null && maxTotalUses < 0) return "admin.couponMaxTotalInvalid";
   if (maxUsesPerUser !== null && maxUsesPerUser < 0) {
-    return "Maximum uses per user must be zero or more.";
+    return "admin.couponMaxPerUserInvalid";
   }
   if (form.starts_at && form.expires_at && new Date(form.expires_at) < new Date(form.starts_at)) {
-    return "Expiration date must be after the start date.";
+    return "admin.couponDateRangeInvalid";
   }
 
   return "";

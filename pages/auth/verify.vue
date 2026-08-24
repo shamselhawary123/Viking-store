@@ -3,7 +3,7 @@
     <div
       class="premium-panel w-full max-w-md rounded-2xl p-8 text-center"
     >
-      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#FF4D00]">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#CF1D1D]">
         <Icon name="i-heroicons-envelope" class="text-3xl" />
       </div>
       <h1 class="mt-6 text-4xl font-black text-white">Verify Your Email</h1>

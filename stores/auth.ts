@@ -145,18 +145,34 @@ export const useAuthStore = defineStore("auth", {
         const supabase = useSupabase();
 
         const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError) {
+          console.error("GET SESSION ERROR:", sessionError);
+          return;
+        }
+
+        if (!session) {
+          this.user = null;
+          this.profile = null;
+          return;
+        }
+
+        const {
           data: { user },
           error,
         } = await supabase.auth.getUser();
 
         if (error) {
-          console.log("GET USER ERROR:", error);
+          console.error("GET USER ERROR:", error);
           return;
         }
 
         this.user = user;
       } catch (err) {
-        console.log("GET USER CATCH:", err);
+        console.error("GET USER CATCH:", err);
       }
     },
     // ORDERS
