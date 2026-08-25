@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { SHOP_PRODUCTS_SELECT } from "../utils/shopProducts";
+import { SHOP_PRODUCT_DETAIL_SELECT, SHOP_PRODUCTS_SELECT } from "../utils/shopProducts";
 
 export const useProductsStore = defineStore("products", {
   state: () => ({
@@ -43,18 +43,9 @@ export const useProductsStore = defineStore("products", {
 
       const { data, error } = await supabase
         .from("products")
-        .select(
-          `
-          *,
-          categories(*),
-          product_colors(
-            *,
-            product_images(*)
-          ),
-          product_sizes(*)
-        `,
-        )
+        .select(SHOP_PRODUCT_DETAIL_SELECT)
         .eq("slug", slug)
+        .eq("product_variants.is_active", true)
         .single();
 
       if (error) {

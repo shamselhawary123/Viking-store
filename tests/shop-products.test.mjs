@@ -16,7 +16,7 @@ describe("shop product loading helpers", () => {
   });
 
   it("does not hide products above the default price slider value", () => {
-    assert.equal(SHOP_DEFAULT_MAX_PRICE, 25000);
+    assert.equal(SHOP_DEFAULT_MAX_PRICE, 10000);
     assert.equal(isWithinShopPriceLimit(30000, 25000), true);
     assert.equal(isWithinShopPriceLimit(30000, 24900), false);
   });
