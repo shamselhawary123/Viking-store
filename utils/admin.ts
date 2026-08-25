@@ -111,17 +111,26 @@ export const buildProductPayload = (form: {
   description: string;
   price: number;
   old_price: number | null;
+  badge?: string | null;
   category_id: number;
   cover_image: string;
-}) => ({
-  title: form.name,
-  slug: form.slug,
-  description: form.description,
-  price: form.price,
-  old_price: form.old_price,
-  category_id: form.category_id,
-  cover_image: form.cover_image,
-});
+}) => {
+  const payload: Record<string, any> = {
+    title: form.name,
+    slug: form.slug,
+    description: form.description,
+    price: form.price,
+    old_price: form.old_price,
+    category_id: form.category_id,
+    cover_image: form.cover_image,
+  };
+
+  if (Object.hasOwn(form, "badge")) {
+    payload.badge = form.badge || null;
+  }
+
+  return payload;
+};
 
 export type ProductMoveDirection = "up" | "down";
 

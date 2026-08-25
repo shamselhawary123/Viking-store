@@ -362,10 +362,10 @@ const updateStatus = async (order: OrderRow, status: string) => {
   order.status = nextStatus;
   setMessage("error", "");
 
-  const { error } = await supabase
-    .from("orders")
-    .update({ status: nextStatus })
-    .eq("id", order.id);
+  const { error } = await supabase.rpc("admin_update_order_status", {
+    p_order_id: order.id,
+    p_status: nextStatus,
+  });
 
   if (error) {
     order.status = previousStatus;

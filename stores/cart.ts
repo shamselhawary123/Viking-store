@@ -1,9 +1,15 @@
 import { defineStore } from "pinia";
+import {
+  addCartItem,
+  increaseCartItemQuantity,
+  normalizeCartItems,
+} from "../utils/cartItems";
 
 export const useCartStore = defineStore("cart", {
   state: () => ({
     items: [] as any[],
     isOpen: false,
+    quantityErrorKey: "",
   }),
 
   actions: {
@@ -13,45 +19,19 @@ export const useCartStore = defineStore("cart", {
       selectedSize: string,
       quantity: number,
       selectedImage: string,
+      variant: any = null,
     ) {
       if (!selectedSize) return;
 
-      const existingItem = this.items.find(
-        (item) =>
-          item.id === product.id &&
-          item.color === selectedColor?.name &&
-          item.size === selectedSize,
-      );
-
-      if (existingItem) {
-        existingItem.quantity += quantity;
-      } else {
-        this.items.push({
-          id: product.id,
-
-          title: product.title,
-
-          slug: product.slug,
-
-          category: product.category,
-
-          price: product.price,
-
-          oldPrice: product.oldPrice,
-
-          image: selectedImage || product.cover_image,
-
-          color: selectedColor?.name || "",
-
-          colorValue: selectedColor?.value || "",
-
-          size: selectedSize,
-
-          quantity,
-
-          badge: product.badge,
-        });
-      }
+      this.quantityErrorKey = "";
+      this.items = addCartItem(this.items, {
+        product,
+        selectedColor,
+        selectedSize,
+        quantity,
+        selectedImage,
+        variant,
+      });
 
       localStorage.setItem("cart", JSON.stringify(this.items));
     },
@@ -73,13 +53,15 @@ export const useCartStore = defineStore("cart", {
         const savedCart = localStorage.getItem("cart");
 
         if (savedCart) {
-          this.items = JSON.parse(savedCart);
+          this.items = normalizeCartItems(JSON.parse(savedCart));
         }
       }
     },
 
     increaseQuantity(index: number) {
-      this.items[index].quantity++;
+      const result = increaseCartItemQuantity(this.items[index]);
+      this.items[index] = result.item;
+      this.quantityErrorKey = result.errorKey;
 
       localStorage.setItem("cart", JSON.stringify(this.items));
     },
@@ -87,6 +69,7 @@ export const useCartStore = defineStore("cart", {
     decreaseQuantity(index: number) {
       if (this.items[index].quantity > 1) {
         this.items[index].quantity--;
+        this.quantityErrorKey = "";
 
         localStorage.setItem("cart", JSON.stringify(this.items));
       }

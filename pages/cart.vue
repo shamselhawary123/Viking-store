@@ -103,6 +103,9 @@
         <aside class="premium-panel sticky top-28 rounded-2xl p-6">
           <p class="eyebrow">{{ t('cart.summary') }}</p>
           <h2 class="mt-2 text-3xl font-black">{{ t('cart.orderTotal') }}</h2>
+          <p v-if="cartStore.quantityErrorKey" class="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-200">
+            {{ t(cartStore.quantityErrorKey) }}
+          </p>
 
           <div class="mt-8 space-y-5">
             <div class="flex items-center justify-between">

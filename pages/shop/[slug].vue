@@ -76,12 +76,15 @@
 
           <div class="space-y-4 rounded-2xl border border-white/10 bg-white/[0.03] p-5">
             <div class="flex flex-wrap items-center gap-4">
-              <span class="text-4xl font-black text-white">{{ formatStorePrice(product.price, locale) }}</span>
+              <span class="text-4xl font-black text-white">{{ displayPriceText }}</span>
               <span v-if="oldPrice" class="text-2xl text-neutral-500 line-through">{{ formatStorePrice(oldPrice, locale) }}</span>
               <span v-if="discountPercent" class="rounded-full bg-[#CF1D1D] px-3 py-1 text-sm font-black text-white">
                 -{{ discountPercent }}%
               </span>
-              <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-sm font-bold text-emerald-300">
+              <span
+                class="rounded-full border px-3 py-1 text-sm font-bold"
+                :class="isAvailable ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-red-400/30 bg-red-500/10 text-red-200'"
+              >
                 {{ isAvailable ? t('shop.inStock') : t('shop.outOfStock') }}
               </span>
             </div>
@@ -108,44 +111,46 @@
 
           <p class="max-w-2xl text-lg leading-8 text-neutral-400">{{ product.description }}</p>
 
-          <div v-if="product.product_colors?.length" class="space-y-4">
+          <div v-if="displayColorOptions.length" class="space-y-4">
             <div class="flex items-center justify-between">
               <h3 class="text-lg font-black">{{ t('shop.color') }}</h3>
-              <span class="text-neutral-400">{{ selectedColor?.name }}</span>
+              <span class="text-neutral-400">{{ selectedColor?.name || t('shop.selectColorRequired') }}</span>
             </div>
 
             <div class="flex flex-wrap gap-3">
               <button
-                v-for="color in product.product_colors"
+                v-for="color in displayColorOptions"
                 :key="color.id"
-                class="flex h-12 w-12 items-center justify-center rounded-full border-2 transition duration-300 hover:-translate-y-0.5 hover:scale-105"
-                :class="selectedColor?.id === color.id ? 'border-[#CF1D1D] bg-white/10 shadow-[0_0_0_4px_rgba(207,29,29,0.14)]' : 'border-white/15 hover:border-[#CF1D1D]/70'"
+                :disabled="color.soldOut"
+                class="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 transition duration-300 disabled:cursor-not-allowed disabled:opacity-45"
+                :class="selectedColor?.id === color.id ? 'border-[#CF1D1D] bg-white/10 shadow-[0_0_0_4px_rgba(207,29,29,0.14)]' : color.soldOut ? 'border-white/5 bg-white/[0.02]' : 'border-white/15 hover:-translate-y-0.5 hover:scale-105 hover:border-[#CF1D1D]/70'"
                 :aria-label="t('shop.selectColor', { color: color.name })"
                 @click="changeColor(color)"
               >
                 <span class="h-8 w-8 rounded-full border border-white/20" :style="{ backgroundColor: colorValue(color) }" />
+                <span v-if="color.soldOut" class="absolute h-px w-12 rotate-45 bg-white/60" />
               </button>
             </div>
           </div>
 
-          <div v-if="product.product_sizes?.length" class="space-y-4">
+          <div v-if="displaySizeOptions.length" class="space-y-4">
             <h3 class="text-lg font-black">{{ t('shop.size') }}</h3>
             <div class="flex flex-wrap gap-3">
               <button
-                v-for="size in product.product_sizes"
+                v-for="size in displaySizeOptions"
                 :key="size.id"
-                :disabled="!size.in_stock"
+                :disabled="size.soldOut"
                 class="min-h-12 min-w-[74px] rounded-xl border px-5 py-3 font-black transition duration-200 disabled:cursor-not-allowed"
                 :class="
-                  selectedSize === size.size
+                  selectedSize === size.label
                     ? 'border-[#CF1D1D] bg-[#CF1D1D] text-white shadow-[0_14px_34px_rgba(207,29,29,0.22)]'
-                    : size.in_stock
+                    : !size.soldOut
                       ? 'border-white/10 bg-white/[0.03] hover:-translate-y-0.5 hover:border-[#CF1D1D]'
                       : 'border-white/5 bg-white/[0.02] text-neutral-600 line-through'
                 "
-                @click="selectedSize = size.size"
+                @click="changeSize(size)"
               >
-                {{ size.size }}
+                {{ size.label }}
               </button>
             </div>
           </div>
@@ -157,7 +162,7 @@
                 <Icon name="i-heroicons-minus" />
               </button>
               <span class="flex h-12 min-w-16 items-center justify-center border-x border-white/10 font-black">{{ quantity }}</span>
-              <button class="flex h-12 w-12 items-center justify-center text-xl transition hover:bg-white/10 active:scale-95" :aria-label="t('cart.increaseQuantity')" @click="quantity++">
+              <button class="flex h-12 w-12 items-center justify-center text-xl transition hover:bg-white/10 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40" :disabled="isVariantProduct && selectedVariant && quantity >= Number(selectedVariant.stock_quantity || 0)" :aria-label="t('cart.increaseQuantity')" @click="quantity++">
                 <Icon name="i-heroicons-plus" />
               </button>
             </div>
@@ -180,6 +185,9 @@
               <Icon :name="wishlistStore.isFavorite(product.id) ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'" />
             </button>
           </div>
+          <p v-if="purchaseError" class="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            {{ purchaseError }}
+          </p>
 
           <div class="grid grid-cols-2 gap-3 border-t border-white/10 pt-7">
             <div v-for="feature in trustFeatures" :key="feature.titleKey" class="rounded-xl border border-white/10 bg-white/[0.03] p-4 transition duration-300 hover:-translate-y-0.5 hover:border-[#CF1D1D]/55">
@@ -373,7 +381,7 @@
     <div class="grid grid-cols-[auto_1fr_1fr] items-center gap-2">
       <div class="pr-1">
         <p class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-neutral-500">{{ t('common.price') }}</p>
-        <p class="text-lg font-black text-white">{{ formatStorePrice(product.price, locale) }}</p>
+        <p class="text-lg font-black text-white">{{ displayPriceText }}</p>
       </div>
       <button class="premium-button premium-button-secondary min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || buyLoading" @click="handleBuyNow">{{ t('shop.buyNow') }}</button>
       <button class="premium-button premium-button-primary min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || addLoading" @click="handleAddToCart">{{ t('shop.addToCart') }}</button>
@@ -396,7 +404,18 @@ import { useProductsStore } from "../../stores/products";
 import { useWishlistStore } from "../../stores/wishlist";
 import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
 import { getPublicSupabaseClient } from "../../utils/publicSupabase";
-import { SHOP_PRODUCTS_SELECT } from "../../utils/shopProducts";
+import { SHOP_PRODUCT_DETAIL_SELECT } from "../../utils/shopProducts";
+import {
+  buildVariantSelectionState,
+  getVariantGalleryImages,
+  getInitialVariantSelection,
+  getVariantPriceState,
+  getVariantSelectionErrorKey,
+  isLegacyInventoryProduct,
+  resolveSelectedVariant,
+  type VariantColorOption,
+  type VariantSizeOption,
+} from "../../utils/storefrontProductVariants";
 import {
   buildBreadcrumbStructuredData,
   buildCanonicalUrl,
@@ -458,6 +477,7 @@ const recentlyViewed = ref<any[]>([]);
 const selectedColor = ref<any>(null);
 const selectedImage = ref("");
 const selectedSize = ref("");
+const purchaseError = ref("");
 const quantity = ref(1);
 const loading = ref(true);
 const activeTab = ref("description");
@@ -478,8 +498,9 @@ const seoSupabase = getPublicSupabaseClient(
 const { data: initialProduct } = await useAsyncData(`shop-product-seo-${slug}`, async () => {
   const { data, error } = await seoSupabase
     .from("products")
-    .select(SHOP_PRODUCTS_SELECT)
+    .select(SHOP_PRODUCT_DETAIL_SELECT)
     .eq("slug", slug)
+    .eq("product_variants.is_active", true)
     .single();
 
   if (error) return null;
@@ -524,14 +545,119 @@ const tabs = [
 ];
 
 const galleryImages = computed(() => {
+  if (isVariantProduct.value) {
+    return getVariantGalleryImages(product.value, variantState.value, selectedColor.value?.id);
+  }
+
   const images = selectedColor.value?.product_images?.map((image: any) => image.image_url).filter(Boolean) || [];
   return images.length ? images : [product.value?.cover_image || product.value?.image].filter(Boolean);
 });
 
 const oldPrice = computed(() => product.value?.old_price || product.value?.oldPrice || null);
 const brandName = computed(() => product.value?.brand?.name || product.value?.brands?.name || product.value?.brand_name || product.value?.brand || "");
-const isAvailable = computed(() => !product.value?.product_sizes?.length || product.value.product_sizes.some((size: any) => size.in_stock));
-const canPurchase = computed(() => Boolean(product.value && selectedSize.value && isAvailable.value));
+const isVariantProduct = computed(() => Boolean(product.value && !isLegacyInventoryProduct(product.value)));
+const variantState = computed(() => buildVariantSelectionState(product.value));
+const displayColorOptions = computed(() => {
+  if (isVariantProduct.value) return variantState.value.colors;
+
+  return (product.value?.product_colors || []).map((color: any) => ({
+    ...color,
+    soldOut: false,
+  }));
+});
+const displaySizeOptions = computed(() => {
+  if (isVariantProduct.value) {
+    if (variantState.value.mode === "color_size") {
+      return selectedColor.value?.id ? variantState.value.sizesForColor(selectedColor.value.id) : [];
+    }
+
+    return variantState.value.sizes;
+  }
+
+  return (product.value?.product_sizes || []).map((size: any) => ({
+    id: size.id,
+    label: size.size,
+    soldOut: !size.in_stock,
+  }));
+});
+const selectedSizeOption = computed(() =>
+  displaySizeOptions.value.find((size: VariantSizeOption) => size.label === selectedSize.value) || null,
+);
+const selectedVariant = computed(() =>
+  isVariantProduct.value
+    ? resolveSelectedVariant(variantState.value, {
+      colorId: selectedColor.value?.id ?? null,
+      sizeId: selectedSizeOption.value?.id ?? null,
+    })
+    : null,
+);
+const variantSelectionErrorKey = computed(() =>
+  isVariantProduct.value
+    ? getVariantSelectionErrorKey(variantState.value, {
+      colorId: selectedColor.value?.id ?? null,
+      sizeId: selectedSizeOption.value?.id ?? null,
+    })
+    : "",
+);
+const displayPriceState = computed(() =>
+  isVariantProduct.value
+    ? getVariantPriceState(variantState.value, {
+      colorId: selectedColor.value?.id ?? null,
+      sizeId: selectedSizeOption.value?.id ?? null,
+    })
+    : { type: "selected" as const, price: Number(product.value?.price || 0) },
+);
+const displayPriceText = computed(() => {
+  const formatted = formatStorePrice(displayPriceState.value.price, locale.value);
+  return displayPriceState.value.type === "from"
+    ? t("shop.fromPrice", { price: formatted })
+    : formatted;
+});
+const isAvailable = computed(() =>
+  isVariantProduct.value
+    ? variantState.value.hasAvailableStock
+    : (!product.value?.product_sizes?.length || product.value.product_sizes.some((size: any) => size.in_stock)),
+);
+const canPurchase = computed(() =>
+  isVariantProduct.value
+    ? Boolean(product.value && !variantSelectionErrorKey.value)
+    : Boolean(product.value && selectedSize.value && isAvailable.value),
+);
+
+const initializeProductSelection = () => {
+  if (!product.value) return;
+
+  if (isVariantProduct.value) {
+    const selection = getInitialVariantSelection(variantState.value);
+    selectedColor.value = selection.color;
+    selectedSize.value = selection.size?.label || "";
+    const images = getVariantGalleryImages(product.value, variantState.value, selection.color?.id);
+    selectedImage.value = images[0] || product.value.cover_image || product.value.image;
+    return;
+  }
+
+  if (product.value.product_colors?.length) {
+    selectedColor.value = product.value.product_colors[0];
+    selectedImage.value = selectedColor.value.product_images?.[0]?.image_url || product.value.cover_image || product.value.image;
+  } else {
+    selectedImage.value = product.value.cover_image || product.value.image;
+  }
+
+  if (product.value.product_sizes?.length) {
+    selectedSize.value = product.value.product_sizes.find((size: any) => size.in_stock)?.size || "";
+  }
+};
+
+watch(product, initializeProductSelection, { immediate: true });
+
+watch(selectedVariant, (variant) => {
+  if (!variant) return;
+
+  const stock = Number(variant.stock_quantity || 0);
+  if (stock > 0 && quantity.value > stock) {
+    quantity.value = stock;
+  }
+});
 const discountPercent = computed(() => {
   if (!oldPrice.value || !product.value?.price) return 0;
 
@@ -621,17 +747,7 @@ onMounted(async () => {
     product.value ||= await productsStore.getProductBySlug(slug);
 
     if (!product.value) return;
-
-    if (product.value.product_colors?.length) {
-      selectedColor.value = product.value.product_colors[0];
-      selectedImage.value = selectedColor.value.product_images?.[0]?.image_url || product.value.cover_image || product.value.image;
-    } else {
-      selectedImage.value = product.value.cover_image || product.value.image;
-    }
-
-    if (product.value.product_sizes?.length) {
-      selectedSize.value = product.value.product_sizes.find((size: any) => size.in_stock)?.size || "";
-    }
+    initializeProductSelection();
 
     if (product.value.categories) {
       relatedProducts.value = await productsStore.getRelatedProducts(product.value.category_id, product.value.id);
@@ -822,9 +938,27 @@ const formatReviewDate = (value: string) =>
     year: "numeric",
   }).format(new Date(value));
 
-const changeColor = (color: any) => {
+const changeColor = (color: VariantColorOption | any) => {
+  if (color.soldOut) return;
+
   selectedColor.value = color;
-  selectedImage.value = color.product_images?.[0]?.image_url || product.value.cover_image || product.value.image;
+  purchaseError.value = "";
+
+  if (isVariantProduct.value) {
+    selectedSize.value = variantState.value.firstAvailableSizeForColor(color.id)?.label || "";
+  }
+
+  const images = isVariantProduct.value
+    ? getVariantGalleryImages(product.value, variantState.value, color.id)
+    : color.product_images?.map((image: any) => image.image_url).filter(Boolean) || [];
+  selectedImage.value = images[0] || product.value.cover_image || product.value.image;
+};
+
+const changeSize = (size: VariantSizeOption) => {
+  if (size.soldOut) return;
+
+  selectedSize.value = size.label;
+  purchaseError.value = "";
 };
 
 const selectImage = (index: number) => {
@@ -894,10 +1028,17 @@ const decreaseQty = () => {
 };
 
 const handleAddToCart = () => {
-  if (!product.value || !selectedSize.value) return;
+  if (!product.value) return;
+
+  if (isVariantProduct.value && variantSelectionErrorKey.value) {
+    purchaseError.value = t(variantSelectionErrorKey.value);
+    return;
+  }
+
+  if (!isVariantProduct.value && !selectedSize.value) return;
 
   addLoading.value = true;
-  cartStore.addToCart(product.value, selectedColor.value, selectedSize.value, quantity.value, selectedImage.value);
+  cartStore.addToCart(product.value, selectedColor.value, selectedSize.value || t("shop.default"), quantity.value, selectedImage.value, selectedVariant.value);
   cartStore.openCart();
   window.setTimeout(() => {
     addLoading.value = false;
@@ -905,10 +1046,17 @@ const handleAddToCart = () => {
 };
 
 const handleBuyNow = () => {
-  if (!product.value || !selectedSize.value) return;
+  if (!product.value) return;
+
+  if (isVariantProduct.value && variantSelectionErrorKey.value) {
+    purchaseError.value = t(variantSelectionErrorKey.value);
+    return;
+  }
+
+  if (!isVariantProduct.value && !selectedSize.value) return;
 
   buyLoading.value = true;
-  cartStore.addToCart(product.value, selectedColor.value, selectedSize.value, quantity.value, selectedImage.value);
+  cartStore.addToCart(product.value, selectedColor.value, selectedSize.value || t("shop.default"), quantity.value, selectedImage.value, selectedVariant.value);
   router.push("/checkout");
 };
 

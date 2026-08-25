@@ -1,4 +1,4 @@
-export const SHOP_DEFAULT_MAX_PRICE = 25000;
+export const SHOP_DEFAULT_MAX_PRICE = 10000;
 
 export const SHOP_PRODUCTS_SELECT = `
   *,
@@ -8,6 +8,11 @@ export const SHOP_PRODUCTS_SELECT = `
     product_images(*)
   ),
   product_sizes(*)
+`;
+
+export const SHOP_PRODUCT_DETAIL_SELECT = `
+  ${SHOP_PRODUCTS_SELECT},
+  product_variants(*)
 `;
 
 export const isWithinShopPriceLimit = (

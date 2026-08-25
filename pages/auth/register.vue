@@ -25,11 +25,11 @@
           </p>
 
           <h1 class="text-5xl font-black leading-tight text-white">
-            {{ t('auth.joinCommunity') }}
+            {{ t("auth.joinCommunity") }}
           </h1>
 
           <p class="mt-5 text-lg leading-relaxed text-gray-300">
-            {{ t('auth.registerLead') }}
+            {{ t("auth.registerLead") }}
           </p>
         </div>
       </div>
@@ -37,9 +37,11 @@
       <!-- RIGHT -->
       <div class="p-6 md:p-10">
         <div class="mx-auto max-w-xl">
-          <h2 class="text-4xl font-black text-white">{{ t('auth.register') }}</h2>
+          <h2 class="text-4xl font-black text-white">
+            {{ t("auth.register") }}
+          </h2>
 
-          <p class="mt-3 text-gray-400">{{ t('auth.createToContinue') }}</p>
+          <p class="mt-3 text-gray-400">{{ t("auth.createToContinue") }}</p>
 
           <form class="mt-10 space-y-5" @submit.prevent="handleRegister">
             <!-- Avatar -->
@@ -58,7 +60,7 @@
                 <label
                   class="inline-flex cursor-pointer items-center rounded-2xl bg-[#CF1D1D] px-5 py-3 font-bold text-white"
                 >
-                  {{ t('auth.uploadAvatar') }}
+                  {{ t("auth.uploadAvatar") }}
 
                   <input
                     type="file"
@@ -103,11 +105,11 @@
                 class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               >
-                <option value="">{{ t('auth.selectGender') }}</option>
+                <option value="">{{ t("auth.selectGender") }}</option>
 
-                <option value="Male">{{ t('auth.male') }}</option>
+                <option value="Male">{{ t("auth.male") }}</option>
 
-                <option value="Female">{{ t('auth.female') }}</option>
+                <option value="Female">{{ t("auth.female") }}</option>
               </select>
             </div>
 
@@ -169,7 +171,7 @@
                 @click="showPassword = !showPassword"
                 class="absolute right-5 top-1/2 -translate-y-1/2 text-sm text-gray-400"
               >
-                {{ showPassword ? t('auth.hide') : t('auth.show') }}
+                {{ showPassword ? t("auth.hide") : t("auth.show") }}
               </button>
             </div>
             <!-- Confirm Password -->
@@ -196,17 +198,17 @@
               :disabled="loading"
               class="h-14 w-full rounded-2xl bg-[#CF1D1D] text-lg font-bold text-white transition hover:opacity-90 disabled:opacity-50"
             >
-              {{ loading ? t('auth.creating') : t('auth.createAccount') }}
+              {{ loading ? t("auth.creating") : t("auth.createAccount") }}
             </button>
             <!-- Login -->
             <p class="text-center text-gray-400">
-              {{ t('auth.alreadyHaveAccount') }}
+              {{ t("auth.alreadyHaveAccount") }}
 
               <NuxtLink
                 to="/auth/login"
                 class="font-bold text-white hover:text-[#CF1D1D]"
               >
-                {{ t('auth.login') }}
+                {{ t("auth.login") }}
               </NuxtLink>
             </p>
           </form>
@@ -233,9 +235,7 @@ const showPassword = ref(false);
 const loading = ref(false);
 const error = ref("");
 
-const avatarPreview = ref(
-  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=300&auto=format&fit=crop",
-);
+const avatarPreview = ref("https://i.postimg.cc/ryHfSRKB/logo2.png");
 
 const avatarFile = ref<File | null>(null);
 const errorMessage = ref("");
@@ -342,7 +342,10 @@ const handleRegister = async () => {
       password: form.value.password,
     });
 
-    localStorage.setItem("pending_profile", JSON.stringify(buildPendingRegistrationProfile(form.value)));
+    localStorage.setItem(
+      "pending_profile",
+      JSON.stringify(buildPendingRegistrationProfile(form.value)),
+    );
     localStorage.setItem("verify_email", form.value.email);
 
     await router.push("/auth/verify-email");

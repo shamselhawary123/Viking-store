@@ -94,12 +94,21 @@
                 <span v-if="product.old_price" class="ml-2 text-gray-500 line-through">{{ formatProductPrice(product.old_price) }}</span>
               </td>
               <td class="px-5 py-4 text-gray-300">
-                <span v-if="product.product_sizes">{{ inStockCount(product) }} / {{ product.product_sizes.length }}</span>
+                <span v-if="isVariantProduct(product)">
+                  {{ t("admin.variantsCount", { count: variantSummary(product).variantCount }) }}
+                </span>
+                <span v-else-if="product.product_sizes">{{ inStockCount(product) }} / {{ product.product_sizes.length }}</span>
                 <span v-else>-</span>
               </td>
               <td class="px-5 py-4">
                 <span
-                  v-if="product.product_sizes"
+                  v-if="isVariantProduct(product)"
+                  class="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-black text-gray-200"
+                >
+                  {{ t("admin.totalUnits", { count: variantSummary(product).totalStock }) }}
+                </span>
+                <span
+                  v-else-if="product.product_sizes"
                   class="rounded-full border px-3 py-1 text-xs font-black"
                   :class="inStockCount(product) ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-red-400/30 bg-red-400/10 text-red-300'"
                 >
@@ -178,7 +187,7 @@
             <div class="rounded-xl border border-white/10 bg-[#111111] p-3">
               <p class="text-xs text-gray-500">{{ t("common.status") }}</p>
               <p class="mt-1 font-bold text-gray-200">
-                {{ product.product_sizes ? (inStockCount(product) ? t("admin.inStock") : t("admin.outOfStock")) : t("admin.orderOnly") }}
+                {{ isVariantProduct(product) ? t("admin.totalUnits", { count: variantSummary(product).totalStock }) : product.product_sizes ? (inStockCount(product) ? t("admin.inStock") : t("admin.outOfStock")) : t("admin.orderOnly") }}
               </p>
             </div>
           </div>
@@ -227,9 +236,9 @@
       <p v-else-if="!filteredProducts.length" class="p-6 text-sm text-gray-500">{{ t("admin.noProducts") }}</p>
     </div>
 
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <form class="max-h-[calc(100dvh-1rem)] w-full max-w-5xl overflow-y-auto rounded-2xl border border-white/10 bg-[#111111] p-4 sm:rounded-3xl sm:p-6" @submit.prevent="saveProduct">
-        <div class="flex items-center justify-between gap-4">
+    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4">
+      <form class="flex max-h-[calc(100dvh-1rem)] w-full max-w-[92rem] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111111] sm:rounded-3xl" @submit.prevent="saveProduct">
+        <div class="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 p-4 sm:p-6">
           <div>
             <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ editingId ? t("admin.editProduct") : t("admin.createProduct") }}</p>
             <h3 class="mt-2 text-2xl font-black">{{ form.name || t("admin.productDetails") }}</h3>
@@ -237,8 +246,8 @@
           <button type="button" class="text-gray-400 hover:text-white" @click="closeModal">{{ t("admin.modalClose") }}</button>
         </div>
 
-        <div class="mt-6 grid gap-5 lg:grid-cols-[1fr_0.9fr]">
-          <div class="space-y-5">
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6">
+          <div class="mx-auto w-full max-w-[84rem] space-y-5">
             <section class="rounded-2xl border border-white/10 bg-black p-5">
               <h4 class="font-black">{{ t("common.product") }}</h4>
               <div class="mt-4 grid gap-4 md:grid-cols-2">
@@ -252,11 +261,18 @@
                 </label>
                 <label class="block">
                   <span class="field-label">{{ t("common.price") }} (EGP)</span>
-                  <input v-model.number="form.price" required type="number" min="0" step="0.01" class="field mt-2" />
+                  <input v-if="!isVariantEditor" v-model.number="form.price" required type="number" min="0" step="0.01" class="field mt-2" />
+                  <p v-else class="mt-2 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-gray-400">
+                    {{ t("admin.variantPriceSyncHint") }}
+                  </p>
                 </label>
                 <label class="block">
                   <span class="field-label">{{ t("admin.oldPrice") }}</span>
                   <input v-model.number="form.old_price" type="number" min="0" step="0.01" class="field mt-2" />
+                </label>
+                <label class="block">
+                  <span class="field-label">{{ t("admin.badge") }}</span>
+                  <input v-model="form.badge" class="field mt-2" />
                 </label>
                 <label class="block md:col-span-2">
                   <span class="field-label">{{ t("common.category") }}</span>
@@ -269,86 +285,196 @@
                   <span class="field-label">{{ t("admin.description") }}</span>
                   <textarea v-model="form.description" rows="4" class="field mt-2" />
                 </label>
+                <label class="block md:col-span-2">
+                  <span class="field-label">{{ t("admin.coverImage") }}</span>
+                  <input v-model="form.cover_image" class="field mt-2" />
+                </label>
               </div>
             </section>
 
-            <section class="rounded-2xl border border-white/10 bg-black p-5">
-              <div class="flex items-center justify-between gap-3">
-                <h4 class="font-black">{{ t("admin.sizes") }}</h4>
-                <button type="button" class="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]" @click="addSize">
-                  {{ t("admin.addSize") }}
-                </button>
-              </div>
-              <div class="mt-4 space-y-3">
-                <div v-for="(size, index) in sizes" :key="size.key" class="grid gap-3 md:grid-cols-[1fr_auto_auto] md:items-center">
-                  <input v-model="size.size" :placeholder="t('admin.sizePlaceholder')" class="field" />
-                  <label class="flex items-center gap-2 text-sm font-bold text-gray-300">
-                    <input v-model="size.in_stock" type="checkbox" class="h-4 w-4 accent-[#FF4D00]" />
-                    {{ t("admin.inStock") }}
-                  </label>
-                  <button type="button" class="rounded-xl border border-red-500/40 px-3 py-2 text-sm font-bold text-red-300" @click="removeSize(index)">
-                    {{ t("common.remove") }}
+            <div v-if="!isVariantEditor" class="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              <section class="rounded-2xl border border-white/10 bg-black p-5">
+                <div class="flex items-center justify-between gap-3">
+                  <h4 class="font-black">{{ t("admin.sizes") }}</h4>
+                  <button type="button" class="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]" @click="addSize">
+                    {{ t("admin.addSize") }}
                   </button>
                 </div>
-                <p v-if="!sizes.length" class="text-sm text-gray-500">{{ t("admin.noSizes") }}</p>
-              </div>
-            </section>
-          </div>
+                <div class="mt-4 space-y-3">
+                  <div v-for="(size, index) in sizes" :key="size.key" class="grid gap-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+                    <input v-model="size.size" :placeholder="t('admin.sizePlaceholder')" class="field" />
+                    <label class="flex items-center gap-2 text-sm font-bold text-gray-300">
+                      <input v-model="size.in_stock" type="checkbox" class="h-4 w-4 accent-[#FF4D00]" />
+                      {{ t("admin.inStock") }}
+                    </label>
+                    <button type="button" class="rounded-xl border border-red-500/40 px-3 py-2 text-sm font-bold text-red-300" @click="removeSize(index)">
+                      {{ t("common.remove") }}
+                    </button>
+                  </div>
+                  <p v-if="!sizes.length" class="text-sm text-gray-500">{{ t("admin.noSizes") }}</p>
+                </div>
+              </section>
 
-          <section class="rounded-2xl border border-white/10 bg-black p-5">
-            <div class="flex items-center justify-between gap-3">
-              <h4 class="font-black">{{ t("admin.colorsImages") }}</h4>
-              <button type="button" class="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]" @click="addColor">
-                {{ t("admin.addColor") }}
-              </button>
-            </div>
-
-            <div class="mt-4 space-y-4">
-              <div v-for="(color, colorIndex) in colors" :key="color.key" class="rounded-2xl border border-white/10 bg-[#111111] p-4">
-                <div class="grid gap-3 md:grid-cols-[1fr_8rem_auto] md:items-end">
-                  <label class="block">
-                    <span class="field-label">{{ t("admin.colorName") }}</span>
-                    <input v-model="color.name" :placeholder="t('admin.colorPlaceholder')" class="field mt-2" />
-                  </label>
-                  <label class="block">
-                    <span class="field-label">{{ t("admin.colorValue") }}</span>
-                    <input v-model="color.value" type="color" class="mt-2 h-12 w-full rounded-xl border border-white/10 bg-black p-1" />
-                  </label>
-                  <button type="button" class="rounded-xl border border-red-500/40 px-3 py-2 text-sm font-bold text-red-300" @click="removeColor(colorIndex)">
-                    {{ t("common.remove") }}
+              <section class="rounded-2xl border border-white/10 bg-black p-5">
+                <div class="flex items-center justify-between gap-3">
+                  <h4 class="font-black">{{ t("admin.colorsImages") }}</h4>
+                  <button type="button" class="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]" @click="addColor">
+                    {{ t("admin.addColor") }}
                   </button>
                 </div>
 
-                <div class="mt-4">
-                  <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]">
-                    {{ t("admin.selectImages") }}
-                    <input type="file" accept="image/*" multiple class="hidden" @change="selectImages(colorIndex, $event)" />
-                  </label>
-                  <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    <div v-for="(image, imageIndex) in color.images" :key="image.key" class="relative overflow-hidden rounded-xl border border-white/10">
-                      <button type="button" class="absolute right-2 top-2 z-10 rounded-lg bg-black/80 px-2 py-1 text-xs font-bold text-red-300" @click="removeImage(colorIndex, imageIndex)">
+                <div class="mt-4 space-y-4">
+                  <div v-for="(color, colorIndex) in colors" :key="color.key" class="rounded-2xl border border-white/10 bg-[#111111] p-4">
+                    <div class="grid gap-3 md:grid-cols-[1fr_8rem_auto] md:items-end">
+                      <label class="block">
+                        <span class="field-label">{{ t("admin.colorName") }}</span>
+                        <input v-model="color.name" :placeholder="t('admin.colorPlaceholder')" class="field mt-2" />
+                      </label>
+                      <label class="block">
+                        <span class="field-label">{{ t("admin.colorValue") }}</span>
+                        <input v-model="color.value" type="color" class="mt-2 h-12 w-full rounded-xl border border-white/10 bg-black p-1" />
+                      </label>
+                      <button type="button" class="rounded-xl border border-red-500/40 px-3 py-2 text-sm font-bold text-red-300" @click="removeColor(colorIndex)">
                         {{ t("common.remove") }}
                       </button>
-                      <button type="button" class="absolute bottom-2 left-2 z-10 rounded-lg bg-black/80 px-2 py-1 text-xs font-bold text-white" @click="form.cover_image = image.preview">
-                        {{ t("admin.main") }}
+                    </div>
+
+                    <div class="mt-4">
+                      <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]">
+                        {{ t("admin.selectImages") }}
+                        <input type="file" accept="image/*" multiple class="hidden" @change="selectImages(colorIndex, $event)" />
+                      </label>
+                      <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        <div v-for="(image, imageIndex) in color.images" :key="image.key" class="relative overflow-hidden rounded-xl border border-white/10">
+                          <button type="button" class="absolute right-2 top-2 z-10 rounded-lg bg-black/80 px-2 py-1 text-xs font-bold text-red-300" @click="removeImage(colorIndex, imageIndex)">
+                            {{ t("common.remove") }}
+                          </button>
+                          <button type="button" class="absolute bottom-2 left-2 z-10 rounded-lg bg-black/80 px-2 py-1 text-xs font-bold text-white" @click="form.cover_image = image.preview">
+                            {{ t("admin.main") }}
+                          </button>
+                          <img :src="image.preview" alt="" class="h-28 w-full object-cover" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <p v-if="!colors.length" class="text-sm text-gray-500">{{ t("admin.noColors") }}</p>
+                </div>
+              </section>
+            </div>
+
+            <section v-else class="rounded-2xl border border-white/10 bg-black p-5 lg:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <h4 class="font-black">{{ t("admin.variantInventory") }}</h4>
+                  <p class="mt-1 text-sm leading-6 text-gray-500">{{ t("admin.variantEditorHint") }}</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" class="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]" @click="addVariantColor">
+                    {{ t("admin.addColor") }}
+                  </button>
+                  <button type="button" class="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]" @click="addStandaloneVariant">
+                    {{ t("admin.addVariant") }}
+                  </button>
+                  <button type="button" class="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]" @click="addSimpleVariant">
+                    {{ t("admin.addSimpleVariant") }}
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-5 space-y-5">
+                <div class="admin-variant-card rounded-2xl border border-white/10 bg-[#111111] p-4 lg:p-6">
+                  <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <h5 class="font-black">{{ t("admin.sizeOnlySimpleVariants") }}</h5>
+                    <span class="text-xs text-gray-500">{{ t("admin.noColorVariantHint") }}</span>
+                  </div>
+
+                  <div class="mt-4 space-y-3">
+                    <div v-for="variant in standaloneVariantRows" :key="variant.key" class="grid gap-3 lg:grid-cols-[minmax(10rem,1fr)_10rem_10rem_8rem_auto] lg:items-center">
+                      <input v-model="variant.size" :placeholder="t('admin.optionalSizePlaceholder')" class="field" />
+                      <input v-model.number="variant.price" type="number" min="0" step="0.01" :placeholder="t('admin.variantPrice')" class="field" />
+                      <input v-model.number="variant.stock_quantity" type="number" min="0" step="1" :placeholder="t('admin.stockQuantity')" class="field" />
+                      <label class="flex min-h-12 items-center gap-2 rounded-xl border border-white/10 px-3 text-sm font-bold text-gray-300">
+                        <input v-model="variant.is_active" type="checkbox" class="h-4 w-4 accent-[#FF4D00]" />
+                        {{ t("admin.active") }}
+                      </label>
+                      <button type="button" class="rounded-xl border border-red-500/40 px-3 py-2 text-sm font-bold text-red-300" @click="removeVariant(variant)">
+                        {{ t("common.remove") }}
                       </button>
-                      <img :src="image.preview" alt="" class="h-28 w-full object-cover" />
+                    </div>
+                    <p v-if="!standaloneVariantRows.length" class="text-sm text-gray-500">{{ t("admin.noStandaloneVariants") }}</p>
+                  </div>
+                </div>
+
+                <div v-for="(color, colorIndex) in colors" :key="color.key" class="admin-variant-card rounded-2xl border border-white/10 bg-[#111111] p-4 lg:p-6">
+                  <div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_10rem_auto] lg:items-end">
+                    <label class="block">
+                      <span class="field-label">{{ t("admin.colorName") }}</span>
+                      <input v-model="color.name" :placeholder="t('admin.colorPlaceholder')" class="field mt-2" />
+                    </label>
+                    <label class="block">
+                      <span class="field-label">{{ t("admin.colorValue") }}</span>
+                      <input v-model="color.value" type="color" class="mt-2 h-12 w-full rounded-xl border border-white/10 bg-black p-1" />
+                    </label>
+                    <button type="button" class="rounded-xl border border-red-500/40 px-3 py-2 text-sm font-bold text-red-300" @click="removeVariantColor(colorIndex)">
+                      {{ t("common.remove") }}
+                    </button>
+                  </div>
+
+                  <div class="mt-5 rounded-2xl border border-white/10 bg-black/60 p-4">
+                    <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]">
+                      {{ t("admin.selectImages") }}
+                      <input type="file" accept="image/*" multiple class="hidden" @change="selectImages(colorIndex, $event)" />
+                    </label>
+                    <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                      <div v-for="(image, imageIndex) in color.images" :key="image.key" class="relative overflow-hidden rounded-xl border border-white/10">
+                        <button type="button" class="absolute right-2 top-2 z-10 rounded-lg bg-black/80 px-2 py-1 text-xs font-bold text-red-300" @click="removeImage(colorIndex, imageIndex)">
+                          {{ t("common.remove") }}
+                        </button>
+                        <button type="button" class="absolute bottom-2 left-2 z-10 rounded-lg bg-black/80 px-2 py-1 text-xs font-bold text-white" @click="form.cover_image = image.preview">
+                          {{ t("admin.main") }}
+                        </button>
+                        <img :src="image.preview" alt="" class="h-28 w-full object-cover" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mt-5 rounded-2xl border border-white/10 bg-black/60 p-4">
+                    <div class="flex items-center justify-between gap-3">
+                      <h5 class="font-black">{{ t("admin.variants") }}</h5>
+                      <button type="button" class="rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]" @click="addColorVariant(color)">
+                        {{ t("admin.addSize") }}
+                      </button>
+                    </div>
+                    <div class="mt-3 space-y-3">
+                      <div v-for="variant in colorVariantRows(color)" :key="variant.key" class="grid gap-3 lg:grid-cols-[minmax(10rem,1fr)_10rem_10rem_8rem_auto] lg:items-center">
+                        <input v-model="variant.size" :placeholder="t('admin.optionalSizePlaceholder')" class="field" />
+                        <input v-model.number="variant.price" type="number" min="0" step="0.01" :placeholder="t('admin.variantPrice')" class="field" />
+                        <input v-model.number="variant.stock_quantity" type="number" min="0" step="1" :placeholder="t('admin.stockQuantity')" class="field" />
+                        <label class="flex min-h-12 items-center gap-2 rounded-xl border border-white/10 px-3 text-sm font-bold text-gray-300">
+                          <input v-model="variant.is_active" type="checkbox" class="h-4 w-4 accent-[#FF4D00]" />
+                          {{ t("admin.active") }}
+                        </label>
+                        <button type="button" class="rounded-xl border border-red-500/40 px-3 py-2 text-sm font-bold text-red-300" @click="removeVariant(variant)">
+                          {{ t("common.remove") }}
+                        </button>
+                      </div>
+                      <p v-if="!colorVariantRows(color).length" class="text-sm text-gray-500">{{ t("admin.noColorVariants") }}</p>
                     </div>
                   </div>
                 </div>
               </div>
-              <p v-if="!colors.length" class="text-sm text-gray-500">{{ t("admin.noColors") }}</p>
-            </div>
-          </section>
+            </section>
+
+            <p v-if="saveProgressMessage" class="rounded-xl border border-white/10 bg-white/[0.03] p-3 text-sm font-bold text-gray-200">{{ saveProgressMessage }}</p>
+            <p v-if="successMessage" class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">{{ successMessage }}</p>
+            <p v-if="errorMessage" class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ errorMessage }}</p>
+          </div>
         </div>
 
-        <p v-if="successMessage" class="mt-5 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">{{ successMessage }}</p>
-        <p v-if="errorMessage" class="mt-5 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ errorMessage }}</p>
-
-        <div class="mt-6 flex flex-col justify-end gap-3 sm:flex-row">
+        <div class="sticky bottom-0 flex shrink-0 flex-col justify-end gap-3 border-t border-white/10 bg-[#111111]/95 p-4 backdrop-blur sm:flex-row sm:px-6">
           <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">{{ t("common.cancel") }}</button>
           <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
-            {{ saving ? t("admin.savingProduct") : t("admin.saveProduct") }}
+            {{ saving ? (saveProgressMessage || t("admin.savingProduct")) : t("admin.saveProduct") }}
           </button>
         </div>
       </form>
@@ -370,6 +496,12 @@ import {
   isProductReorderMode,
   sortProductsByShopPosition,
 } from "../../utils/admin";
+import {
+  buildVariantProductRpcPayload,
+  getVariantInventorySummary,
+  validateVariantProduct,
+  type AdminVariantRowInput,
+} from "../../utils/adminProductVariants";
 import type { ProductMoveDirection } from "../../utils/admin";
 
 definePageMeta({
@@ -390,6 +522,7 @@ type ProductImageRow = {
 
 type ProductColorRow = {
   id: number;
+  product_id?: number;
   name: string;
   value?: string;
   product_images?: ProductImageRow[];
@@ -397,8 +530,19 @@ type ProductColorRow = {
 
 type ProductSizeRow = {
   id: number;
+  product_id?: number;
   size: string;
   in_stock: boolean;
+};
+
+type ProductVariantRow = {
+  id: number;
+  product_id: number;
+  color_id?: number | null;
+  size_id?: number | null;
+  price: number;
+  stock_quantity: number;
+  is_active: boolean;
 };
 
 type ProductRow = {
@@ -408,13 +552,16 @@ type ProductRow = {
   description?: string;
   price?: number;
   old_price?: number | null;
+  badge?: string | null;
   cover_image?: string;
   category_id?: number;
   created_at?: string;
   shop_position?: number | null;
+  inventory_model?: "legacy" | "variants" | string | null;
   categories?: { name?: string };
   product_colors?: ProductColorRow[];
   product_sizes?: ProductSizeRow[];
+  product_variants?: ProductVariantRow[];
 };
 
 type SizeForm = {
@@ -440,6 +587,8 @@ type ColorForm = {
   images: ImageForm[];
 };
 
+type VariantForm = AdminVariantRowInput;
+
 const supabase = useSupabase();
 const { t } = useI18n();
 const products = ref<ProductRow[]>([]);
@@ -457,6 +606,7 @@ const limit = ref(12);
 const pageSize = 12;
 const errorMessage = ref("");
 const successMessage = ref("");
+const saveProgressMessage = ref("");
 const movingProductId = ref<number | null>(null);
 const dragSaving = ref(false);
 const draggingProductId = ref<number | null>(null);
@@ -470,6 +620,9 @@ const productTableBody = ref<HTMLElement | null>(null);
 const productCardList = ref<HTMLElement | null>(null);
 const sizes = ref<SizeForm[]>([]);
 const colors = ref<ColorForm[]>([]);
+const variants = ref<VariantForm[]>([]);
+const currentInventoryModel = ref<"legacy" | "variants">("variants");
+const maxVariantImageUploadConcurrency = 3;
 
 const form = ref({
   name: "",
@@ -477,6 +630,7 @@ const form = ref({
   description: "",
   price: 0,
   old_price: null as number | null,
+  badge: "",
   category_id: 0,
   cover_image: "",
 });
@@ -493,6 +647,21 @@ const inStockCount = (product: ProductRow) =>
 
 const firstProductImage = (product: ProductRow) =>
   product.product_colors?.flatMap((color) => color.product_images || [])[0]?.image_url || "";
+
+const isVariantProduct = (product: ProductRow) => product.inventory_model === "variants";
+const variantSummary = (product: ProductRow) => getVariantInventorySummary(product);
+const isVariantEditor = computed(() => currentInventoryModel.value === "variants");
+const activeVariantRows = computed(() =>
+  variants.value.filter((variant) => variant.is_active !== false),
+);
+const standaloneVariantRows = computed(() =>
+  activeVariantRows.value.filter((variant) => !variant.colorKey && !variant.colorId),
+);
+
+const colorVariantRows = (color: ColorForm) =>
+  activeVariantRows.value.filter(
+    (variant) => variant.colorKey === color.key || Boolean(color.id && variant.colorId === color.id),
+  );
 
 const orderedProducts = computed(() => sortProductsByShopPosition(products.value));
 
@@ -624,7 +793,7 @@ const loadData = async () => {
   const [{ data: productsData, error: productsError }, { data: categoriesData, error: categoriesError }] = await Promise.all([
     supabase
       .from("products")
-      .select("*, categories(id, name), product_colors(*, product_images(*)), product_sizes(*)")
+      .select("*, categories(id, name), product_colors(*, product_images(*)), product_sizes(*), product_variants(*)")
       .order("shop_position", { ascending: true, nullsFirst: false })
       .order("id", { ascending: true }),
     supabase.from("categories").select("id, name").order("id"),
@@ -675,11 +844,14 @@ const resetForm = () => {
     description: "",
     price: 0,
     old_price: null,
+    badge: "",
     category_id: categories.value[0]?.id || 0,
     cover_image: "",
   };
   sizes.value = [];
   colors.value = [];
+  variants.value = [];
+  currentInventoryModel.value = "variants";
   editingId.value = null;
   editingProduct.value = null;
   errorMessage.value = "";
@@ -688,23 +860,33 @@ const resetForm = () => {
 
 const openCreate = () => {
   resetForm();
-  addSize();
-  addColor();
+  setupNewVariantEditor();
   modalOpen.value = true;
 };
 
 const openEdit = (product: ProductRow) => {
   editingProduct.value = product;
   editingId.value = product.id;
+  currentInventoryModel.value = isVariantProduct(product) ? "variants" : "legacy";
   form.value = {
     name: product.title,
     slug: product.slug,
     description: product.description || "",
     price: Number(product.price || 0),
     old_price: product.old_price || null,
+    badge: product.badge || "",
     category_id: product.category_id || 0,
     cover_image: product.cover_image || firstProductImage(product),
   };
+
+  if (isVariantProduct(product)) {
+    setupVariantEditor(product);
+    errorMessage.value = "";
+    successMessage.value = "";
+    modalOpen.value = true;
+    return;
+  }
+
   sizes.value = (product.product_sizes || []).map((size) => ({
     key: newKey(),
     id: size.id,
@@ -758,6 +940,106 @@ const addColor = () => {
   });
 };
 
+const createColorForm = () => ({
+  key: newKey(),
+  name: "",
+  value: "#000000",
+  images: [],
+});
+
+const createVariantForm = (input: Partial<VariantForm> = {}): VariantForm => ({
+  key: newKey(),
+  colorKey: null,
+  colorId: null,
+  size: "",
+  price: 0,
+  stock_quantity: 0,
+  is_active: true,
+  ...input,
+});
+
+const addVariantColor = () => {
+  const color = createColorForm();
+  colors.value.push(color);
+  addColorVariant(color);
+};
+
+const addColorVariant = (color: ColorForm) => {
+  variants.value.push(createVariantForm({
+    colorKey: color.key,
+    colorId: color.id || null,
+  }));
+};
+
+const addStandaloneVariant = () => {
+  variants.value.push(createVariantForm());
+};
+
+const addSimpleVariant = () => {
+  colors.value = [];
+  variants.value = [createVariantForm()];
+};
+
+const removeVariant = (variant: VariantForm) => {
+  if (variant.id) {
+    variant.is_active = false;
+    return;
+  }
+
+  variants.value = variants.value.filter((item) => item.key !== variant.key);
+};
+
+const removeVariantColor = (index: number) => {
+  const color = colors.value[index];
+  if (!color) return;
+  color.images.forEach((image) => {
+    if (image.file) URL.revokeObjectURL(image.preview);
+  });
+  variants.value
+    .filter((variant) => variant.colorKey === color.key || Boolean(color.id && variant.colorId === color.id))
+    .forEach(removeVariant);
+  colors.value.splice(index, 1);
+};
+
+const setupNewVariantEditor = () => {
+  currentInventoryModel.value = "variants";
+  colors.value = [];
+  variants.value = [createVariantForm()];
+};
+
+const setupVariantEditor = (product: ProductRow) => {
+  const sizeById = new Map((product.product_sizes || []).map((size) => [size.id, size.size]));
+  colors.value = (product.product_colors || []).map((color) => ({
+    key: newKey(),
+    id: color.id,
+    name: color.name,
+    value: color.value || "#000000",
+    images: (color.product_images || []).map((image) => ({
+      key: newKey(),
+      id: image.id,
+      image_url: image.image_url,
+      preview: image.image_url,
+    })),
+  }));
+  const colorKeyById = new Map(colors.value.filter((color) => color.id).map((color) => [color.id, color.key]));
+  variants.value = (product.product_variants || []).map((variant) =>
+    createVariantForm({
+      id: variant.id,
+      colorId: variant.color_id || null,
+      colorKey: variant.color_id ? colorKeyById.get(variant.color_id) || null : null,
+      sizeId: variant.size_id || null,
+      size: variant.size_id ? sizeById.get(variant.size_id) || "" : "",
+      price: Number(variant.price || 0),
+      stock_quantity: Number(variant.stock_quantity || 0),
+      is_active: variant.is_active !== false,
+    }),
+  );
+
+  if (!variants.value.length) {
+    variants.value = [createVariantForm({ price: Number(product.price || 0) })];
+  }
+};
+
 const removeColor = (index: number) => {
   colors.value[index]?.images.forEach((image) => {
     if (image.file) URL.revokeObjectURL(image.preview);
@@ -796,7 +1078,15 @@ const validateForm = () => {
   if (!form.value.name.trim()) return t("admin.productNameRequired");
   if (!form.value.slug.trim()) return t("admin.productSlugRequired");
   if (!form.value.category_id) return t("admin.categoryRequired");
-  if (Number(form.value.price) < 0) return t("admin.priceInvalid");
+  if (!isVariantEditor.value && Number(form.value.price) < 0) return t("admin.priceInvalid");
+
+  if (isVariantEditor.value) {
+    const variantError = validateVariantProduct({
+      colors: colors.value,
+      variants: variants.value,
+    });
+    if (variantError) return t(variantError);
+  }
 
   const cleanSizes = sizes.value.map((size) => size.size.trim()).filter(Boolean);
   if (new Set(cleanSizes.map((size) => size.toLowerCase())).size !== cleanSizes.length) {
@@ -841,6 +1131,34 @@ const storagePathFromUrl = (url: string) => {
   const index = url.indexOf(marker);
   if (index === -1) return "";
   return decodeURIComponent(url.slice(index + marker.length));
+};
+
+const nowMs = () =>
+  typeof performance !== "undefined" && typeof performance.now === "function"
+    ? performance.now()
+    : Date.now();
+
+const durationMs = (startedAt: number) => Math.round(nowMs() - startedAt);
+
+const logProductSaveMetric = (event: string, details: Record<string, unknown> = {}) => {
+  console.info("[admin-product-save]", event, details);
+};
+
+const runWithConcurrency = async <T>(
+  items: T[],
+  limit: number,
+  worker: (item: T, index: number) => Promise<void>,
+) => {
+  let nextIndex = 0;
+  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
+    while (nextIndex < items.length) {
+      const currentIndex = nextIndex;
+      nextIndex += 1;
+      await worker(items[currentIndex], currentIndex);
+    }
+  });
+
+  await Promise.all(workers);
 };
 
 const removeImageRecord = async (image: ProductImageRow) => {
@@ -922,15 +1240,154 @@ const saveColorsAndImages = async (productId: number) => {
   }
 };
 
+const uploadVariantImages = async () => {
+  const uploadedPaths: string[] = [];
+  const uploadJobs = colors.value.flatMap((color) =>
+    color.images
+      .filter((image) => image.file)
+      .map((image) => ({ image })),
+  );
+  const uploadRequests = uploadJobs.length;
+  let uploadedCount = 0;
+  const stageStartedAt = nowMs();
+
+  logProductSaveMetric("variant image upload stage started", {
+    uploadRequests,
+    maxConcurrency: maxVariantImageUploadConcurrency,
+  });
+
+  if (!uploadRequests) {
+    logProductSaveMetric("variant image upload stage skipped", {
+      uploadRequests,
+      totalDurationMs: durationMs(stageStartedAt),
+    });
+    return uploadedPaths;
+  }
+
+  saveProgressMessage.value = t("admin.uploadingImagesProgress", {
+    uploaded: 0,
+    total: uploadRequests,
+  });
+
+  await runWithConcurrency(uploadJobs, maxVariantImageUploadConcurrency, async ({ image }, index) => {
+    if (!image.file) return;
+
+    const uploadStartedAt = nowMs();
+    const originalPreview = image.preview;
+    const fileName = image.file.name;
+    const path = buildProductImagePath(fileName);
+
+    try {
+      const { error: uploadError } = await supabase.storage.from("products").upload(path, image.file);
+      if (uploadError) throw uploadError;
+      uploadedPaths.push(path);
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("products").getPublicUrl(path);
+
+      image.image_url = publicUrl;
+      image.preview = publicUrl;
+      delete image.file;
+
+      if (form.value.cover_image === originalPreview) {
+        form.value.cover_image = publicUrl;
+      } else if (!form.value.cover_image) {
+        form.value.cover_image = publicUrl;
+      }
+
+      uploadedCount += 1;
+      saveProgressMessage.value = t("admin.uploadingImagesProgress", {
+        uploaded: uploadedCount,
+        total: uploadRequests,
+      });
+      logProductSaveMetric("variant image upload completed", {
+        index: index + 1,
+        uploadRequests,
+        fileName,
+        durationMs: durationMs(uploadStartedAt),
+      });
+    } catch (error) {
+      logProductSaveMetric("variant image upload failed", {
+        index: index + 1,
+        uploadRequests,
+        fileName,
+        durationMs: durationMs(uploadStartedAt),
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
+  });
+
+  logProductSaveMetric("variant image upload stage completed", {
+    uploadRequests,
+    totalDurationMs: durationMs(stageStartedAt),
+  });
+
+  return uploadedPaths;
+};
+
+const saveVariantProduct = async () => {
+  const uploadedPaths = await uploadVariantImages();
+
+  const payload = buildVariantProductRpcPayload({
+    form: {
+      id: editingId.value,
+      ...form.value,
+      cover_image: form.value.cover_image.startsWith("blob:") ? "" : form.value.cover_image,
+    },
+    colors: colors.value,
+    variants: variants.value,
+  });
+
+  saveProgressMessage.value = t("admin.savingProductStage");
+  const rpcStartedAt = nowMs();
+  const { data, error } = await supabase.rpc("save_admin_variant_product", payload);
+  const rpcDurationMs = durationMs(rpcStartedAt);
+  logProductSaveMetric("save_admin_variant_product rpc completed", {
+    rpcDurationMs,
+    hasError: Boolean(error),
+  });
+  if (error) {
+    if (uploadedPaths.length) {
+      await supabase.storage.from("products").remove(uploadedPaths);
+    }
+    logProductSaveMetric("save_admin_variant_product rpc failed", {
+      rpcDurationMs,
+      uploadedPathsCleanedUp: uploadedPaths.length,
+      error: error.message,
+    });
+    throw error;
+  }
+
+  return Number(data);
+};
+
 const saveProduct = async () => {
+  if (saving.value) return;
+  const totalSaveStartedAt = nowMs();
   try {
     saving.value = true;
     errorMessage.value = "";
     successMessage.value = "";
+    saveProgressMessage.value = t("admin.savingProductStage");
 
     const validationError = validateForm();
     if (validationError) {
       errorMessage.value = validationError;
+      saveProgressMessage.value = "";
+      return;
+    }
+
+    if (isVariantEditor.value) {
+      await saveVariantProduct();
+      await loadData();
+      if (reorderProductsLoaded.value || isReorderMode.value) {
+        await refreshReorderProducts();
+      }
+      successMessage.value = t("admin.productSaved");
+      saveProgressMessage.value = "";
+      setTimeout(() => closeModal(), 500);
       return;
     }
 
@@ -965,10 +1422,19 @@ const saveProduct = async () => {
       await refreshReorderProducts();
     }
     successMessage.value = t("admin.productSaved");
+    saveProgressMessage.value = "";
     setTimeout(() => closeModal(), 500);
   } catch (error: unknown) {
     errorMessage.value = error instanceof Error ? error.message : t("admin.unableSaveProduct");
   } finally {
+    logProductSaveMetric("product save completed", {
+      inventoryModel: currentInventoryModel.value,
+      totalSaveTimeMs: durationMs(totalSaveStartedAt),
+      failed: Boolean(errorMessage.value),
+    });
+    if (errorMessage.value) {
+      saveProgressMessage.value = "";
+    }
     saving.value = false;
   }
 };
@@ -978,6 +1444,10 @@ const deleteProduct = async (product: ProductRow) => {
 
   try {
     saving.value = true;
+
+    if (isVariantProduct(product)) {
+      await supabase.from("product_variants").delete().eq("product_id", product.id);
+    }
 
     for (const color of product.product_colors || []) {
       for (const image of color.product_images || []) {

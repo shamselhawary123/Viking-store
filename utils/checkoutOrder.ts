@@ -1,5 +1,7 @@
 type CheckoutCartItem = {
   id: string | number;
+  variant_id?: string | number | null;
+  variantId?: string | number | null;
   title: string;
   image: string;
   price: number | string;
@@ -66,6 +68,7 @@ export const buildCheckoutOrderRequest = ({
   const orderItems = cartItems.map((item) => ({
     order_id: orderId,
     product_id: item.id,
+    variant_id: item.variant_id ?? item.variantId ?? null,
     product_name: item.title,
     product_image: item.image,
     product_price: item.price,
@@ -81,6 +84,7 @@ export const buildCheckoutOrderRequest = ({
       p_order_id: orderId,
       p_items: orderItems.map((item) => ({
         id: item.product_id,
+        variant_id: item.variant_id,
         title: item.product_name,
         image: item.product_image,
         price: item.product_price,

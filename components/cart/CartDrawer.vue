@@ -100,6 +100,12 @@
       </div>
 
       <div v-if="cartStore.items.length" class="border-t border-white/10 p-6">
+        <p
+          v-if="cartStore.quantityErrorKey"
+          class="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-200"
+        >
+          {{ t(cartStore.quantityErrorKey) }}
+        </p>
         <div class="mb-6 space-y-3">
           <div class="flex items-center justify-between text-sm text-neutral-400">
             <span>{{ t('common.subtotal') }}</span>

@@ -241,7 +241,7 @@
           <div class="mt-6 space-y-5">
             <div
               v-for="item in cartStore.items"
-              :key="`${item.id}-${item.size}-${item.color}`"
+              :key="`${item.id}-${item.variant_id || 'legacy'}-${item.size}-${item.color}`"
               class="flex gap-4 border-b border-white/10 pb-5"
             >
               <img
@@ -417,6 +417,7 @@ onMounted(async () => {
 const checkoutRpcItems = () =>
   cartStore.items.map((item) => ({
     id: item.id,
+    variant_id: item.variant_id || null,
     title: item.title,
     image: item.image,
     price: item.price,
