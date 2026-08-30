@@ -1,19 +1,31 @@
 <template>
   <section class="section-premium bg-black">
     <div class="container-premium">
-      <div v-reveal class="mx-auto mb-16 max-w-3xl text-center">
-        <p class="eyebrow">{{ t("common.categories") }}</p>
-        <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">
-          {{ t("home.chooseYourWeapon") }}
-        </h2>
-        <p class="mt-5 leading-8 text-neutral-400">
-          {{ t("home.categoriesLead") }}
-        </p>
+      <div
+        v-reveal
+        class="mb-16 flex flex-col gap-6 text-center md:flex-row md:items-end md:justify-between md:text-start"
+      >
+        <div class="mx-auto max-w-3xl md:mx-0">
+          <p class="eyebrow">{{ t("common.categories") }}</p>
+          <h2 class="display-heading mt-4 text-6xl text-white md:text-7xl">
+            {{ t("home.chooseYourWeapon") }}
+          </h2>
+          <p class="mt-5 leading-8 text-neutral-400">
+            {{ t("home.categoriesLead") }}
+          </p>
+        </div>
+        <NuxtLink
+          to="/categories"
+          class="premium-button premium-button-primary inline-flex min-h-12 px-5 text-sm md:min-h-14 md:px-6"
+        >
+          {{ t("home.viewAllCategories") }}
+          <Icon name="i-heroicons-arrow-right" />
+        </NuxtLink>
       </div>
 
       <div class="hidden gap-5 sm:grid sm:grid-cols-2 xl:grid-cols-4">
         <NuxtLink
-          v-for="(category, index) in visibleCategories"
+          v-for="(category, index) in homepageCategories"
           :key="category.id"
           v-reveal="{ delay: index * 90 }"
           :to="buildShopCategoryUrl(category.slug)"
@@ -69,7 +81,7 @@
       </div>
 
       <div
-        v-if="visibleCategories.length"
+        v-if="homepageCategories.length"
         v-reveal
         class="flex items-center gap-2 sm:hidden"
         :dir="locale === 'ar' ? 'rtl' : 'ltr'"
@@ -110,14 +122,14 @@
           >
             <NuxtLink
               v-for="(itemIndex, index) in carousel.loopedIndexes"
-              :key="`${index}-${visibleCategories[itemIndex].id}`"
-              :to="buildShopCategoryUrl(visibleCategories[itemIndex].slug)"
+              :key="`${index}-${homepageCategories[itemIndex].id}`"
+              :to="buildShopCategoryUrl(homepageCategories[itemIndex].slug)"
               class="mobile-carousel-slide group flex h-[25rem] shrink-0 flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#171717] shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition duration-300 hover:border-[#CF1D1D]/70 hover:shadow-[0_30px_90px_rgba(207,29,29,0.12)]"
             >
               <div class="relative h-[70%] overflow-hidden bg-black">
                 <img
-                  :src="visibleCategories[itemIndex].image"
-                  :alt="categorySeo(visibleCategories[itemIndex]).title"
+                  :src="homepageCategories[itemIndex].image"
+                  :alt="categorySeo(homepageCategories[itemIndex]).title"
                   width="640"
                   height="800"
                   class="absolute inset-0 h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-110 group-hover:opacity-100"
@@ -150,13 +162,13 @@
                   >
                     {{
                       getLocalizedCategoryName(
-                        visibleCategories[itemIndex],
+                        homepageCategories[itemIndex],
                         locale,
-                      ) || visibleCategories[itemIndex].name
+                      ) || homepageCategories[itemIndex].name
                     }}
                   </h3>
                   <p class="mt-3 line-clamp-2 text-sm leading-6 text-neutral-400">
-                    {{ categorySeo(visibleCategories[itemIndex]).intro }}
+                    {{ categorySeo(homepageCategories[itemIndex]).intro }}
                   </p>
                 </div>
                 <p
@@ -209,9 +221,10 @@ const categorySeo = (category: {
 const visibleCategories = computed(() =>
   categoriesStore.categories.filter((category) => category.slug !== "all"),
 );
+const homepageCategories = computed(() => visibleCategories.value.slice(0, 8));
 const isRtl = computed(() => locale.value === "ar");
 const carousel = useMobileCarousel(
-  computed(() => visibleCategories.value.length),
+  computed(() => homepageCategories.value.length),
   {
     isRtl,
   },

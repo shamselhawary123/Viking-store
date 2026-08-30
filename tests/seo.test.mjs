@@ -6,14 +6,17 @@ import {
   DEFAULT_SITE_URL,
   buildCategorySeo,
   buildCanonicalUrl,
+  buildOrganizationStructuredData,
   buildProductImageAlt,
   buildProductSeoMeta,
   buildProductStructuredData,
   buildRobotsTxt,
   buildShopCategoryUrl,
   buildSitemapXml,
+  buildWebsiteStructuredData,
   getCategorySeoIntent,
   publicSitemapEntries,
+  SEO_DEFAULT_IMAGE,
 } from "../utils/seo.ts";
 
 const enLocaleSource = readFileSync(
@@ -56,6 +59,7 @@ const nuxtConfigSource = readFileSync(
   new URL("../nuxt.config.ts", import.meta.url),
   "utf8",
 );
+const appSource = readFileSync(new URL("../app.vue", import.meta.url), "utf8");
 
 describe("SEO helpers", () => {
   it("builds clean canonical URLs without query strings or duplicate slashes", () => {
@@ -202,5 +206,48 @@ describe("SEO route integration", () => {
     assert.match(productPageSource, /buildProductSeoMeta/);
     assert.match(productPageSource, /buildShopCategoryUrl/);
     assert.match(blogDetailSource, /blogCategoryShopUrl/);
+  });
+
+  it("adds Egypt-focused social metadata without stale logo references", () => {
+    const organization = buildOrganizationStructuredData("https://viking.example");
+    const website = buildWebsiteStructuredData("https://viking.example");
+
+    assert.equal(SEO_DEFAULT_IMAGE, "/logo.png");
+    assert.equal(organization.logo, "https://viking.example/logo.png");
+    assert.match(organization.description, /فايكنج ستور/);
+    assert.match(organization.description, /boxing gloves/i);
+    assert.deepEqual(organization.alternateName, [
+      "فايكنج ستور",
+      "فايكنج استور",
+      "Viking Store Egypt",
+    ]);
+    assert.deepEqual(website.alternateName, [
+      "فايكنج ستور",
+      "فايكنج استور",
+      "Viking Store Egypt",
+    ]);
+    assert.deepEqual(organization.sameAs, [
+      "https://www.facebook.com/profile.php?id=100025354200512",
+      "https://www.instagram.com/vikingclubstore/",
+      "https://www.tiktok.com/@the_vikings22",
+    ]);
+    assert.match(appSource, /ogImage/);
+    assert.match(appSource, /twitterImage/);
+    assert.doesNotMatch(appSource, /old-logo|logo-old|viking-logo/i);
+    assert.doesNotMatch(enLocaleSource, /old-logo|logo-old|viking-logo/i);
+    assert.doesNotMatch(arLocaleSource, /old-logo|logo-old|viking-logo/i);
+  });
+
+  it("targets Arabic Egypt combat-sports search intent naturally", () => {
+    assert.match(arLocaleSource, /فايكنج ستور/);
+    assert.match(arLocaleSource, /فايكنج استور/);
+    assert.match(arLocaleSource, /مستلزمات الألعاب القتالية/);
+    assert.match(arLocaleSource, /قفازات ملاكمة/);
+    assert.match(arLocaleSource, /قفازات MMA/);
+    assert.match(arLocaleSource, /واقي رأس/);
+    assert.match(arLocaleSource, /واقي أسنان/);
+    assert.match(arLocaleSource, /بنداج/);
+    assert.match(arLocaleSource, /ساندا/);
+    assert.match(arLocaleSource, /كونغ فو/);
   });
 });

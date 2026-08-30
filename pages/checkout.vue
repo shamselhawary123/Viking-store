@@ -124,7 +124,7 @@
             </div>
           </div>
 
-          <label class="floating-field">
+          <label class="floating-field checkout-field">
             <input
               v-model="fullName"
               required
@@ -136,7 +136,7 @@
           </label>
 
           <div class="mt-5 grid gap-5 md:grid-cols-2">
-            <label class="floating-field">
+            <label class="floating-field checkout-field">
               <input
                 v-model="phone"
                 required
@@ -146,7 +146,17 @@
               />
               <span>{{ t("common.phone") }}</span>
             </label>
-            <label class="floating-field">
+            <div class="field-block checkout-field">
+              <GovernorateSelect
+                v-model="selectedGovernorateCode"
+                :governorates="shippingGovernorates"
+                class="mt-2"
+              />
+            </div>
+          </div>
+
+          <div class="mt-5 grid gap-5 md:grid-cols-2">
+            <label class="floating-field checkout-field">
               <input
                 v-model="city"
                 required
@@ -158,7 +168,7 @@
             </label>
           </div>
 
-          <label class="floating-field mt-5">
+          <label class="floating-field checkout-field mt-5">
             <input
               v-model="address"
               required
@@ -169,7 +179,7 @@
             <span>{{ t("common.address") }}</span>
           </label>
 
-          <label class="floating-field mt-5">
+          <label class="floating-field checkout-field mt-5">
             <textarea
               v-model="notes"
               rows="4"
@@ -233,16 +243,25 @@
       </form>
 
       <aside class="space-y-6 lg:sticky lg:top-28 lg:self-start">
-        <div class="premium-panel rounded-2xl p-6 md:p-8">
-          <p class="eyebrow">{{ t("checkout.summary") }}</p>
-          <h2 class="mt-2 text-2xl font-black text-white">
-            {{ t("checkout.orderSummary") }}
-          </h2>
-          <div class="mt-6 space-y-5">
+        <div class="premium-panel rounded-2xl p-5 md:p-7">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="eyebrow">{{ t("checkout.summary") }}</p>
+              <h2 class="mt-2 text-2xl font-black text-white">
+                {{ t("checkout.orderSummary") }}
+              </h2>
+            </div>
+            <div
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 text-[#CF1D1D]"
+            >
+              <Icon name="i-heroicons-receipt-percent" class="text-xl" />
+            </div>
+          </div>
+          <div class="mt-6 space-y-4">
             <div
               v-for="item in cartStore.items"
               :key="`${item.id}-${item.variant_id || 'legacy'}-${item.size}-${item.color}`"
-              class="flex gap-4 border-b border-white/10 pb-5"
+              class="summary-item"
             >
               <img
                 :src="item.image"
@@ -254,23 +273,26 @@
                 decoding="async"
               />
               <div class="min-w-0 flex-1">
-                <h3 class="truncate font-black">{{ item.title }}</h3>
-                <p class="mt-1 text-sm text-neutral-400">
-                  {{ item.color }} / {{ item.size }} / Qty {{ item.quantity }}
+                <h3 class="line-clamp-2 font-black leading-6 text-white">
+                  {{ item.title }}
+                </h3>
+                <p class="mt-1 text-sm leading-6 text-neutral-400">
+                  {{ item.color }} / {{ item.size }} / {{ t("admin.qty") }}
+                  {{ item.quantity }}
                 </p>
               </div>
-              <div class="font-black">
+              <div class="shrink-0 text-sm font-black text-white sm:text-base">
                 {{ formatStorePrice(item.price * item.quantity, locale) }}
               </div>
             </div>
           </div>
-          <div class="mt-6 rounded-2xl border border-white/10 bg-black/40 p-4">
+          <div class="coupon-box">
             <label
               class="block text-sm font-black uppercase tracking-[0.18em] text-neutral-400"
               for="coupon-code"
               >{{ t("checkout.promoCode") }}</label
             >
-            <div class="mt-3 flex flex-col gap-3 sm:flex-row">
+            <div class="mt-3 grid gap-3 sm:grid-cols-[1fr_auto]">
               <input
                 id="coupon-code"
                 v-model="couponCode"
@@ -311,33 +333,34 @@
               {{ couponError }}
             </p>
           </div>
-          <div class="space-y-4 pt-6">
-            <div class="flex justify-between text-neutral-400">
+          <p
+            v-if="shippingError"
+            class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm font-bold text-red-300"
+          >
+            {{ shippingError }}
+          </p>
+          <div class="summary-totals">
+            <div class="summary-row">
               <span>{{ t("common.subtotal") }}</span
               ><span class="font-bold text-white">{{
-                formatStorePrice(cartStore.totalPrice, locale)
+                formatStorePrice(displaySubtotal, locale)
               }}</span>
             </div>
-            <div class="flex justify-between text-neutral-400">
+            <div class="summary-row">
               <span>{{ t("common.shipping") }}</span
-              ><span class="font-bold text-emerald-400">{{
-                t("common.free")
-              }}</span>
-            </div>
-            <div
-              v-if="appliedCoupon"
-              class="flex justify-between text-neutral-400"
-            >
-              <span>{{ t("common.discount") }}</span>
-              <span class="font-bold text-emerald-400"
-                >-{{
-                  formatStorePrice(appliedCoupon.discountAmount, locale)
-                }}</span
+              ><span
+                class="font-bold"
+                :class="shippingCost > 0 ? 'text-white' : 'text-emerald-400'"
+                >{{ shippingSummary }}</span
               >
             </div>
-            <div
-              class="flex justify-between border-t border-white/10 pt-6 text-2xl font-black"
-            >
+            <div v-if="appliedCoupon" class="summary-row">
+              <span>{{ t("common.discount") }}</span>
+              <span class="font-bold text-emerald-400"
+                >-{{ formatStorePrice(displayDiscount, locale) }}</span
+              >
+            </div>
+            <div class="summary-total-row">
               <span>{{ t("common.total") }}</span
               ><span class="text-[#CF1D1D]">{{
                 formatStorePrice(displayTotal, locale)
@@ -351,7 +374,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
+import { computed, ref, onMounted, watch } from "vue";
+import GovernorateSelect from "../components/checkout/GovernorateSelect.vue";
 import { useCartStore } from "../stores/cart";
 import { useAuthStore } from "../stores/auth";
 import { normalizeCheckoutCouponCode } from "../utils/checkoutCoupons";
@@ -368,12 +392,33 @@ const phone = ref("");
 const city = ref("");
 const notes = ref("");
 const address = ref("");
+const selectedGovernorateCode = ref("");
 const loading = ref(false);
 const errorMessage = ref("");
 const couponCode = ref("");
 const couponLoading = ref(false);
 const couponMessage = ref("");
 const couponError = ref("");
+const shippingLoading = ref(false);
+const shippingError = ref("");
+const shippingGovernorates = ref<
+  Array<{
+    code: string;
+    name_ar: string;
+    name_en: string;
+    shipping_fee?: number | string | null;
+  }>
+>([]);
+const shippingPreview = ref<null | {
+  ok?: boolean;
+  error?: string;
+  subtotal?: number | string;
+  discount_amount?: number | string;
+  shipping_cost?: number | string;
+  total?: number | string;
+  shipping_enabled?: boolean;
+  shipping_required?: boolean;
+}>(null);
 const appliedCoupon = ref<null | {
   couponId: string;
   code: string;
@@ -383,9 +428,43 @@ const appliedCoupon = ref<null | {
 const canSubmit = computed(
   () => checkoutMode.value === "guest" || Boolean(authStore.user),
 );
-const displayTotal = computed(
-  () => appliedCoupon.value?.total ?? cartStore.totalPrice,
+const displaySubtotal = computed(() =>
+  Number(shippingPreview.value?.subtotal ?? cartStore.totalPrice),
 );
+const displayDiscount = computed(() =>
+  Number(
+    shippingPreview.value?.discount_amount ??
+      appliedCoupon.value?.discountAmount ??
+      0,
+  ),
+);
+const shippingCost = computed(() =>
+  Number(shippingPreview.value?.shipping_cost ?? 0),
+);
+const shippingRequired = computed(() =>
+  Boolean(shippingPreview.value?.shipping_required ?? true),
+);
+const displayTotal = computed(() =>
+  Number(
+    shippingPreview.value?.total ??
+      appliedCoupon.value?.total ??
+      cartStore.totalPrice,
+  ),
+);
+const shippingSummary = computed(() => {
+  if (shippingLoading.value) return t("common.loading");
+  if (shippingPreview.value?.shipping_enabled === false) {
+    return t("checkout.shippingUnavailable");
+  }
+  if (!selectedGovernorateCode.value && shippingRequired.value) {
+    return t("checkout.selectGovernorate");
+  }
+  if (shippingCost.value <= 0) return t("common.free");
+
+  return formatStorePrice(shippingCost.value, locale.value);
+});
+
+let previewRequestId = 0;
 
 onMounted(async () => {
   cartStore.loadCart();
@@ -412,6 +491,9 @@ onMounted(async () => {
       fullName.value = authStore.user?.user_metadata?.full_name || "";
     }
   }
+
+  await loadShippingGovernorates();
+  await refreshCheckoutPreview();
 });
 
 const checkoutRpcItems = () =>
@@ -426,6 +508,65 @@ const checkoutRpcItems = () =>
     quantity: item.quantity,
   }));
 
+const loadShippingGovernorates = async () => {
+  const { data, error } = await supabase
+    .from("shipping_governorates")
+    .select("code,name_ar,name_en,shipping_fee,is_enabled,sort_order")
+    .eq("is_enabled", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) {
+    shippingError.value = error.message;
+    return;
+  }
+
+  shippingGovernorates.value = data || [];
+};
+
+const refreshCheckoutPreview = async (
+  code = appliedCoupon.value?.code || "",
+) => {
+  if (!cartStore.items.length) return null;
+
+  const requestId = ++previewRequestId;
+  shippingLoading.value = true;
+  shippingError.value = "";
+
+  const { data, error } = await supabase.rpc("preview_checkout_totals", {
+    p_items: checkoutRpcItems(),
+    p_coupon_code: code || null,
+    p_governorate_code: selectedGovernorateCode.value || null,
+  });
+
+  if (requestId !== previewRequestId) return null;
+
+  shippingLoading.value = false;
+
+  if (error) {
+    shippingError.value = error.message;
+    return null;
+  }
+
+  shippingPreview.value = data || null;
+
+  if (data?.ok === false) {
+    shippingError.value = data.error || t("checkout.shippingRateUnavailable");
+    return data;
+  }
+
+  if (appliedCoupon.value && data?.code) {
+    appliedCoupon.value = {
+      ...appliedCoupon.value,
+      couponId: data.coupon_id || appliedCoupon.value.couponId,
+      code: data.code,
+      discountAmount: Number(data.discount_amount || 0),
+      total: Number(data.total || cartStore.totalPrice),
+    };
+  }
+
+  return data;
+};
+
 const applyCoupon = async () => {
   const code = normalizeCheckoutCouponCode(couponCode.value);
   if (!code) return;
@@ -434,9 +575,10 @@ const applyCoupon = async () => {
   couponError.value = "";
   couponMessage.value = "";
 
-  const { data, error } = await supabase.rpc("preview_checkout_coupon", {
-    p_code: code,
+  const { data, error } = await supabase.rpc("preview_checkout_totals", {
     p_items: checkoutRpcItems(),
+    p_coupon_code: code,
+    p_governorate_code: selectedGovernorateCode.value || null,
   });
 
   couponLoading.value = false;
@@ -457,6 +599,7 @@ const applyCoupon = async () => {
     discountAmount: Number(data.discount_amount || 0),
     total: Number(data.total || cartStore.totalPrice),
   };
+  shippingPreview.value = data;
   couponCode.value = appliedCoupon.value.code;
   couponMessage.value = t("checkout.applied", {
     code: appliedCoupon.value.code,
@@ -468,13 +611,31 @@ const removeCoupon = () => {
   couponCode.value = "";
   couponMessage.value = "";
   couponError.value = "";
+  refreshCheckoutPreview("");
 };
+
+watch(selectedGovernorateCode, () => {
+  refreshCheckoutPreview();
+});
 
 const handleCheckout = async () => {
   try {
     if (!canSubmit.value) return;
 
     errorMessage.value = "";
+
+    if (!selectedGovernorateCode.value) {
+      errorMessage.value = t("checkout.governorateRequired");
+      return;
+    }
+
+    const preview = await refreshCheckoutPreview();
+    if (preview?.ok === false) {
+      errorMessage.value =
+        preview.error || t("checkout.shippingRateUnavailable");
+      return;
+    }
+
     loading.value = true;
 
     const order = await authStore.createOrder(
@@ -486,6 +647,7 @@ const handleCheckout = async () => {
         fullName: fullName.value,
         phone: phone.value,
         city: city.value,
+        governorateCode: selectedGovernorateCode.value,
         notes: notes.value,
         address: address.value,
       },
@@ -531,6 +693,37 @@ const handleCheckout = async () => {
 .floating-field {
   position: relative;
   display: block;
+}
+
+.field-block {
+  display: block;
+}
+
+.field-block span {
+  display: block;
+  color: #a3a3a3;
+  font-size: 0.875rem;
+  font-weight: 800;
+}
+
+.field-input {
+  min-height: 3.75rem;
+  width: 100%;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.42);
+  padding: 0 1rem;
+  color: #ffffff;
+  outline: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.field-input:focus {
+  border-color: #cf1d1d;
+  box-shadow: 0 0 0 4px rgba(207, 29, 29, 0.12);
 }
 
 .floating-input {
@@ -598,5 +791,49 @@ const handleCheckout = async () => {
 .coupon-input:focus {
   border-color: #cf1d1d;
   box-shadow: 0 0 0 4px rgba(207, 29, 29, 0.12);
+}
+
+.summary-item {
+  display: flex;
+  gap: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.28);
+  padding: 0.85rem;
+}
+
+.coupon-box {
+  margin-top: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.34);
+  padding: 1rem;
+}
+
+.summary-totals {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+}
+
+.summary-row,
+.summary-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.summary-row {
+  color: #a3a3a3;
+}
+
+.summary-total-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.25rem;
+  font-size: 1.35rem;
+  font-weight: 900;
 }
 </style>

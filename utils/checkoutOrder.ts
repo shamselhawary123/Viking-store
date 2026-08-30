@@ -16,6 +16,7 @@ type CheckoutCustomerData = {
   fullName: string;
   phone: string;
   city: string;
+  governorateCode?: string | null;
   address: string;
   notes?: string;
 };
@@ -53,6 +54,7 @@ export const buildCheckoutOrderRequest = ({
           full_name: customerData.fullName,
           phone: customerData.phone,
           city: customerData.city,
+          governorate_code: customerData.governorateCode || null,
           address: customerData.address,
           notes: customerData.notes,
         }
@@ -60,6 +62,7 @@ export const buildCheckoutOrderRequest = ({
           guest_name: customerData.fullName,
           guest_phone: customerData.phone,
           guest_city: customerData.city,
+          governorate_code: customerData.governorateCode || null,
           guest_address: customerData.address,
           guest_notes: customerData.notes,
         }),
@@ -97,6 +100,7 @@ export const buildCheckoutOrderRequest = ({
         full_name: customerData.fullName,
         phone: customerData.phone,
         city: customerData.city,
+        governorate_code: customerData.governorateCode || null,
         address: customerData.address,
         notes: customerData.notes || "",
       },

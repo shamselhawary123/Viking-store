@@ -14,6 +14,7 @@ const arabicCategoryBySlug: Record<string, string> = {
   "hand-wraps": "بنداج اليد",
   "t-shirts": "تيشيرتات",
   "jump-ropes": "حبال القفز",
+  "mouth-guards": "واقيات الفم",
   "2pcs": "طقم قطعتين",
 };
 

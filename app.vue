@@ -13,6 +13,7 @@ import {
   buildWebsiteStructuredData,
   isPrivateSeoPath,
   normalizeSiteUrl,
+  SEO_DEFAULT_IMAGE,
   SEO_SITE_NAME,
 } from "./utils/seo";
 
@@ -69,13 +70,15 @@ useSeoMeta({
   title: () => SEO_SITE_NAME,
   description: () =>
     locale.value === "ar"
-      ? "Viking Store لادوات القتال عالية الجودة للملاكمة وMMA والكيك بوكسينج والتمرين اليومي."
-      : "Viking Store supplies premium boxing, MMA, kickboxing, and combat-sports gear for serious daily training.",
+      ? "فايكنج ستور لمستلزمات الألعاب القتالية في مصر: قفازات ملاكمة وMMA، واقي رأس، واقي أسنان، بنداج، وتجهيزات تمرين يومية."
+      : "Viking Store Egypt supplies boxing gloves, MMA gloves, head guards, mouth guards, hand wraps, and combat-sports training gear.",
   ogSiteName: SEO_SITE_NAME,
   ogType: "website",
   ogLocale: () => (locale.value === "ar" ? "ar_EG" : "en_US"),
   ogUrl: () => canonicalUrl.value,
+  ogImage: () => buildCanonicalUrl(siteUrl.value, SEO_DEFAULT_IMAGE),
   twitterCard: "summary_large_image",
+  twitterImage: () => buildCanonicalUrl(siteUrl.value, SEO_DEFAULT_IMAGE),
   robots: () => (isPrivateRoute.value ? "noindex,nofollow" : "index,follow"),
 });
 
