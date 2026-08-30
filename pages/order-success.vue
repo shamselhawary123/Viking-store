@@ -29,6 +29,10 @@
         <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
           <NuxtLink to="/shop" class="premium-button premium-button-primary">{{ t('cart.continueShopping') }}</NuxtLink>
           <NuxtLink to="/profile/orders" class="premium-button premium-button-secondary">{{ t('orders.trackOrder') }}</NuxtLink>
+          <a v-if="orderWhatsappLink" :href="orderWhatsappLink" target="_blank" rel="noopener" class="premium-button premium-button-secondary">
+            <Icon name="simple-icons:whatsapp" />
+            {{ t('payments.orderWhatsapp') }}
+          </a>
         </div>
       </div>
     </div>
@@ -36,7 +40,28 @@
 </template>
 
 <script setup lang="ts">
+import { buildOrderWhatsAppLink } from "../utils/whatsapp";
+
 const route = useRoute();
-const { t } = useI18n();
+const supabase = useSupabase();
+const { locale, t } = useI18n();
 const orderNumber = computed(() => String(route.query.order || t("pages.pendingConfirmation")));
+const whatsappNumber = ref("");
+const orderWhatsappLink = computed(() =>
+  buildOrderWhatsAppLink({
+    phoneNumber: whatsappNumber.value,
+    orderNumber: orderNumber.value,
+    locale: locale.value,
+  }),
+);
+
+onMounted(async () => {
+  const { data } = await supabase
+    .from("payment_settings")
+    .select("whatsapp_number")
+    .eq("id", true)
+    .single();
+
+  whatsappNumber.value = data?.whatsapp_number || "";
+});
 </script>

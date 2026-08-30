@@ -19,6 +19,7 @@ type CheckoutCustomerData = {
   governorateCode?: string | null;
   address: string;
   notes?: string;
+  paymentMethod?: "cash" | "instapay";
 };
 
 type CheckoutCouponData = {
@@ -45,10 +46,10 @@ export const buildCheckoutOrderRequest = ({
     user_id: user?.id || null,
     total_price: totalPrice,
     status: "pending",
-    payment_method: "cash",
+    payment_method: customerData.paymentMethod || "cash",
     shipping_cost: 0,
     discount: 0,
-    payment_status: "unpaid",
+    payment_status: customerData.paymentMethod === "instapay" ? "awaiting_payment" : "unpaid",
     ...(user
       ? {
           full_name: customerData.fullName,
@@ -103,6 +104,7 @@ export const buildCheckoutOrderRequest = ({
         governorate_code: customerData.governorateCode || null,
         address: customerData.address,
         notes: customerData.notes || "",
+        payment_method: customerData.paymentMethod || "cash",
       },
       p_coupon_code: coupon?.code || null,
     },
