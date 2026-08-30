@@ -18,7 +18,7 @@ const ar = JSON.parse(readFileSync("locales/ar.json", "utf8"));
 const extractFunction = (name) => {
   const match = sql.match(
     new RegExp(
-      `create or replace function public\\.${name}[\\s\\S]*?\\nend;\\n\\$\\$;`,
+      `create or replace function public\\.${name}[\\s\\S]*?\\r?\\nend;\\r?\\n\\$\\$;`,
       "i",
     ),
   );

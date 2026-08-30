@@ -191,26 +191,64 @@
         </div>
 
         <div v-if="canSubmit" class="premium-panel rounded-2xl p-6 md:p-8">
-          <div
-            class="flex items-center gap-4 rounded-2xl border border-[#CF1D1D] bg-[#CF1D1D]/10 p-5"
-          >
-            <Icon
-              name="i-heroicons-banknotes"
-              class="text-3xl text-[#CF1D1D]"
-            />
+          <div class="mb-5 flex items-start gap-4">
+            <div
+              class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 text-[#CF1D1D]"
+            >
+              <Icon name="i-heroicons-credit-card" class="text-2xl" />
+            </div>
             <div>
-              <p class="font-black text-white">
-                {{ t("checkout.cashOnDelivery") }}
-              </p>
-              <p class="mt-1 text-sm text-neutral-400">
-                {{ t("checkout.cashText") }}
+              <h2 class="text-2xl font-black text-white">
+                {{ t("checkout.paymentMethod") }}
+              </h2>
+              <p class="mt-2 text-sm leading-6 text-neutral-400">
+                {{ t("checkout.paymentMethodText") }}
               </p>
             </div>
-            <Icon
-              name="i-heroicons-check-circle-solid"
-              class="ml-auto text-2xl text-emerald-400"
-            />
           </div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <button
+              v-if="paymentSettings.cod_enabled"
+              type="button"
+              class="payment-choice"
+              :class="{ active: selectedPaymentMethod === 'cash' }"
+              :aria-pressed="selectedPaymentMethod === 'cash'"
+              @click="selectedPaymentMethod = 'cash'"
+            >
+              <Icon name="i-heroicons-banknotes" class="text-3xl text-[#CF1D1D]" />
+              <span class="mt-4 block text-lg font-black text-white">
+                {{ t("checkout.cashOnDelivery") }}
+              </span>
+              <span class="mt-2 block text-sm leading-6 text-neutral-400">
+                {{ t("checkout.cashText") }}
+              </span>
+            </button>
+
+            <button
+              v-if="paymentSettings.instapay_enabled"
+              type="button"
+              class="payment-choice"
+              :class="{ active: selectedPaymentMethod === 'instapay' }"
+              :aria-pressed="selectedPaymentMethod === 'instapay'"
+              @click="selectedPaymentMethod = 'instapay'"
+            >
+              <Icon name="i-heroicons-qr-code" class="text-3xl text-[#CF1D1D]" />
+              <span class="mt-4 block text-lg font-black text-white">
+                {{ t("checkout.payWithInstapay") }}
+              </span>
+              <span class="mt-2 block text-sm leading-6 text-neutral-400">
+                {{ t("checkout.instapayText") }}
+              </span>
+            </button>
+          </div>
+
+          <p
+            v-if="!availablePaymentMethods.length"
+            class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm font-bold text-red-300"
+          >
+            {{ t("checkout.noPaymentMethods") }}
+          </p>
         </div>
 
         <p
@@ -235,9 +273,11 @@
           {{
             loading
               ? t("checkout.placing")
-              : checkoutMode === "guest"
-                ? t("checkout.placeGuest")
-                : t("checkout.placeAccount")
+              : selectedPaymentMethod === "instapay"
+                ? t("checkout.createOrderContinuePayment")
+                : checkoutMode === "guest"
+                  ? t("checkout.placeGuest")
+                  : t("checkout.placeAccount")
           }}
         </button>
       </form>
@@ -384,6 +424,7 @@ import { formatStorePrice } from "../utils/localizationFormat";
 const cartStore = useCartStore(usePinia());
 const authStore = useAuthStore(usePinia());
 const supabase = useSupabase();
+const route = useRoute();
 const { locale, t } = useI18n();
 
 const checkoutMode = ref<"guest" | "account">("guest");
@@ -393,6 +434,7 @@ const city = ref("");
 const notes = ref("");
 const address = ref("");
 const selectedGovernorateCode = ref("");
+const selectedPaymentMethod = ref<"cash" | "instapay">("cash");
 const loading = ref(false);
 const errorMessage = ref("");
 const couponCode = ref("");
@@ -419,6 +461,16 @@ const shippingPreview = ref<null | {
   shipping_enabled?: boolean;
   shipping_required?: boolean;
 }>(null);
+const paymentSettings = ref({
+  cod_enabled: true,
+  instapay_enabled: false,
+  instapay_account_name: "",
+  instapay_id: "",
+  instapay_payment_link: "",
+  instapay_qr_path: "",
+  whatsapp_number: "",
+  instapay_timeout_minutes: 30,
+});
 const appliedCoupon = ref<null | {
   couponId: string;
   code: string;
@@ -427,6 +479,12 @@ const appliedCoupon = ref<null | {
 }>(null);
 const canSubmit = computed(
   () => checkoutMode.value === "guest" || Boolean(authStore.user),
+);
+const availablePaymentMethods = computed(() =>
+  [
+    paymentSettings.value.cod_enabled ? "cash" : "",
+    paymentSettings.value.instapay_enabled ? "instapay" : "",
+  ].filter(Boolean),
 );
 const displaySubtotal = computed(() =>
   Number(shippingPreview.value?.subtotal ?? cartStore.totalPrice),
@@ -492,7 +550,7 @@ onMounted(async () => {
     }
   }
 
-  await loadShippingGovernorates();
+  await Promise.all([loadShippingGovernorates(), loadPaymentSettings()]);
   await refreshCheckoutPreview();
 });
 
@@ -521,6 +579,44 @@ const loadShippingGovernorates = async () => {
   }
 
   shippingGovernorates.value = data || [];
+};
+
+const syncSelectedPaymentMethod = () => {
+  if (availablePaymentMethods.value.length === 1) {
+    selectedPaymentMethod.value = availablePaymentMethods.value[0] as "cash" | "instapay";
+    return;
+  }
+
+  if (!availablePaymentMethods.value.includes(selectedPaymentMethod.value)) {
+    selectedPaymentMethod.value = (availablePaymentMethods.value[0] || "cash") as "cash" | "instapay";
+  }
+
+  if (route.query.payment === "instapay" && availablePaymentMethods.value.includes("instapay")) {
+    selectedPaymentMethod.value = "instapay";
+  }
+};
+
+const loadPaymentSettings = async () => {
+  const { data, error } = await supabase
+    .from("payment_settings")
+    .select("cod_enabled,instapay_enabled,instapay_account_name,instapay_id,instapay_payment_link,instapay_qr_path,whatsapp_number,instapay_timeout_minutes")
+    .eq("id", true)
+    .single();
+
+  if (!error && data) {
+    paymentSettings.value = {
+      cod_enabled: data.cod_enabled !== false,
+      instapay_enabled: data.instapay_enabled === true,
+      instapay_account_name: data.instapay_account_name || "",
+      instapay_id: data.instapay_id || "",
+      instapay_payment_link: data.instapay_payment_link || "",
+      instapay_qr_path: data.instapay_qr_path || "",
+      whatsapp_number: data.whatsapp_number || "",
+      instapay_timeout_minutes: Number(data.instapay_timeout_minutes || 30),
+    };
+  }
+
+  syncSelectedPaymentMethod();
 };
 
 const refreshCheckoutPreview = async (
@@ -618,6 +714,8 @@ watch(selectedGovernorateCode, () => {
   refreshCheckoutPreview();
 });
 
+watch(availablePaymentMethods, syncSelectedPaymentMethod);
+
 const handleCheckout = async () => {
   try {
     if (!canSubmit.value) return;
@@ -626,6 +724,16 @@ const handleCheckout = async () => {
 
     if (!selectedGovernorateCode.value) {
       errorMessage.value = t("checkout.governorateRequired");
+      return;
+    }
+
+    if (!availablePaymentMethods.value.length) {
+      errorMessage.value = t("checkout.noPaymentMethods");
+      return;
+    }
+
+    if (!availablePaymentMethods.value.includes(selectedPaymentMethod.value)) {
+      errorMessage.value = t("checkout.paymentUnavailable");
       return;
     }
 
@@ -650,11 +758,17 @@ const handleCheckout = async () => {
         governorateCode: selectedGovernorateCode.value,
         notes: notes.value,
         address: address.value,
+        paymentMethod: selectedPaymentMethod.value,
       },
       appliedCoupon.value ? { code: appliedCoupon.value.code } : null,
     );
 
     cartStore.clearCart();
+    if (order.payment_method === "instapay" || order.payment_status === "awaiting_payment") {
+      await navigateTo(`/payments/instapay/${order.id}?token=${encodeURIComponent(order.payment_access_token || "")}`);
+      return;
+    }
+
     await navigateTo(`/order-success?order=${order.id}`);
   } catch (error: any) {
     errorMessage.value = error?.message || t("checkout.orderFailed");
@@ -665,7 +779,8 @@ const handleCheckout = async () => {
 </script>
 
 <style scoped>
-.checkout-choice {
+.checkout-choice,
+.payment-choice {
   min-height: 12rem;
   border-radius: 1rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -680,14 +795,21 @@ const handleCheckout = async () => {
 }
 
 .checkout-choice:hover,
-.checkout-choice.active {
+.checkout-choice.active,
+.payment-choice:hover,
+.payment-choice.active {
   border-color: rgba(207, 29, 29, 0.75);
   background: rgba(207, 29, 29, 0.08);
   transform: translateY(-2px);
 }
 
-.checkout-choice.active {
+.checkout-choice.active,
+.payment-choice.active {
   box-shadow: 0 0 0 4px rgba(207, 29, 29, 0.1);
+}
+
+.payment-choice {
+  min-height: 10rem;
 }
 
 .floating-field {

@@ -185,6 +185,16 @@
               <Icon :name="wishlistStore.isFavorite(product.id) ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'" />
             </button>
           </div>
+          <a
+            v-if="productWhatsappLink"
+            :href="productWhatsappLink"
+            target="_blank"
+            rel="noopener"
+            class="premium-button premium-button-secondary w-full justify-center"
+          >
+            <Icon name="simple-icons:whatsapp" />
+            {{ t('shop.askWhatsapp') }}
+          </a>
           <p v-if="purchaseError" class="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {{ purchaseError }}
           </p>
@@ -432,6 +442,7 @@ import {
   normalizeReviewInput,
   reviewerDisplayName,
 } from "../../utils/productReviews";
+import { buildProductWhatsAppLink } from "../../utils/whatsapp";
 
 type ProductReviewRow = {
   id: number;
@@ -494,6 +505,7 @@ const seoSupabase = getPublicSupabaseClient(
   config.public.supabaseUrl as string,
   config.public.supabaseKey as string,
 );
+const paymentSettings = ref<{ whatsapp_number?: string | null }>({});
 
 const { data: initialProduct } = await useAsyncData(`shop-product-seo-${slug}`, async () => {
   const { data, error } = await seoSupabase
@@ -623,6 +635,19 @@ const canPurchase = computed(() =>
     ? Boolean(product.value && !variantSelectionErrorKey.value)
     : Boolean(product.value && selectedSize.value && isAvailable.value),
 );
+const productWhatsappLink = computed(() =>
+  product.value && paymentSettings.value.whatsapp_number
+    ? buildProductWhatsAppLink({
+        phoneNumber: paymentSettings.value.whatsapp_number,
+        productName: product.value.title,
+        color: selectedColor.value?.name,
+        size: selectedSize.value,
+        price: displayPriceState.value.price,
+        url: canonicalUrl.value,
+        locale: locale.value,
+      })
+    : "",
+);
 
 const initializeProductSelection = () => {
   if (!product.value) return;
@@ -743,7 +768,7 @@ onMounted(async () => {
   try {
     wishlistStore.loadWishlist();
     loadRecentlyViewed();
-    await loadCurrentUser();
+    await Promise.all([loadCurrentUser(), loadPaymentSettings()]);
     product.value ||= await productsStore.getProductBySlug(slug);
 
     if (!product.value) return;
@@ -770,6 +795,16 @@ const loadCurrentUser = async () => {
   } = await supabase.auth.getUser();
 
   currentUser.value = user || null;
+};
+
+const loadPaymentSettings = async () => {
+  const { data } = await supabase
+    .from("payment_settings")
+    .select("whatsapp_number")
+    .eq("id", true)
+    .single();
+
+  paymentSettings.value = data || {};
 };
 
 const loadReviews = async () => {

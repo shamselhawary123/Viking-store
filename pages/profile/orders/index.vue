@@ -19,71 +19,54 @@
       <NuxtLink to="/shop" class="premium-button premium-button-primary mt-8">{{ t('profile.goShopping') }}</NuxtLink>
     </div>
 
-    <div v-else class="grid gap-5">
-      <NuxtLink
-        v-for="order in orders"
-        :key="order.id"
-        :to="`/profile/orders/${order.id}`"
-        class="premium-panel rounded-2xl p-6 transition hover:-translate-y-1 hover:border-[#CF1D1D]/70"
-      >
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p class="text-sm text-neutral-500">{{ t('orders.orderId') }}</p>
-            <h3 class="mt-1 text-lg font-black text-white">#{{ order.id.slice(0, 8) }}</h3>
-            <p class="mt-3 text-neutral-400">{{ formatDate(order.created_at) }}</p>
-          </div>
+    <div v-else>
+      <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm font-bold text-neutral-400">
+          {{ t("profile.showingOrders", { visible: visibleOrders.length, total: orders.length }) }}
+        </p>
+      </div>
 
-          <span class="w-fit rounded-full border px-4 py-2 text-sm font-black capitalize" :class="getStatusClass(order.status)">
-            {{ t(`orders.${order.status}`) }}
-          </span>
+      <div class="grid gap-5">
+        <CustomerOrderCard
+          v-for="order in visibleOrders"
+          :key="order.id"
+          :order="order"
+        />
+      </div>
 
-          <div class="text-left lg:text-right">
-            <p class="text-sm text-neutral-500">{{ t('common.total') }}</p>
-            <h2 class="text-4xl font-black text-[#CF1D1D]">{{ formatStorePrice(order.total_price, locale) }}</h2>
-            <span class="mt-4 inline-flex items-center gap-2 text-sm font-black text-white">
-              {{ t('common.details') }}
-              <Icon name="i-heroicons-arrow-right" />
-            </span>
-          </div>
-        </div>
-      </NuxtLink>
+      <div v-if="hasMoreOrders" class="mt-8 flex justify-center">
+        <button
+          type="button"
+          class="inline-flex items-center justify-center rounded-full border border-[#CF1D1D]/40 bg-neutral-950 px-7 py-3 text-sm font-black text-white shadow-[0_14px_36px_rgba(0,0,0,0.32)] transition hover:border-[#CF1D1D]/80 hover:bg-[#CF1D1D]/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#CF1D1D] focus-visible:ring-offset-2 focus-visible:ring-offset-black"
+          @click="showMoreOrders"
+        >
+          {{ t("profile.showMore") }}
+        </button>
+      </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
+import CustomerOrderCard from "../../../components/shared/CustomerOrderCard.vue";
 import { useAuthStore } from "../../../stores/auth";
-import { formatStorePrice } from "../../../utils/localizationFormat";
 
 definePageMeta({
   middleware: ["auth"],
 });
 
 const authStore = useAuthStore(usePinia());
-const { locale, t } = useI18n();
+const { t } = useI18n();
 const orders = ref<any[]>([]);
 const loading = ref(true);
+const visibleCount = ref(5);
 
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString(locale.value === "ar" ? "ar-EG" : "en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-};
+const visibleOrders = computed(() => orders.value.slice(0, visibleCount.value));
+const hasMoreOrders = computed(() => visibleCount.value < orders.value.length);
 
-const getStatusClass = (status: string) => {
-  switch (status?.toLowerCase()) {
-    case "delivered":
-      return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
-    case "shipped":
-      return "border-blue-500/30 bg-blue-500/10 text-blue-300";
-    case "cancelled":
-      return "border-red-500/30 bg-red-500/10 text-red-300";
-    default:
-      return "border-yellow-500/30 bg-yellow-500/10 text-yellow-300";
-  }
+const showMoreOrders = () => {
+  visibleCount.value += 5;
 };
 
 onMounted(async () => {

@@ -81,7 +81,7 @@ describe("product variants phase 1 migration", () => {
 
   it("serializes parent price sync by locking the product row before reading variants", () => {
     const functionBody = sql.match(
-      /create or replace function public\.sync_product_variant_parent_price\([\s\S]*?\nend;\n\$\$;/i,
+      /create or replace function public\.sync_product_variant_parent_price\([\s\S]*?\r?\nend;\r?\n\$\$;/i,
     )?.[0] || "";
     const lockIndex = functionBody.search(/for update/i);
     const minIndex = functionBody.search(/min\(price\)/i);

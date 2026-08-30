@@ -186,6 +186,11 @@ const navItems = [
     to: "/admin/shipping",
     icon: "i-heroicons-truck",
   },
+  {
+    labelKey: "admin.paymentSettings",
+    to: "/admin/payment-settings",
+    icon: "i-heroicons-credit-card",
+  },
   { labelKey: "admin.settings", to: "/admin/settings", icon: "i-heroicons-cog-6-tooth" },
 ];
 

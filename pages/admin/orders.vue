@@ -162,6 +162,7 @@
               <InfoBlock :label="t('common.created')" :value="formatDateTime(selectedOrder.created_at)" />
               <InfoBlock :label="t('admin.paymentMethod')" :value="selectedOrder.payment_method || '-'" />
               <InfoBlock :label="t('admin.paymentStatus')" :value="selectedOrder.payment_status ? t(adminPaymentStatusLabelKey(selectedOrder.payment_status)) : '-'" />
+              <InfoBlock :label="t('admin.paymentDeadline')" :value="formatDateTime(selectedOrder.payment_expires_at)" />
               <InfoBlock :label="t('common.shipping')" :value="formatCurrency(selectedOrder.shipping_cost)" />
               <InfoBlock :label="t('common.discount')" :value="formatCurrency(selectedOrder.discount)" />
               <InfoBlock :label="t('common.subtotal')" :value="formatCurrency(selectedSubtotal)" />
@@ -180,6 +181,43 @@
             </label>
           </section>
         </div>
+
+        <section v-if="selectedOrder.payment_method === 'instapay'" class="mt-6 rounded-2xl bg-black p-5">
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h4 class="font-black">{{ t("admin.paymentProofs") }}</h4>
+              <p class="mt-1 text-sm text-gray-500">{{ t("admin.paymentProofsText") }}</p>
+            </div>
+          </div>
+
+          <div class="mt-4 space-y-3">
+            <article v-for="proof in paymentProofs" :key="proof.id" class="rounded-2xl border border-white/10 bg-[#111111] p-4">
+              <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <p class="font-bold text-white">{{ t(adminPaymentProofStatusLabelKey(proof.status)) }}</p>
+                  <p class="mt-1 text-sm text-gray-500">{{ formatDateTime(proof.submitted_at) }}</p>
+                  <p v-if="proof.transaction_reference" class="mt-1 text-sm text-gray-400">{{ proof.transaction_reference }}</p>
+                  <p v-if="proof.rejection_reason" class="mt-2 text-sm text-red-300">{{ proof.rejection_reason }}</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button class="rounded-xl border border-white/10 px-4 py-2 text-sm font-bold transition hover:border-[#FF4D00]" @click="openProof(proof)">
+                    {{ t("admin.viewProof") }}
+                  </button>
+                  <template v-if="selectedOrder.payment_status === 'proof_submitted' && proof.status === 'submitted'">
+                    <button class="rounded-xl border border-emerald-500/40 px-4 py-2 text-sm font-bold text-emerald-300 transition hover:bg-emerald-500 hover:text-white" @click="reviewPayment(proof, 'confirm')">
+                      {{ t("admin.confirmPayment") }}
+                    </button>
+                    <button class="rounded-xl border border-red-500/40 px-4 py-2 text-sm font-bold text-red-300 transition hover:bg-red-500 hover:text-white" @click="startRejectProof(proof)">
+                      {{ t("admin.rejectProof") }}
+                    </button>
+                  </template>
+                </div>
+              </div>
+            </article>
+            <p v-if="proofsLoading" class="text-sm text-gray-500">{{ t("common.loading") }}</p>
+            <p v-else-if="!paymentProofs.length" class="text-sm text-gray-500">{{ t("admin.noPaymentProofs") }}</p>
+          </div>
+        </section>
 
         <section class="mt-6">
           <h4 class="text-xl font-black">{{ t("admin.items") }}</h4>
@@ -200,6 +238,30 @@
           </div>
         </section>
       </div>
+    </div>
+
+    <div v-if="proofViewer" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4" @click="closeProof">
+      <div class="w-full max-w-4xl rounded-3xl border border-white/10 bg-[#111111] p-4" @click.stop>
+        <div class="flex items-center justify-between gap-4">
+          <h3 class="text-xl font-black">{{ t("admin.paymentProof") }}</h3>
+          <button class="text-gray-400 hover:text-white" @click="closeProof">{{ t("admin.modalClose") }}</button>
+        </div>
+        <img :src="proofViewer" alt="" class="mt-4 max-h-[76vh] w-full rounded-2xl object-contain" />
+      </div>
+    </div>
+
+    <div v-if="rejectingProof" class="fixed inset-0 z-[60] flex items-center justify-center bg-black/85 p-4">
+      <form class="w-full max-w-lg rounded-3xl border border-white/10 bg-[#111111] p-5" @submit.prevent="submitRejectProof">
+        <h3 class="text-xl font-black">{{ t("admin.rejectProof") }}</h3>
+        <label class="mt-4 block">
+          <span class="text-sm text-gray-500">{{ t("admin.rejectionReason") }}</span>
+          <textarea v-model="rejectionReason" required class="field mt-2 min-h-32" />
+        </label>
+        <div class="mt-5 flex flex-col gap-3 sm:flex-row">
+          <button type="submit" class="rounded-xl bg-red-600 px-4 py-3 text-sm font-black text-white">{{ t("admin.rejectProof") }}</button>
+          <button type="button" class="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold" @click="rejectingProof = null">{{ t("common.cancel") }}</button>
+        </div>
+      </form>
     </div>
   </section>
 </template>
@@ -245,6 +307,8 @@ type OrderRow = {
   governorate_code?: string | null;
   discount?: number | string | null;
   payment_status?: string | null;
+  payment_expires_at?: string | null;
+  payment_rejection_reason?: string | null;
   [key: string]: any;
 };
 
@@ -266,6 +330,17 @@ type ShippingGovernorateRow = {
   name_en: string;
 };
 
+type PaymentProofRow = {
+  id: string;
+  order_id: string;
+  storage_path?: string;
+  status: string;
+  transaction_reference?: string | null;
+  submitted_at?: string | null;
+  reviewed_at?: string | null;
+  rejection_reason?: string | null;
+};
+
 const InfoBlock = defineComponent({
   props: {
     label: { type: String, required: true },
@@ -285,6 +360,7 @@ const { locale, t } = useI18n();
 const orders = ref<OrderRow[]>([]);
 const selectedOrder = ref<OrderRow | null>(null);
 const orderItems = ref<OrderItemRow[]>([]);
+const paymentProofs = ref<PaymentProofRow[]>([]);
 const shippingGovernorates = ref<ShippingGovernorateRow[]>([]);
 const search = ref("");
 const statusFilter = ref("all");
@@ -292,7 +368,11 @@ const paymentStatusFilter = ref("all");
 const loading = ref(true);
 const hasMore = ref(true);
 const itemsLoading = ref(false);
+const proofsLoading = ref(false);
 const updatingOrderId = ref<string | null>(null);
+const proofViewer = ref("");
+const rejectingProof = ref<PaymentProofRow | null>(null);
+const rejectionReason = ref("");
 const successMessage = ref("");
 const errorMessage = ref("");
 const pageSize = 20;
@@ -383,6 +463,9 @@ const loadShippingGovernorates = async () => {
   shippingGovernorates.value = (data || []) as ShippingGovernorateRow[];
 };
 
+const adminPaymentProofStatusLabelKey = (status?: string | null) =>
+  `admin.paymentProofStatus.${String(status || "submitted").toLowerCase()}`;
+
 const updateStatus = async (order: OrderRow, status: string) => {
   const nextStatus = status as AdminOrderStatus;
   const previousStatus = order.status;
@@ -409,7 +492,9 @@ const updateStatus = async (order: OrderRow, status: string) => {
 const openDetails = async (order: OrderRow) => {
   selectedOrder.value = order;
   orderItems.value = [];
+  paymentProofs.value = [];
   itemsLoading.value = true;
+  proofsLoading.value = order.payment_method === "instapay";
   setMessage("error", "");
 
   const { data, error } = await supabase
@@ -425,11 +510,78 @@ const openDetails = async (order: OrderRow) => {
 
   orderItems.value = (data || []) as OrderItemRow[];
   itemsLoading.value = false;
+
+  if (order.payment_method === "instapay") {
+    const { data: proofs, error: proofError } = await supabase
+      .from("payment_proofs")
+      .select("*")
+      .eq("order_id", order.id)
+      .order("submitted_at", { ascending: false });
+
+    if (proofError) {
+      setMessage("error", proofError.message);
+    } else {
+      paymentProofs.value = (proofs || []) as PaymentProofRow[];
+    }
+    proofsLoading.value = false;
+  }
 };
 
 const closeDetails = () => {
   selectedOrder.value = null;
   orderItems.value = [];
+  paymentProofs.value = [];
+};
+
+const openProof = async (proof: PaymentProofRow) => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  const { signedUrl } = await $fetch<{ signedUrl: string }>("/api/admin/payments/proof-url", {
+    query: { proof_id: proof.id },
+    headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+  });
+  proofViewer.value = signedUrl;
+};
+
+const closeProof = () => {
+  proofViewer.value = "";
+};
+
+const reviewPayment = async (proof: PaymentProofRow, action: "confirm" | "reject") => {
+  if (!selectedOrder.value) return;
+
+  const { error } = await supabase.rpc("admin_review_instapay_payment", {
+    p_order_id: selectedOrder.value.id,
+    p_proof_id: proof.id,
+    p_action: action,
+    p_rejection_reason: action === "reject" ? rejectionReason.value : null,
+  });
+
+  if (error) {
+    setMessage("error", error.message);
+    return;
+  }
+
+  setMessage("success", t(action === "confirm" ? "admin.paymentConfirmed" : "admin.paymentRejected"));
+  selectedOrder.value.payment_status = action === "confirm" ? "paid" : "rejected";
+  if (action === "reject") {
+    selectedOrder.value.payment_rejection_reason = rejectionReason.value;
+  }
+  rejectingProof.value = null;
+  rejectionReason.value = "";
+  await openDetails(selectedOrder.value);
+};
+
+const startRejectProof = (proof: PaymentProofRow) => {
+  rejectingProof.value = proof;
+  rejectionReason.value = "";
+};
+
+const submitRejectProof = async () => {
+  if (rejectingProof.value) {
+    await reviewPayment(rejectingProof.value, "reject");
+  }
 };
 
 onMounted(() => {
