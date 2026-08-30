@@ -2,6 +2,18 @@ export const DEFAULT_SITE_URL = "https://viking-store.vercel.app";
 export const SEO_SITE_NAME = "Viking Store";
 export const SEO_DEFAULT_IMAGE = "/logo.png";
 export const SEO_PRICE_CURRENCY = "EGP";
+export const SEO_ALTERNATE_NAMES = [
+  "فايكنج ستور",
+  "فايكنج استور",
+  "Viking Store Egypt",
+];
+export const SEO_SOCIAL_LINKS = [
+  "https://www.facebook.com/profile.php?id=100025354200512",
+  "https://www.instagram.com/vikingclubstore/",
+  "https://www.tiktok.com/@the_vikings22",
+];
+export const SEO_ORGANIZATION_DESCRIPTION =
+  "Viking Store / فايكنج ستور is an Egypt online store for combat-sports gear, boxing gloves, MMA gloves, head guards, mouth guards, hand wraps, and martial arts training essentials.";
 
 export const PRIVATE_SEO_PREFIXES = [
   "/admin",
@@ -401,14 +413,19 @@ export const buildOrganizationStructuredData = (siteUrl: string) => ({
   "@context": "https://schema.org",
   "@type": "Organization",
   name: SEO_SITE_NAME,
+  alternateName: SEO_ALTERNATE_NAMES,
+  description: SEO_ORGANIZATION_DESCRIPTION,
   url: buildCanonicalUrl(siteUrl, "/"),
   logo: absoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
+  image: absoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
+  sameAs: SEO_SOCIAL_LINKS,
 });
 
 export const buildWebsiteStructuredData = (siteUrl: string) => ({
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: SEO_SITE_NAME,
+  alternateName: SEO_ALTERNATE_NAMES,
   url: buildCanonicalUrl(siteUrl, "/"),
   potentialAction: {
     "@type": "SearchAction",

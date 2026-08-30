@@ -26,4 +26,24 @@ describe("home UI layout", () => {
     assert.doesNotMatch(source, /absolute bottom-6 left-6 right-6/);
     assert.doesNotMatch(source, /font-display text-5xl/);
   });
+
+  it("limits homepage categories to eight and places the categories CTA above the grid", () => {
+    const source = read("../components/home/CategoriesSection.vue");
+    const enLocale = read("../locales/en.json");
+    const arLocale = read("../locales/ar.json");
+
+    assert.match(source, /homepageCategories/);
+    assert.match(source, /\.slice\(0, 8\)/);
+    assert.match(source, /to="\/categories"/);
+    assert.match(source, /home\.viewAllCategories/);
+    assert.match(source, /<div\s+v-reveal\s+class="mb-16/);
+    assert.match(source, /<div class="hidden gap-5 sm:grid/);
+    assert.ok(
+      source.indexOf('to="/categories"') <
+        source.indexOf('class="hidden gap-5 sm:grid'),
+      "Categories CTA should render before the category grid",
+    );
+    assert.match(enLocale, /"viewAllCategories": "View All Categories"/);
+    assert.match(arLocale, /"viewAllCategories": "عرض كل الأقسام"/);
+  });
 });

@@ -181,6 +181,11 @@ const navItems = [
     to: "/admin/users",
     icon: "i-heroicons-users",
   },
+  {
+    labelKey: "admin.shippingSettings",
+    to: "/admin/shipping",
+    icon: "i-heroicons-truck",
+  },
   { labelKey: "admin.settings", to: "/admin/settings", icon: "i-heroicons-cog-6-tooth" },
 ];
 

@@ -145,6 +145,7 @@
               <InfoBlock :label="t('common.type')" :value="customerTypeLabel(selectedOrder)" />
               <InfoBlock :label="t('common.phone')" :value="selectedCustomer.phone" />
               <InfoBlock :label="t('common.email')" :value="selectedCustomer.email" />
+              <InfoBlock :label="t('admin.governorate')" :value="selectedGovernorateName" />
               <InfoBlock :label="t('common.city')" :value="selectedCustomer.city" />
               <InfoBlock :label="t('common.address')" :value="selectedCustomer.address" />
             </div>
@@ -241,6 +242,7 @@ type OrderRow = {
   guest_notes?: string | null;
   order_number?: number | string | null;
   shipping_cost?: number | string | null;
+  governorate_code?: string | null;
   discount?: number | string | null;
   payment_status?: string | null;
   [key: string]: any;
@@ -258,6 +260,12 @@ type OrderItemRow = {
   quantity?: number;
 };
 
+type ShippingGovernorateRow = {
+  code: string;
+  name_ar: string;
+  name_en: string;
+};
+
 const InfoBlock = defineComponent({
   props: {
     label: { type: String, required: true },
@@ -273,10 +281,11 @@ const InfoBlock = defineComponent({
 });
 
 const supabase = useSupabase();
-const { t } = useI18n();
+const { locale, t } = useI18n();
 const orders = ref<OrderRow[]>([]);
 const selectedOrder = ref<OrderRow | null>(null);
 const orderItems = ref<OrderItemRow[]>([]);
+const shippingGovernorates = ref<ShippingGovernorateRow[]>([]);
 const search = ref("");
 const statusFilter = ref("all");
 const paymentStatusFilter = ref("all");
@@ -303,6 +312,17 @@ const paymentStatusOptions = computed(() =>
 const selectedCustomer = computed(() => getOrderCustomer(selectedOrder.value || {}));
 const customerTypeLabel = (order: OrderRow | null) =>
   order?.user_id ? t("admin.authenticated") : t("common.guest");
+const governorateName = (code?: string | null) => {
+  if (!code) return "-";
+
+  const governorate = shippingGovernorates.value.find((item) => item.code === code);
+  if (!governorate) return code;
+
+  return locale.value === "ar" ? governorate.name_ar : governorate.name_en;
+};
+const selectedGovernorateName = computed(() =>
+  governorateName(selectedOrder.value?.governorate_code),
+);
 const selectedSubtotal = computed(() => {
   if (!selectedOrder.value) return 0;
 
@@ -354,6 +374,15 @@ const loadOrders = async () => {
   loading.value = false;
 };
 
+const loadShippingGovernorates = async () => {
+  const { data } = await supabase
+    .from("shipping_governorates")
+    .select("code,name_ar,name_en")
+    .order("sort_order", { ascending: true });
+
+  shippingGovernorates.value = (data || []) as ShippingGovernorateRow[];
+};
+
 const updateStatus = async (order: OrderRow, status: string) => {
   const nextStatus = status as AdminOrderStatus;
   const previousStatus = order.status;
@@ -403,7 +432,10 @@ const closeDetails = () => {
   orderItems.value = [];
 };
 
-onMounted(loadOrders);
+onMounted(() => {
+  loadShippingGovernorates();
+  loadOrders();
+});
 </script>
 
 <style scoped>
