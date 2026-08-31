@@ -158,6 +158,65 @@ describe("SEO helpers", () => {
     assert.doesNotMatch(buildShopCategoryUrl("kick boxing!"), /!| /);
   });
 
+  it("maps Egyptian product category search intent without keyword stuffing", () => {
+    const gloves = getCategorySeoIntent({ slug: "gloves", name: "Gloves" }, "ar");
+    const shinGuards = getCategorySeoIntent(
+      { slug: "shin-guards", name: "Shin Guards" },
+      "ar",
+    );
+    const handWraps = getCategorySeoIntent(
+      { slug: "hand-wraps", name: "Hand Wraps" },
+      "ar",
+    );
+    const headGuards = getCategorySeoIntent(
+      { slug: "head-guards", name: "Head Guards" },
+      "ar",
+    );
+    const mouthGuards = getCategorySeoIntent(
+      { slug: "mouth-guards", name: "Mouth Guards" },
+      "ar",
+    );
+
+    assert.equal(gloves.title, "جلافز ملاكمة في مصر");
+    assert.equal(`${gloves.title} | Viking Store`, "جلافز ملاكمة في مصر | Viking Store");
+    assert.doesNotMatch(gloves.title, /قلبظ|قلابظ/);
+    assert.match(gloves.description, /قفازات ملاكمة/);
+    assert.match(gloves.keywords, /جلافز ملاكمة/);
+    assert.match(gloves.keywords, /قلبظ ملاكمة/);
+    assert.match(gloves.keywords, /قلابظ ملاكمة/);
+    assert.match(gloves.keywords, /قفازات ملاكمة/);
+    assert.doesNotMatch(gloves.keywords, /جوانتي بوكس/);
+    assert.match(shinGuards.title, /شنكار كيك بوكس ومواي تاي/);
+    assert.match(shinGuards.keywords, /شنكار شراب/);
+    assert.match(handWraps.title, /بنداج ملاكمة/);
+    assert.match(headGuards.title, /هيد جارد/);
+    assert.match(mouthGuards.title, /ماوث جارد/);
+
+    const combinedCopy = [
+      gloves.title,
+      gloves.description,
+      gloves.keywords,
+      shinGuards.title,
+      shinGuards.description,
+      shinGuards.keywords,
+      handWraps.title,
+      handWraps.description,
+      handWraps.keywords,
+      headGuards.title,
+      headGuards.description,
+      headGuards.keywords,
+      mouthGuards.title,
+      mouthGuards.description,
+      mouthGuards.keywords,
+    ].join(" ");
+
+    assert.doesNotMatch(combinedCopy, /جوانتي بوكس/);
+    assert.ok(
+      combinedCopy.length < 1400,
+      "intent copy should stay concise, not become a keyword block",
+    );
+  });
+
   it("builds product SEO from real product and category data without fake review data", () => {
     const product = {
       title: "Pro Gloves",
@@ -178,8 +237,17 @@ describe("SEO helpers", () => {
     );
 
     assert.match(english.title, /Boxing Gloves/);
-    assert.match(arabic.title, /قفازات ملاكمة/);
+    assert.match(arabic.title, /جلافز وقلبظ ملاكمة/);
+    assert.match(arabic.description, /قفازات ملاكمة/);
     assert.match(buildProductImageAlt(product, "ar"), /Pro Gloves/);
+    assert.deepEqual(structuredData.alternateName, [
+      "جلافز ملاكمة",
+      "قلبظ ملاكمة",
+      "قلابظ ملاكمة",
+      "قفازات ملاكمة",
+      "جلافز بوكس",
+      "Boxing Gloves",
+    ]);
     assert.equal(structuredData.aggregateRating, undefined);
   });
 });
@@ -190,6 +258,8 @@ describe("SEO route integration", () => {
     assert.match(productPageSource, /useSeoMeta/);
     assert.match(productPageSource, /setResponseStatus\(404\)/);
     assert.match(sitemapSource, /\.from\("products"\)/);
+    assert.match(sitemapSource, /\.from\("categories"\)/);
+    assert.match(sitemapSource, /buildShopCategoryCanonicalUrl/);
     assert.match(sitemapSource, /\.from\("blog_posts"\)/);
     assert.doesNotMatch(sitemapSource, /\/admin/);
     assert.match(robotsSource, /buildRobotsTxt/);

@@ -1,4 +1,14 @@
 import { defineStore } from "pinia";
+import { getPublicSupabaseClient } from "../utils/publicSupabase";
+
+const usePublicCatalogSupabase = () => {
+  const config = useRuntimeConfig();
+
+  return getPublicSupabaseClient(
+    String(config.public.supabaseUrl || ""),
+    String(config.public.supabaseKey || ""),
+  );
+};
 
 export const useCategoriesStore = defineStore("categories", {
   state: () => ({
@@ -11,7 +21,7 @@ export const useCategoriesStore = defineStore("categories", {
     async getCategories(force = false) {
       if (!force && (this.loaded || this.loading)) return;
 
-      const supabase = useSupabase();
+      const supabase = usePublicCatalogSupabase();
 
       this.loading = true;
 

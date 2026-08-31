@@ -1,5 +1,15 @@
 import { defineStore } from "pinia";
+import { getPublicSupabaseClient } from "../utils/publicSupabase";
 import { SHOP_PRODUCT_DETAIL_SELECT, SHOP_PRODUCTS_SELECT } from "../utils/shopProducts";
+
+const usePublicCatalogSupabase = () => {
+  const config = useRuntimeConfig();
+
+  return getPublicSupabaseClient(
+    String(config.public.supabaseUrl || ""),
+    String(config.public.supabaseKey || ""),
+  );
+};
 
 export const useProductsStore = defineStore("products", {
   state: () => ({
@@ -13,7 +23,7 @@ export const useProductsStore = defineStore("products", {
     async getProducts(force = false) {
       if (!force && (this.loaded || this.loading)) return;
 
-      const supabase = useSupabase();
+      const supabase = usePublicCatalogSupabase();
 
       this.loading = true;
 
@@ -39,7 +49,7 @@ export const useProductsStore = defineStore("products", {
 
     // GET PRODUCT BY SLUG
     async getProductBySlug(slug: string) {
-      const supabase = useSupabase();
+      const supabase = usePublicCatalogSupabase();
 
       const { data, error } = await supabase
         .from("products")
@@ -58,7 +68,7 @@ export const useProductsStore = defineStore("products", {
 
     // RELATED PRODUCTS
     async getRelatedProducts(categoryId: number, currentProductId: number) {
-      const supabase = useSupabase();
+      const supabase = usePublicCatalogSupabase();
 
       const { data, error } = await supabase
         .from("products")

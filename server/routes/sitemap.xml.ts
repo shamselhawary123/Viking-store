@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { buildCanonicalUrl, buildSitemapXml, normalizeSiteUrl, publicSitemapEntries } from "../../utils/seo";
+import { buildCanonicalUrl, buildShopCategoryCanonicalUrl, buildSitemapXml, normalizeSiteUrl, publicSitemapEntries } from "../../utils/seo";
 
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig(event);
@@ -17,6 +17,20 @@ export default defineEventHandler(async (event) => {
       .select("slug,created_at")
       .not("slug", "is", null)
       .order("id", { ascending: false });
+
+    const { data: categories } = await supabase
+      .from("categories")
+      .select("slug")
+      .not("slug", "is", null)
+      .order("id", { ascending: true });
+
+    (categories || []).forEach((category) => {
+      if (!category.slug || category.slug === "all") return;
+
+      urls.push({
+        loc: buildShopCategoryCanonicalUrl(origin, category.slug),
+      });
+    });
 
     (products || []).forEach((product) => {
       urls.push({

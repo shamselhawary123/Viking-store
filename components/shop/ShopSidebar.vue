@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
+import { computed, ref } from "vue";
 import { useShopStore } from "../../stores/shop";
 import { useCategoriesStore } from "../../stores/categories";
 import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
@@ -115,10 +115,6 @@ const isRtl = computed(() => locale.value === "ar");
 const priceLabel = computed(() =>
   shopStore.maxPrice >= SHOP_DEFAULT_MAX_PRICE ? t("shop.any") : formatStorePrice(shopStore.maxPrice, locale.value),
 );
-
-onMounted(async () => {
-  await categoriesStore.getCategories();
-});
 
 const selectCategory = (slug: string) => {
   shopStore.selectedCategory = slug;
