@@ -15,11 +15,15 @@
       :class="isRtl ? 'left-0 border-r' : 'right-0 border-l'"
       :aria-label="t('nav.cart')"
     >
-      <div class="flex items-center justify-between border-b border-white/10 p-6">
+      <div
+        class="flex items-center justify-between border-b border-white/10 p-6"
+      >
         <div>
-          <p class="eyebrow">{{ t('cart.vikingCart') }}</p>
-          <h2 class="mt-2 text-3xl font-black">{{ t('cart.yourBag') }}</h2>
-          <p class="mt-1 text-sm text-neutral-400">{{ t('cart.itemsSelected', { count: cartStore.totalItems }) }}</p>
+          <p class="eyebrow">{{ t("cart.vikingCart") }}</p>
+          <h2 class="mt-2 text-3xl font-black">{{ t("cart.yourBag") }}</h2>
+          <p class="mt-1 text-sm text-neutral-400">
+            {{ t("cart.itemsSelected", { count: cartStore.totalItems }) }}
+          </p>
         </div>
 
         <button
@@ -35,15 +39,21 @@
         v-if="!cartStore.items.length"
         class="flex flex-1 flex-col items-center justify-center gap-5 p-6 text-center"
       >
-        <div class="flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#CF1D1D]">
+        <div
+          class="flex h-20 w-20 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#CF1D1D]"
+        >
           <Icon name="i-heroicons-shopping-bag" class="text-4xl" />
         </div>
         <div>
-          <h3 class="text-3xl font-black">{{ t('cart.emptyBag') }}</h3>
-          <p class="mt-3 text-neutral-400">{{ t('cart.emptyBagText') }}</p>
+          <h3 class="text-3xl font-black">{{ t("cart.emptyBag") }}</h3>
+          <p class="mt-3 text-neutral-400">{{ t("cart.emptyBagText") }}</p>
         </div>
-        <NuxtLink to="/shop" class="premium-button premium-button-primary" @click="cartStore.closeCart()">
-          {{ t('cart.continueShopping') }}
+        <NuxtLink
+          to="/shop"
+          class="premium-button premium-button-primary"
+          @click="cartStore.closeCart()"
+        >
+          {{ t("cart.continueShopping") }}
         </NuxtLink>
       </div>
 
@@ -54,13 +64,25 @@
           class="premium-panel rounded-2xl p-4"
         >
           <div class="flex gap-4">
-            <img :src="item.image" :alt="item.title" width="96" height="96" class="h-24 w-24 rounded-xl object-cover" loading="lazy" decoding="async" />
+            <img
+              :src="item.image"
+              :alt="item.title"
+              width="96"
+              height="96"
+              class="h-24 w-24 rounded-xl object-cover"
+              loading="lazy"
+              decoding="async"
+            />
 
             <div class="min-w-0 flex-1">
               <div class="flex items-start justify-between gap-3">
                 <div class="min-w-0">
-                  <h3 class="truncate text-base font-black">{{ item.title }}</h3>
-                  <p class="mt-1 text-sm text-neutral-400">{{ item.color }} / {{ item.size }}</p>
+                  <h3 class="truncate text-base font-black">
+                    {{ item.title }}
+                  </h3>
+                  <p class="mt-1 text-sm text-neutral-400">
+                    {{ item.color }} / {{ item.size }}
+                  </p>
                 </div>
                 <button
                   class="text-neutral-500 transition hover:text-red-400"
@@ -72,7 +94,9 @@
               </div>
 
               <div class="mt-4 flex items-center justify-between gap-3">
-                <div class="flex items-center overflow-hidden rounded-full border border-white/10">
+                <div
+                  class="flex items-center overflow-hidden rounded-full border border-white/10"
+                >
                   <button
                     class="flex h-9 w-9 items-center justify-center transition hover:bg-white/10"
                     :aria-label="t('cart.decreaseQuantity')"
@@ -80,7 +104,9 @@
                   >
                     <Icon name="i-heroicons-minus" />
                   </button>
-                  <div class="flex h-9 min-w-10 items-center justify-center border-x border-white/10 text-sm font-black">
+                  <div
+                    class="flex h-9 min-w-10 items-center justify-center border-x border-white/10 text-sm font-black"
+                  >
                     {{ item.quantity }}
                   </div>
                   <button
@@ -92,7 +118,9 @@
                   </button>
                 </div>
 
-                <p class="text-xl font-black text-[#CF1D1D]">{{ formatStorePrice(item.price * item.quantity, locale) }}</p>
+                <p class="text-xl font-black text-[#CF1D1D]">
+                  {{ formatStorePrice(item.price * item.quantity, locale) }}
+                </p>
               </div>
             </div>
           </div>
@@ -107,26 +135,41 @@
           {{ t(cartStore.quantityErrorKey) }}
         </p>
         <div class="mb-6 space-y-3">
-          <div class="flex items-center justify-between text-sm text-neutral-400">
-            <span>{{ t('common.subtotal') }}</span>
-            <span class="font-bold text-white">{{ formatStorePrice(cartStore.totalPrice, locale) }}</span>
+          <div
+            class="flex items-center justify-between text-sm text-neutral-400"
+          >
+            <span>{{ t("common.subtotal") }}</span>
+            <span class="font-bold text-white">{{
+              formatStorePrice(cartStore.totalPrice, locale)
+            }}</span>
           </div>
-          <div class="flex items-center justify-between text-sm text-neutral-400">
+          <!-- <div class="flex items-center justify-between text-sm text-neutral-400">
             <span>{{ t('common.shipping') }}</span>
             <span class="font-bold text-emerald-400">{{ t('common.free') }}</span>
-          </div>
-          <div class="flex items-center justify-between border-t border-white/10 pt-4">
-            <span class="text-lg font-black">{{ t('common.total') }}</span>
-            <span class="text-3xl font-black text-[#CF1D1D]">{{ formatStorePrice(cartStore.totalPrice, locale) }}</span>
+          </div> -->
+          <div
+            class="flex items-center justify-between border-t border-white/10 pt-4"
+          >
+            <span class="text-lg font-black">{{ t("common.total") }}</span>
+            <span class="text-3xl font-black text-[#CF1D1D]">{{
+              formatStorePrice(cartStore.totalPrice, locale)
+            }}</span>
           </div>
         </div>
 
         <div class="grid gap-3">
-          <NuxtLink to="/cart" class="premium-button premium-button-secondary w-full" @click="cartStore.closeCart()">
-            {{ t('cart.viewCart') }}
+          <NuxtLink
+            to="/cart"
+            class="premium-button premium-button-secondary w-full"
+            @click="cartStore.closeCart()"
+          >
+            {{ t("cart.viewCart") }}
           </NuxtLink>
-          <button class="premium-button premium-button-primary w-full" @click="handleCheckout">
-            {{ t('cart.checkout') }}
+          <button
+            class="premium-button premium-button-primary w-full"
+            @click="handleCheckout"
+          >
+            {{ t("cart.checkout") }}
           </button>
         </div>
       </div>
