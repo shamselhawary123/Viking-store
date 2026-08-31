@@ -518,6 +518,7 @@
     "paymentMethod": "Payment Method",
     "unpaid": "Unpaid",
     "paid": "Paid",
+    "expired": "Expired",
     "cash": "Cash",
     "orderDetails": "Order Details",
     "orderNumber": "Order Number",

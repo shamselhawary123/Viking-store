@@ -26,6 +26,12 @@ describe("home UI layout", () => {
     assert.match(css, /\.container-premium\s*{[^}]*margin-inline:\s*auto;/s);
   });
 
+  it("prevents post-hydration root transforms from shifting the RTL page", () => {
+    const css = read("../assets/css/main.css");
+
+    assert.match(css, /html\[dir="rtl"\]\s*{[^}]*transform:\s*none\s*!important;[^}]*translate:\s*none\s*!important;/s);
+  });
+
   it("keeps category text in a dedicated lower panel instead of over the image", () => {
     const source = read("../components/home/CategoriesSection.vue");
 
