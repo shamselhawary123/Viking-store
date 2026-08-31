@@ -30,6 +30,14 @@ test("default layout mounts the branded global loader once", () => {
   assert.match(layout, /<SharedVikingGlobalLoader\s*\/>/);
 });
 
+test("global loader overlay is teleported to a viewport-fixed body layer", () => {
+  const loader = read("components/shared/VikingGlobalLoader.vue");
+
+  assert.match(loader, /<Teleport\s+to=["']body["']>/);
+  assert.match(loader, /class=["'][^"']*fixed[^"']*inset-0[^"']*/);
+  assert.doesNotMatch(loader, /absolute inset-0/);
+});
+
 test("global loader is branded, accessible, localized, reduced-motion safe, and does not touch root transforms", () => {
   const loader = read("components/shared/VikingGlobalLoader.vue");
   const ar = JSON.parse(read("locales/ar.json"));

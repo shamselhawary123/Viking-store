@@ -1,74 +1,76 @@
 <template>
-  <Transition name="viking-loader-fade">
-    <div
-      v-if="isVisible"
-      class="fixed inset-0 z-[120] flex items-center justify-center bg-black/75 px-6 backdrop-blur-[2px]"
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-    >
-      <div class="viking-loader-shell">
-        <span class="viking-loader-idle-halo" aria-hidden="true" />
+  <Teleport to="body">
+    <Transition name="viking-loader-fade">
+      <div
+        v-if="isVisible"
+        class="fixed inset-0 z-[120] flex items-center justify-center bg-black/75 px-6 backdrop-blur-[2px]"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <div class="viking-loader-shell">
+          <span class="viking-loader-idle-halo" aria-hidden="true" />
 
-        <svg class="viking-loader-glove viking-loader-glove-left" viewBox="0 0 80 54" aria-hidden="true">
-          <path
-            d="M18 17C20 8 28 5 37 8l12 4c8 3 12 9 10 17-2 9-9 15-19 15H25c-11 0-16-9-13-18 1-4 3-7 6-9Z"
-            fill="url(#viking-glove-metal-left)"
+          <svg class="viking-loader-glove viking-loader-glove-left" viewBox="0 0 80 54" aria-hidden="true">
+            <path
+              d="M18 17C20 8 28 5 37 8l12 4c8 3 12 9 10 17-2 9-9 15-19 15H25c-11 0-16-9-13-18 1-4 3-7 6-9Z"
+              fill="url(#viking-glove-metal-left)"
+            />
+            <path d="M14 33h19c5 0 9 4 9 9v3H17c-5 0-9-4-9-9 0-2 2-3 6-3Z" fill="#161616" />
+            <path d="M24 16c9-3 21 0 28 6M15 31c8 3 21 3 31 0" stroke="#CF1D1D" stroke-width="2.2" stroke-linecap="round" />
+            <defs>
+              <linearGradient id="viking-glove-metal-left" x1="11" x2="61" y1="8" y2="42">
+                <stop stop-color="#303030" />
+                <stop offset="0.6" stop-color="#101010" />
+                <stop offset="1" stop-color="#CF1D1D" stop-opacity="0.42" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <svg class="viking-loader-glove viking-loader-glove-right" viewBox="0 0 80 54" aria-hidden="true">
+            <path
+              d="M18 17C20 8 28 5 37 8l12 4c8 3 12 9 10 17-2 9-9 15-19 15H25c-11 0-16-9-13-18 1-4 3-7 6-9Z"
+              fill="url(#viking-glove-metal-right)"
+            />
+            <path d="M14 33h19c5 0 9 4 9 9v3H17c-5 0-9-4-9-9 0-2 2-3 6-3Z" fill="#161616" />
+            <path d="M24 16c9-3 21 0 28 6M15 31c8 3 21 3 31 0" stroke="#CF1D1D" stroke-width="2.2" stroke-linecap="round" />
+            <defs>
+              <linearGradient id="viking-glove-metal-right" x1="11" x2="61" y1="8" y2="42">
+                <stop stop-color="#303030" />
+                <stop offset="0.6" stop-color="#101010" />
+                <stop offset="1" stop-color="#CF1D1D" stop-opacity="0.42" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <span class="viking-loader-impact-flash" aria-hidden="true" />
+          <span
+            v-for="streak in 6"
+            :key="streak"
+            class="viking-loader-impact-streak"
+            :style="{ '--streak-angle': `${streak * 60}deg` }"
+            aria-hidden="true"
           />
-          <path d="M14 33h19c5 0 9 4 9 9v3H17c-5 0-9-4-9-9 0-2 2-3 6-3Z" fill="#161616" />
-          <path d="M24 16c9-3 21 0 28 6M15 31c8 3 21 3 31 0" stroke="#CF1D1D" stroke-width="2.2" stroke-linecap="round" />
-          <defs>
-            <linearGradient id="viking-glove-metal-left" x1="11" x2="61" y1="8" y2="42">
-              <stop stop-color="#303030" />
-              <stop offset="0.6" stop-color="#101010" />
-              <stop offset="1" stop-color="#CF1D1D" stop-opacity="0.42" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <svg class="viking-loader-glove viking-loader-glove-right" viewBox="0 0 80 54" aria-hidden="true">
-          <path
-            d="M18 17C20 8 28 5 37 8l12 4c8 3 12 9 10 17-2 9-9 15-19 15H25c-11 0-16-9-13-18 1-4 3-7 6-9Z"
-            fill="url(#viking-glove-metal-right)"
+          <img
+            src="/logo.png"
+            alt=""
+            width="72"
+            height="72"
+            class="viking-loader-logo viking-loader-logo-reveal relative z-10 h-16 w-16 object-contain sm:h-[72px] sm:w-[72px]"
+            loading="eager"
+            decoding="async"
           />
-          <path d="M14 33h19c5 0 9 4 9 9v3H17c-5 0-9-4-9-9 0-2 2-3 6-3Z" fill="#161616" />
-          <path d="M24 16c9-3 21 0 28 6M15 31c8 3 21 3 31 0" stroke="#CF1D1D" stroke-width="2.2" stroke-linecap="round" />
-          <defs>
-            <linearGradient id="viking-glove-metal-right" x1="11" x2="61" y1="8" y2="42">
-              <stop stop-color="#303030" />
-              <stop offset="0.6" stop-color="#101010" />
-              <stop offset="1" stop-color="#CF1D1D" stop-opacity="0.42" />
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <span class="viking-loader-impact-flash" aria-hidden="true" />
-        <span
-          v-for="streak in 6"
-          :key="streak"
-          class="viking-loader-impact-streak"
-          :style="{ '--streak-angle': `${streak * 60}deg` }"
-          aria-hidden="true"
-        />
-        <img
-          src="/logo.png"
-          alt=""
-          width="72"
-          height="72"
-          class="viking-loader-logo viking-loader-logo-reveal relative z-10 h-16 w-16 object-contain sm:h-[72px] sm:w-[72px]"
-          loading="eager"
-          decoding="async"
-        />
-        <p class="sr-only">{{ t("common.preparingGear") }}</p>
-        <p
-          class="viking-loader-text relative z-10 mt-3 text-center text-xs font-black uppercase tracking-[0.18em] text-neutral-300"
-          aria-hidden="true"
-        >
-          {{ t("common.preparingGear") }}
-        </p>
+          <p class="sr-only">{{ t("common.preparingGear") }}</p>
+          <p
+            class="viking-loader-text relative z-10 mt-3 text-center text-xs font-black uppercase tracking-[0.18em] text-neutral-300"
+            aria-hidden="true"
+          >
+            {{ t("common.preparingGear") }}
+          </p>
+        </div>
       </div>
-    </div>
-  </Transition>
+    </Transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
