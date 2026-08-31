@@ -65,6 +65,7 @@ type CategorySeoIntent = {
   title: string;
   description: string;
   keywords: string;
+  alternateNames?: string[];
   known: boolean;
 };
 
@@ -94,8 +95,16 @@ export const normalizeCategorySlug = (value: string) =>
     .replace(/^-|-$/g, "");
 
 const categoryAliases: Record<string, string> = {
+  "boxing-glove": "gloves",
+  "boxing-gloves": "gloves",
+  glove: "gloves",
   "kick-boxing": "kickboxing",
   "kick-box": "kickboxing",
+  handwraps: "hand-wraps",
+  wraps: "hand-wraps",
+  headguards: "head-guards",
+  mouthguards: "mouth-guards",
+  mouthguard: "mouth-guards",
   muaythai: "muay-thai",
   "thai-boxing": "muay-thai",
   kungfu: "kung-fu",
@@ -108,18 +117,50 @@ const categorySeoIntents: Record<
 > = {
   boxing: {
     en: {
-      label: "Boxing Gear",
+      label: "Boxing Gloves",
       title: "Boxing Gloves & Gear",
       description:
         "Shop boxing gloves, wraps, protection, and training essentials built for daily rounds in Egypt.",
       keywords: "boxing gloves, boxing gear, combat sports gear Egypt",
+      alternateNames: ["Boxing Gloves"],
     },
     ar: {
-      label: "ادوات ملاكمة",
-      title: "قفازات ملاكمة وادوات ملاكمة",
+      label: "جلافز ملاكمة",
+      title: "جلافز وقلبظ ملاكمة",
       description:
-        "اختار قفازات ملاكمة وادوات تمرين تستحمل شغل الكيس والسبارينج والتمرين اليومي في مصر.",
-      keywords: "قفازات ملاكمة، ادوات ملاكمة، أدوات رياضية",
+        "اختار جلافز وقلبظ الملاكمة المناسبة للتمرين والسبارينج، مع قفازات ملاكمة تستحمل شغل الكيس والجولات اليومية.",
+      keywords: "جلافز ملاكمة، قلبظ ملاكمة، قفازات ملاكمة، جلافز بوكس",
+      alternateNames: [
+        "جلافز ملاكمة",
+        "قلبظ ملاكمة",
+        "قلابظ ملاكمة",
+        "قفازات ملاكمة",
+        "جلافز بوكس",
+      ],
+    },
+  },
+  gloves: {
+    en: {
+      label: "Boxing Gloves",
+      title: "Boxing Gloves in Egypt",
+      description:
+        "Shop boxing gloves for bag work, sparring, and daily combat-sports training in Egypt.",
+      keywords: "boxing gloves, boxing gloves Egypt, sparring gloves",
+      alternateNames: ["Boxing Gloves"],
+    },
+    ar: {
+      label: "جلافز ملاكمة",
+      title: "جلافز ملاكمة في مصر",
+      description:
+        "اختار جلافز ملاكمة للتمرين والسبارينج بأوزان ومقاسات مختلفة، مع قفازات ملاكمة وخيارات مناسبة للبوكس والرياضات القتالية في مصر.",
+      keywords: "جلافز ملاكمة، قلبظ ملاكمة، قلابظ ملاكمة، قفازات ملاكمة، جلافز بوكس",
+      alternateNames: [
+        "جلافز ملاكمة",
+        "قلبظ ملاكمة",
+        "قلابظ ملاكمة",
+        "قفازات ملاكمة",
+        "جلافز بوكس",
+      ],
     },
   },
   kickboxing: {
@@ -200,6 +241,95 @@ const categorySeoIntents: Record<
       description:
         "اختار ادوات مواي تاي للجولات التقيلة، شغل الباد، والسبارينج.",
       keywords: "ادوات مواي تاي، قفازات مواي تاي، أدوات رياضية",
+    },
+  },
+  "shin-guards": {
+    en: {
+      label: "Shin Guards",
+      title: "Kickboxing & Muay Thai Shin Guards",
+      description:
+        "Shop shin guards for kickboxing, Muay Thai, sparring, and striking training.",
+      keywords: "shin guards, kickboxing shin guards, Muay Thai shin guards",
+      alternateNames: ["Shin Guards", "Kickboxing Shin Guards"],
+    },
+    ar: {
+      label: "شنكار",
+      title: "شنكار كيك بوكس ومواي تاي في مصر",
+      description:
+        "اختار الشنكار المناسب للكيك بوكس والمواي تاي، من شنكار شراب لتصميمات حماية ثابتة للسبارينج.",
+      keywords: "شنكار كيك بوكس، شنكار مواي تاي، شنكار، شنكار شراب، واقي قصبة الساق",
+      alternateNames: [
+        "شنكار كيك بوكس",
+        "شنكار مواي تاي",
+        "شنكار",
+        "شنكار شراب",
+        "واقي قصبة الساق",
+      ],
+    },
+  },
+  "hand-wraps": {
+    en: {
+      label: "Hand Wraps",
+      title: "Boxing Hand Wraps",
+      description:
+        "Shop hand wraps for boxing, bag work, and wrist support during daily training.",
+      keywords: "boxing hand wraps, hand wraps, wrist wraps",
+      alternateNames: ["Hand Wraps", "Boxing Hand Wraps"],
+    },
+    ar: {
+      label: "بنداج ملاكمة",
+      title: "بنداج ملاكمة وبنداج بوكس",
+      description:
+        "اختار بنداج ملاكمة يحمي إيدك ومعصمك في التمرين، سواء لشغل الكيس أو السبارينج.",
+      keywords: "بنداج ملاكمة، بنداج بوكس، رباط يد للملاكمة",
+      alternateNames: ["بنداج ملاكمة", "بنداج بوكس", "رباط يد للملاكمة"],
+    },
+  },
+  "head-guards": {
+    en: {
+      label: "Head Guards",
+      title: "Boxing & Kickboxing Head Guards",
+      description:
+        "Shop head guards for boxing, kickboxing, martial arts sparring, and daily protection.",
+      keywords: "boxing head guard, kickboxing head guard, martial arts head guard",
+      alternateNames: ["Head Guards", "Boxing Head Guard"],
+    },
+    ar: {
+      label: "هيد جارد",
+      title: "هيد جارد وواقي رأس ملاكمة",
+      description:
+        "اختار هيد جارد مناسب للملاكمة والكيك بوكس والسبارينج، مع واقي رأس ثابت ومريح للتمرين.",
+      keywords: "هيد جارد ملاكمة، واقي رأس ملاكمة، هيد جارد كيك بوكس، واقي رأس كيك بوكس، واقي رأس للفنون القتالية",
+      alternateNames: [
+        "هيد جارد ملاكمة",
+        "واقي رأس ملاكمة",
+        "هيد جارد كيك بوكس",
+        "واقي رأس كيك بوكس",
+        "واقي رأس للفنون القتالية",
+      ],
+    },
+  },
+  "mouth-guards": {
+    en: {
+      label: "Mouthguards",
+      title: "Mouthguards for Combat Sports",
+      description:
+        "Shop mouthguards for boxing, kickboxing, and combat-sports training protection.",
+      keywords: "mouthguard, boxing mouthguard, kickboxing mouthguard",
+      alternateNames: ["Mouthguard", "Boxing Mouthguard"],
+    },
+    ar: {
+      label: "ماوث جارد",
+      title: "ماوث جارد وواقي أسنان ملاكمة",
+      description:
+        "اختار ماوث جارد للتمرين والسبارينج، مع واقي أسنان مناسب للملاكمة والكيك بوكس والرياضات القتالية.",
+      keywords: "ماوث جارد، واقي أسنان ملاكمة، واقي أسنان كيك بوكس، واقي أسنان للرياضات القتالية",
+      alternateNames: [
+        "ماوث جارد",
+        "واقي أسنان ملاكمة",
+        "واقي أسنان كيك بوكس",
+        "واقي أسنان للرياضات القتالية",
+      ],
     },
   },
 };
@@ -473,6 +603,16 @@ const productBrandName = (product: ProductLike) => {
   return product.brand?.name || product.brand_name || SEO_SITE_NAME;
 };
 
+const productAlternateNames = (product: ProductLike) => {
+  const key = categoryIntentKey(product.categories || product.category);
+  const names = [
+    ...(categorySeoIntents[key]?.ar.alternateNames || []),
+    ...(categorySeoIntents[key]?.en.alternateNames || []),
+  ];
+
+  return Array.from(new Set(names));
+};
+
 export const buildProductStructuredData = (
   product: ProductLike,
   canonicalUrl: string,
@@ -488,6 +628,9 @@ export const buildProductStructuredData = (
     "@context": "https://schema.org",
     "@type": "Product",
     name,
+    alternateName: productAlternateNames(product).length
+      ? productAlternateNames(product)
+      : undefined,
     description: product.description || name,
     image: images.length
       ? images.map((image) => absoluteImageUrl(siteUrl, image))

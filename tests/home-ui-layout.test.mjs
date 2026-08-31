@@ -16,6 +16,16 @@ describe("home UI layout", () => {
     assert.doesNotMatch(source, /text-left/);
   });
 
+  it("clips root horizontal overflow while keeping premium containers centered for RTL", () => {
+    const css = read("../assets/css/main.css");
+
+    assert.match(css, /html,\s*body,\s*#__nuxt\s*{/);
+    assert.match(css, /max-width:\s*100%;/);
+    assert.match(css, /overflow-x:\s*clip;/);
+    assert.match(css, /\.container-premium\s*{[^}]*width:\s*min\(100% - 2rem,\s*80rem\);/s);
+    assert.match(css, /\.container-premium\s*{[^}]*margin-inline:\s*auto;/s);
+  });
+
   it("keeps category text in a dedicated lower panel instead of over the image", () => {
     const source = read("../components/home/CategoriesSection.vue");
 

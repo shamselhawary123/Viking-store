@@ -39,6 +39,7 @@
 <script setup lang="ts">
 import { computed, watch, onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { useCategoriesStore } from "../../stores/categories";
 import { useProductsStore } from "../../stores/products";
 import { useShopStore } from "../../stores/shop";
 import { useWishlistStore } from "../../stores/wishlist";
@@ -50,6 +51,7 @@ import {
 
 const route = useRoute();
 const productsStore = useProductsStore(usePinia());
+const categoriesStore = useCategoriesStore(usePinia());
 const shopStore = useShopStore(usePinia());
 const wishlistStore = useWishlistStore(usePinia());
 const { locale, t } = useI18n();
@@ -61,7 +63,22 @@ const selectedCategorySlug = computed(() => {
   return normalizeCategorySlug(String(value || "all"));
 });
 
+shopStore.selectedCategory = selectedCategorySlug.value;
+
+await useAsyncData("shop-initial-catalog", async () => {
+  await Promise.all([
+    productsStore.getProducts(),
+    categoriesStore.getCategories(),
+  ]);
+
+  return {
+    productsLoaded: productsStore.loaded,
+    categoriesLoaded: categoriesStore.loaded,
+  };
+});
+
 const selectedCategoryRecord = computed(() =>
+  categoriesStore.categories.find((category) => category.slug === selectedCategorySlug.value) ||
   productsStore.products.find((product) => product.categories?.slug === selectedCategorySlug.value)?.categories || {
     slug: selectedCategorySlug.value,
     name: selectedCategorySlug.value,
@@ -92,7 +109,6 @@ useHead(() => ({
 
 onMounted(async () => {
   wishlistStore.loadWishlist();
-  await productsStore.getProducts();
 });
 
 const filteredProducts = computed(() => {
