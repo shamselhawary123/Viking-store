@@ -52,4 +52,11 @@ describe("i18n configuration", () => {
     assert.match(css, /html\[dir="rtl"\]\s+\.font-display/s);
     assert.match(css, /html\[dir="rtl"\]\s+\.display-heading/s);
   });
+
+  it("keeps Nuxt DevTools development-only", () => {
+    const config = readFileSync(new URL("../nuxt.config.ts", import.meta.url), "utf8");
+
+    assert.match(config, /devtools:\s*{\s*enabled:\s*process\.env\.NODE_ENV !== "production"\s*}/);
+    assert.doesNotMatch(config, /devtools:\s*{\s*enabled:\s*true\s*}/);
+  });
 });

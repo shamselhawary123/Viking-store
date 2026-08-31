@@ -3,7 +3,7 @@ import { DEFAULT_SITE_URL } from "./utils/seo";
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
 
-  devtools: { enabled: true },
+  devtools: { enabled: process.env.NODE_ENV !== "production" },
 
   runtimeConfig: {
     supabaseServiceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,

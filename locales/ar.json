@@ -519,6 +519,7 @@
     "paymentMethod": "طريقة الدفع",
     "unpaid": "غير مدفوع",
     "paid": "مدفوع",
+    "expired": "منتهي",
     "cash": "كاش",
     "orderDetails": "تفاصيل الطلب",
     "orderNumber": "رقم الطلب",

@@ -68,12 +68,14 @@ describe("profile orders UI", () => {
     assert.equal(en.orders.shipped, "Shipped");
     assert.equal(en.orders.delivered, "Delivered");
     assert.equal(en.orders.cancelled, "Cancelled");
+    assert.equal(en.orders.expired, "Expired");
 
     assert.equal(ar.orders.pending, "قيد الانتظار");
     assert.equal(ar.orders.processing, "قيد التجهيز");
     assert.equal(ar.orders.shipped, "تم الشحن");
     assert.equal(ar.orders.delivered, "تم التسليم");
     assert.equal(ar.orders.cancelled, "ملغي");
+    assert.equal(ar.orders.expired, "منتهي");
 
     assert.equal(en.profile.showMore, "Show more");
     assert.equal(ar.profile.showMore, "عرض المزيد");
