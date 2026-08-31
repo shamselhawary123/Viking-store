@@ -376,6 +376,8 @@
     </div>
   </section>
 
+  <SharedVikingSkeleton v-else-if="loading" variant="product-detail" />
+
   <div v-else-if="!loading && !product" class="container-premium flex min-h-[60vh] items-center justify-center py-20 text-center">
     <div class="premium-panel rounded-2xl p-10">
       <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-black text-[#CF1D1D]">
