@@ -2,6 +2,8 @@
   <NuxtLink
     :to="`/shop/${product.slug}`"
     class="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#171717] transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/70 hover:shadow-[0_24px_70px_rgba(0,0,0,0.45)]"
+    :class="isNavigatingToProduct ? 'scale-[0.985] border-[#CF1D1D]/80 opacity-85 shadow-[0_0_0_1px_rgba(207,29,29,0.28)]' : ''"
+    @click="handleCardClick"
   >
     <div class="relative aspect-[4/5] overflow-hidden bg-black">
       <img
@@ -18,7 +20,7 @@
       <button
         class="absolute right-4 top-4 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#CF1D1D] backdrop-blur transition hover:scale-105 hover:border-[#CF1D1D] active:scale-95"
         :aria-label="wishlistStore.isFavorite(product.id) ? t('shop.removeWishlist') : t('shop.addWishlist')"
-        @click.prevent="wishlistStore.toggleWishlist(product)"
+        @click.prevent.stop="toggleWishlist"
       >
         <Icon :name="wishlistStore.isFavorite(product.id) ? 'i-heroicons-heart-solid' : 'i-heroicons-heart'" class="text-xl" />
       </button>
@@ -62,7 +64,7 @@
 
       <button
         class="premium-button premium-button-secondary mt-auto min-h-0 w-full rounded-xl py-3 active:scale-[0.98]"
-        @click.prevent="navigateToDetails"
+        @click.prevent.stop="navigateToDetails"
       >
         {{ t('shop.viewDetails') }}
         <Icon :name="isRtl ? 'i-heroicons-arrow-left' : 'i-heroicons-arrow-right'" />
@@ -73,19 +75,48 @@
 
 <script setup lang="ts">
 import { useWishlistStore } from "../../stores/wishlist";
-import { computed } from "vue";
+import { computed, onBeforeUnmount, ref } from "vue";
 import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
 
 const wishlistStore = useWishlistStore(usePinia());
 const router = useRouter();
 const { locale, t } = useI18n();
 const isRtl = computed(() => locale.value === "ar");
+const isNavigatingToProduct = ref(false);
+let navigationFeedbackTimer: ReturnType<typeof window.setTimeout> | undefined;
 
 const props = defineProps<{
   product: any;
 }>();
 
-const navigateToDetails = () => {
-  router.push(`/shop/${props.product.slug}`);
+const clearNavigationFeedbackTimer = () => {
+  if (!navigationFeedbackTimer) return;
+  window.clearTimeout(navigationFeedbackTimer);
+  navigationFeedbackTimer = undefined;
 };
+
+const markProductNavigation = () => {
+  isNavigatingToProduct.value = true;
+  clearNavigationFeedbackTimer();
+  navigationFeedbackTimer = window.setTimeout(() => {
+    isNavigatingToProduct.value = false;
+  }, 1200);
+};
+
+const handleCardClick = (event: MouseEvent) => {
+  const target = event.target as HTMLElement | null;
+  if (target?.closest("button")) return;
+  markProductNavigation();
+};
+
+const toggleWishlist = () => {
+  wishlistStore.toggleWishlist(props.product);
+};
+
+const navigateToDetails = async () => {
+  markProductNavigation();
+  await router.push(`/shop/${props.product.slug}`);
+};
+
+onBeforeUnmount(clearNavigationFeedbackTimer);
 </script>
