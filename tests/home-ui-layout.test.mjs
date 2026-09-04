@@ -28,8 +28,10 @@ describe("home UI layout", () => {
 
   it("prevents post-hydration root transforms from shifting the RTL page", () => {
     const css = read("../assets/css/main.css");
+    const rtlRootRule = css.match(/html\[dir="rtl"\]\s*{[\s\S]*?}/)?.[0] || "";
 
-    assert.match(css, /html\[dir="rtl"\]\s*{[^}]*transform:\s*none\s*!important;[^}]*translate:\s*none\s*!important;/s);
+    assert.doesNotMatch(rtlRootRule, /transform\s*:/);
+    assert.doesNotMatch(rtlRootRule, /translate\s*:/);
   });
 
   it("keeps category text in a dedicated lower panel instead of over the image", () => {

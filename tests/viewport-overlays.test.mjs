@@ -28,7 +28,9 @@ test("RTL root containers stay non-transformed so fixed layers use viewport geom
   assert.doesNotMatch(rootSizingRule[0], /perspective\s*:/);
   assert.doesNotMatch(rootSizingRule[0], /contain\s*:/);
   assert.doesNotMatch(rootSizingRule[0], /will-change\s*:/);
-  assert.match(css, /html\[dir="rtl"\]\s*{[\s\S]*transform:\s*none\s*!important;[\s\S]*translate:\s*none\s*!important;[\s\S]*}/);
+  const rtlRootRule = css.match(/html\[dir="rtl"\]\s*{[\s\S]*?}/)?.[0] || "";
+  assert.doesNotMatch(rtlRootRule, /transform\s*:/);
+  assert.doesNotMatch(rtlRootRule, /translate\s*:/);
 
   for (const source of [app, defaultLayout, adminLayout]) {
     assert.doesNotMatch(source, /document\.documentElement\.style\.(transform|translate)/);

@@ -13,11 +13,6 @@ body,
   overflow-x: clip;
 }
 
-html[dir="rtl"] {
-  transform: none !important;
-  translate: none !important;
-}
-
 * {
   box-sizing: border-box;
 }
