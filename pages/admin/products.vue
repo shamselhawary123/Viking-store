@@ -236,8 +236,9 @@
       <p v-else-if="!filteredProducts.length" class="p-6 text-sm text-gray-500">{{ t("admin.noProducts") }}</p>
     </div>
 
-    <div v-if="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4">
-      <form class="flex max-h-[calc(100dvh-1rem)] w-full max-w-[92rem] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111111] sm:rounded-3xl" @submit.prevent="saveProduct">
+    <Teleport to="body">
+      <div v-if="modalOpen" class="admin-product-modal fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-2 sm:p-4">
+        <form class="flex max-h-[calc(100dvh-1rem)] w-full max-w-[92rem] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#111111] sm:rounded-3xl" @submit.prevent="saveProduct">
         <div class="flex shrink-0 items-center justify-between gap-4 border-b border-white/10 p-4 sm:p-6">
           <div>
             <p class="text-sm font-bold uppercase tracking-[0.25em] text-[#FF4D00]">{{ editingId ? t("admin.editProduct") : t("admin.createProduct") }}</p>
@@ -471,14 +472,15 @@
           </div>
         </div>
 
-        <div class="sticky bottom-0 flex shrink-0 flex-col justify-end gap-3 border-t border-white/10 bg-[#111111]/95 p-4 backdrop-blur sm:flex-row sm:px-6">
-          <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">{{ t("common.cancel") }}</button>
-          <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
-            {{ saving ? (saveProgressMessage || t("admin.savingProduct")) : t("admin.saveProduct") }}
-          </button>
-        </div>
-      </form>
-    </div>
+          <div class="sticky bottom-0 flex shrink-0 flex-col justify-end gap-3 border-t border-white/10 bg-[#111111]/95 p-4 backdrop-blur sm:flex-row sm:px-6">
+            <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">{{ t("common.cancel") }}</button>
+            <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
+              {{ saving ? (saveProgressMessage || t("admin.savingProduct")) : t("admin.saveProduct") }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </Teleport>
   </section>
 </template>
 
