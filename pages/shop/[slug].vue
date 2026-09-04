@@ -389,16 +389,22 @@
     </div>
   </div>
 
-  <div v-if="product" class="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/90 p-3 backdrop-blur sm:hidden">
-    <div class="grid grid-cols-[auto_1fr_1fr] items-center gap-2">
-      <div class="pr-1">
-        <p class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-neutral-500">{{ t('common.price') }}</p>
-        <p class="text-lg font-black text-white">{{ displayPriceText }}</p>
+  <Teleport to="body">
+    <div
+      v-if="product"
+      class="mobile-product-cta fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-black/90 px-3 pt-3 backdrop-blur sm:hidden"
+      style="padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));"
+    >
+      <div class="grid grid-cols-[auto_1fr_1fr] items-center gap-2">
+        <div class="pr-1">
+          <p class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-neutral-500">{{ t('common.price') }}</p>
+          <p class="text-lg font-black text-white">{{ displayPriceText }}</p>
+        </div>
+        <button class="premium-button premium-button-secondary min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || buyLoading" @click="handleBuyNow">{{ t('shop.buyNow') }}</button>
+        <button class="premium-button premium-button-primary min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || addLoading" @click="handleAddToCart">{{ t('shop.addToCart') }}</button>
       </div>
-      <button class="premium-button premium-button-secondary min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || buyLoading" @click="handleBuyNow">{{ t('shop.buyNow') }}</button>
-      <button class="premium-button premium-button-primary min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || addLoading" @click="handleAddToCart">{{ t('shop.addToCart') }}</button>
     </div>
-  </div>
+  </Teleport>
 
   <div v-if="isLightboxOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4" @click="isLightboxOpen = false">
     <button class="absolute right-5 top-5 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white transition hover:border-[#CF1D1D] hover:text-[#CF1D1D]" :aria-label="t('common.close')" @click="isLightboxOpen = false">
