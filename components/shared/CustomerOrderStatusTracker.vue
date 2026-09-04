@@ -156,7 +156,7 @@ const statusMessage = computed(() => {
     transform 180ms ease;
 }
 
-:global([dir="rtl"]) .tracker-marker {
+.tracker-marker:dir(rtl) {
   transform: translateX(50%);
 }
 
