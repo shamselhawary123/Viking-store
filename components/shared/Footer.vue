@@ -253,6 +253,9 @@ const fallbackCategories = [
   { name: "Shorts", slug: "shorts" },
   { name: "Shin Guards", slug: "shin-guards" },
   { name: "Hand Wraps", slug: "hand-wraps" },
+  { name: "Mouth Guards", slug: "mouth-guards" },
+  { name: "Medical Products", slug: "medical-products" },
+  { name: "Gear Bundles", slug: "gear-bundles" },
 ];
 
 const footerCategories = computed(() => {

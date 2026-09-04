@@ -153,7 +153,8 @@ const categorySeoIntents: Record<
       title: "جلافز ملاكمة في مصر",
       description:
         "اختار جلافز ملاكمة للتمرين والسبارينج بأوزان ومقاسات مختلفة، مع قفازات ملاكمة وخيارات مناسبة للبوكس والرياضات القتالية في مصر.",
-      keywords: "جلافز ملاكمة، قلبظ ملاكمة، قلابظ ملاكمة، قفازات ملاكمة، جلافز بوكس",
+      keywords:
+        "جلافز ملاكمة، قلبظ ملاكمة، قلابظ ملاكمة، قفازات ملاكمة، جلافز بوكس",
       alternateNames: [
         "جلافز ملاكمة",
         "قلبظ ملاكمة",
@@ -257,7 +258,8 @@ const categorySeoIntents: Record<
       title: "شنكار كيك بوكس ومواي تاي في مصر",
       description:
         "اختار الشنكار المناسب للكيك بوكس والمواي تاي، من شنكار شراب لتصميمات حماية ثابتة للسبارينج.",
-      keywords: "شنكار كيك بوكس، شنكار مواي تاي، شنكار، شنكار شراب، واقي قصبة الساق",
+      keywords:
+        "شنكار كيك بوكس، شنكار مواي تاي، شنكار، شنكار شراب، واقي قصبة الساق",
       alternateNames: [
         "شنكار كيك بوكس",
         "شنكار مواي تاي",
@@ -265,6 +267,60 @@ const categorySeoIntents: Record<
         "شنكار شراب",
         "واقي قصبة الساق",
       ],
+    },
+  },
+  "medical-products": {
+    en: {
+      label: "Medical Products",
+      title: "Medical Products for Sports",
+      description:
+        "Shop medical products for sports and fitness, including first aid supplies and recovery tools.",
+      keywords: "medical products, sports medicine, first aid",
+      alternateNames: ["Medical Products", "Sports Medicine"],
+    },
+    ar: {
+      label: "منتجات طبية",
+      title: "منتجات طبية للرياضات",
+      description:
+        "اختار منتجات طبية للرياضات والتمرين، بما في ذلك مواد العلاج الأولي وأدوات الاسترداد.",
+      keywords: "منتجات طبية، طب الرياضات، علاج أولي",
+      alternateNames: ["منتجات طبية", "طب الرياضات", "علاج أولي"],
+    },
+  },
+  "mouth-guards": {
+    en: {
+      label: "Mouth Guards",
+      title: "Mouth Guards for Sports",
+      description:
+        "Shop mouth guards for various sports and activities to protect your teeth and mouth.",
+      keywords: "mouth guards, sports mouth guard, dental protection",
+      alternateNames: ["Mouth Guards", "Sports Mouth Guard"],
+    },
+    ar: {
+      label: "واقيات الفم",
+      title: "واقيات الفم للرياضات",
+      description:
+        "اختار واقيات فم مناسبة للرياضات المختلفة والأنشطة لحماية أسنانك وفمك.",
+      keywords: "واقيات الفم، واقيات رياضية، حماية الأسنان",
+      alternateNames: ["واقيات الفم", "واقيات رياضية", "حماية الأسنان"],
+    },
+  },
+  "gear-bundles": {
+    en: {
+      label: "Gear Bundles",
+      title: "Sports Gear Bundles",
+      description:
+        "Shop complete gear bundles for various sports and training needs.",
+      keywords: "gear bundles, sports gear, training gear",
+      alternateNames: ["Gear Bundles", "Sports Gear"],
+    },
+    ar: {
+      label: "مجموعة ادوات ",
+      title: "مجموعات ادوات الرياضات",
+      description:
+        "اختار مجموعات ادوات كاملة للرياضات المختلفة والاحتياجات التمرينية.",
+      keywords: "مجموعات ادوات، ادوات الرياضات، ادوات التمرين",
+      alternateNames: ["مجموعة ادوات ", "ادوات الرياضات", "ادوات التمرين"],
     },
   },
   "hand-wraps": {
@@ -291,7 +347,8 @@ const categorySeoIntents: Record<
       title: "Boxing & Kickboxing Head Guards",
       description:
         "Shop head guards for boxing, kickboxing, martial arts sparring, and daily protection.",
-      keywords: "boxing head guard, kickboxing head guard, martial arts head guard",
+      keywords:
+        "boxing head guard, kickboxing head guard, martial arts head guard",
       alternateNames: ["Head Guards", "Boxing Head Guard"],
     },
     ar: {
@@ -299,7 +356,8 @@ const categorySeoIntents: Record<
       title: "هيد جارد وواقي رأس ملاكمة",
       description:
         "اختار هيد جارد مناسب للملاكمة والكيك بوكس والسبارينج، مع واقي رأس ثابت ومريح للتمرين.",
-      keywords: "هيد جارد ملاكمة، واقي رأس ملاكمة، هيد جارد كيك بوكس، واقي رأس كيك بوكس، واقي رأس للفنون القتالية",
+      keywords:
+        "هيد جارد ملاكمة، واقي رأس ملاكمة، هيد جارد كيك بوكس، واقي رأس كيك بوكس، واقي رأس للفنون القتالية",
       alternateNames: [
         "هيد جارد ملاكمة",
         "واقي رأس ملاكمة",
@@ -323,7 +381,8 @@ const categorySeoIntents: Record<
       title: "ماوث جارد وواقي أسنان ملاكمة",
       description:
         "اختار ماوث جارد للتمرين والسبارينج، مع واقي أسنان مناسب للملاكمة والكيك بوكس والرياضات القتالية.",
-      keywords: "ماوث جارد، واقي أسنان ملاكمة، واقي أسنان كيك بوكس، واقي أسنان للرياضات القتالية",
+      keywords:
+        "ماوث جارد، واقي أسنان ملاكمة، واقي أسنان كيك بوكس، واقي أسنان للرياضات القتالية",
       alternateNames: [
         "ماوث جارد",
         "واقي أسنان ملاكمة",

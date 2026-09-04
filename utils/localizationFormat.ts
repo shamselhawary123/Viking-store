@@ -16,6 +16,8 @@ const arabicCategoryBySlug: Record<string, string> = {
   "jump-ropes": "حبال القفز",
   "mouth-guards": "واقيات الفم",
   "2pcs": "طقم قطعتين",
+  "medical-products": "منتجات طبية",
+  "gear-bundles": "مجموعة ادوات ",
 };
 
 const toFinitePrice = (value: number | string | null | undefined) => {
