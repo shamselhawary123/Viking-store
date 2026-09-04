@@ -41,6 +41,11 @@ describe("profile orders UI", () => {
     assert.match(tracker, /prefers-reduced-motion:\s*reduce/);
   });
 
+  it("keeps RTL tracker marker transform scoped away from root dir elements", () => {
+    assert.doesNotMatch(tracker, /:global\(\[dir=["']rtl["']\]\)\s+\.tracker-marker/);
+    assert.match(tracker, /\.tracker-marker:dir\(rtl\)\s*{[\s\S]*transform:\s*translateX\(50%\)/);
+  });
+
   it("styles the show more action as a visible secondary button", () => {
     assert.match(ordersPage, /profile\.showMore/);
     assert.match(ordersPage, /border-\[#CF1D1D\]\/40/);
