@@ -287,6 +287,24 @@ const categorySeoIntents: Record<
       alternateNames: ["منتجات طبية", "طب الرياضات", "علاج أولي"],
     },
   },
+  "Sports-equipment": {
+    en: {
+      label: "Sports Equipment",
+      title: "Sports Equipment for All Activities",
+      description:
+        "Shop a wide range of sports equipment for all your athletic needs.",
+      keywords: "sports equipment, athletic gear, training equipment",
+      alternateNames: ["Sports Equipment", "Athletic Gear"],
+    },
+    ar: {
+      label: "معدات رياضية",
+      title: "معدات رياضية لجميع الأنشطة",
+      description:
+        "اختار مجموعة واسعة من معدات الرياضة لجميع احتياجاتك الرياضية.",
+      keywords: "معدات رياضية، أدوات رياضية، معدات التمرين",
+      alternateNames: ["معدات رياضية", "أدوات رياضية", "معدات التمرين"],
+    },
+  },
   "mouth-guards": {
     en: {
       label: "Mouth Guards",

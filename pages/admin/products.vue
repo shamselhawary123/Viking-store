@@ -343,7 +343,7 @@
                     <div class="mt-4">
                       <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]">
                         {{ t("admin.selectImages") }}
-                        <input type="file" accept="image/*" multiple class="hidden" @change="selectImages(colorIndex, $event)" />
+                        <input type="file" accept="image/*" multiple class="hidden" :disabled="imageOptimizing || saving" @change="selectImages(colorIndex, $event)" />
                       </label>
                       <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                         <div v-for="(image, imageIndex) in color.images" :key="image.key" class="relative overflow-hidden rounded-xl border border-white/10">
@@ -424,7 +424,7 @@
                   <div class="mt-5 rounded-2xl border border-white/10 bg-black/60 p-4">
                     <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-3 py-2 text-sm font-bold hover:border-[#FF4D00]">
                       {{ t("admin.selectImages") }}
-                      <input type="file" accept="image/*" multiple class="hidden" @change="selectImages(colorIndex, $event)" />
+                      <input type="file" accept="image/*" multiple class="hidden" :disabled="imageOptimizing || saving" @change="selectImages(colorIndex, $event)" />
                     </label>
                     <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                       <div v-for="(image, imageIndex) in color.images" :key="image.key" class="relative overflow-hidden rounded-xl border border-white/10">
@@ -474,7 +474,7 @@
 
           <div class="sticky bottom-0 flex shrink-0 flex-col justify-end gap-3 border-t border-white/10 bg-[#111111]/95 p-4 backdrop-blur sm:flex-row sm:px-6">
             <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">{{ t("common.cancel") }}</button>
-            <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
+            <button type="submit" :disabled="saving || imageOptimizing" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
               {{ saving ? (saveProgressMessage || t("admin.savingProduct")) : t("admin.saveProduct") }}
             </button>
           </div>
@@ -504,6 +504,7 @@ import {
   validateVariantProduct,
   type AdminVariantRowInput,
 } from "../../utils/adminProductVariants";
+import { optimizeImage } from "../../utils/imageOptimizer";
 import type { ProductMoveDirection } from "../../utils/admin";
 
 definePageMeta({
@@ -609,6 +610,7 @@ const pageSize = 12;
 const errorMessage = ref("");
 const successMessage = ref("");
 const saveProgressMessage = ref("");
+const imageOptimizing = ref(false);
 const movingProductId = ref<number | null>(null);
 const dragSaving = ref(false);
 const draggingProductId = ref<number | null>(null);
@@ -1049,25 +1051,62 @@ const removeColor = (index: number) => {
   colors.value.splice(index, 1);
 };
 
-const selectImages = (colorIndex: number, event: Event) => {
+const selectImages = async (colorIndex: number, event: Event) => {
   const input = event.target as HTMLInputElement;
   const files = Array.from(input.files || []);
   const color = colors.value[colorIndex];
-  if (!color) return;
-
-  color.images.push(
-    ...files.map((file) => ({
-      key: newKey(),
-      file,
-      preview: URL.createObjectURL(file),
-    })),
-  );
-
-  if (!form.value.cover_image && color.images[0]) {
-    form.value.cover_image = color.images[0].preview;
+  if (!color) {
+    input.value = "";
+    return;
+  }
+  if (!files.length) {
+    input.value = "";
+    return;
+  }
+  if (imageOptimizing.value) {
+    input.value = "";
+    return;
   }
 
-  input.value = "";
+  const optimizedImages: ImageForm[] = [];
+
+  try {
+    imageOptimizing.value = true;
+    errorMessage.value = "";
+    saveProgressMessage.value = t("admin.optimizingImagesProgress", {
+      processed: 0,
+      total: files.length,
+    });
+
+    for (const [index, file] of files.entries()) {
+      const optimizedFile = await optimizeImage(file);
+      optimizedImages.push({
+        key: newKey(),
+        file: optimizedFile,
+        preview: URL.createObjectURL(optimizedFile),
+      });
+      saveProgressMessage.value = t("admin.optimizingImagesProgress", {
+        processed: index + 1,
+        total: files.length,
+      });
+    }
+
+    color.images.push(...optimizedImages);
+
+    if (!form.value.cover_image && color.images[0]) {
+      form.value.cover_image = color.images[0].preview;
+    }
+  } catch (error: unknown) {
+    optimizedImages.forEach((image) => URL.revokeObjectURL(image.preview));
+    errorMessage.value =
+      error instanceof Error && error.message === "Unsupported product image type."
+        ? t("admin.unsupportedProductImageType")
+        : t("admin.imageOptimizationFailed");
+  } finally {
+    imageOptimizing.value = false;
+    saveProgressMessage.value = "";
+    input.value = "";
+  }
 };
 
 const removeImage = (colorIndex: number, imageIndex: number) => {

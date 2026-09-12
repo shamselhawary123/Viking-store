@@ -51,13 +51,18 @@
             <span class="field-label">{{ t("admin.imageUrl") }}</span>
             <input v-model="form.image" class="field mt-2" />
           </label>
+          <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-4 py-3 text-sm font-bold transition hover:border-[#FF4D00]">
+            {{ categoryImageProcessing ? t("admin.uploading") : t("admin.selectImages") }}
+            <input type="file" accept="image/*" class="hidden" :disabled="categoryImageProcessing || saving" @change="selectCategoryImage" />
+          </label>
+          <img v-if="categoryImagePreviewSource" :src="categoryImagePreviewSource" alt="" class="h-44 w-full rounded-xl object-cover" loading="lazy" decoding="async" />
         </div>
 
         <p v-if="errorMessage" class="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ errorMessage }}</p>
 
         <div class="mt-6 flex justify-end gap-3">
           <button type="button" class="rounded-2xl border border-white/10 px-5 py-3 font-bold" @click="closeModal">{{ t("common.cancel") }}</button>
-          <button type="submit" :disabled="saving" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
+          <button type="submit" :disabled="saving || categoryImageProcessing" class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white disabled:opacity-50">
             {{ saving ? t("admin.saving") : t("admin.saveCategory") }}
           </button>
         </div>
@@ -67,7 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { optimizeImage } from "../../utils/imageOptimizer";
 
 definePageMeta({
   layout: "admin",
@@ -89,12 +95,16 @@ const saving = ref(false);
 const modalOpen = ref(false);
 const editingId = ref<number | null>(null);
 const errorMessage = ref("");
+const categoryImageFile = ref<File | null>(null);
+const categoryImagePreview = ref("");
+const categoryImageProcessing = ref(false);
 
 const form = ref({
   name: "",
   slug: "",
   image: "",
 });
+const categoryImagePreviewSource = computed(() => categoryImagePreview.value || form.value.image);
 
 watch(
   () => form.value.name,
@@ -118,7 +128,27 @@ const loadCategories = async () => {
   loading.value = false;
 };
 
+const buildCategoryImagePath = (fileName: string, timestamp = Date.now()) => {
+  const safeName = fileName
+    .toLowerCase()
+    .replace(/[^a-z0-9.]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return `category-images/${timestamp}-${safeName || "image"}`;
+};
+
+const clearCategoryImageSelection = () => {
+  if (categoryImagePreview.value) {
+    URL.revokeObjectURL(categoryImagePreview.value);
+  }
+
+  categoryImageFile.value = null;
+  categoryImagePreview.value = "";
+};
+
 const resetForm = () => {
+  clearCategoryImageSelection();
   form.value = {
     name: "",
     slug: "",
@@ -134,6 +164,7 @@ const openCreate = () => {
 };
 
 const openEdit = (category: CategoryRow) => {
+  clearCategoryImageSelection();
   editingId.value = category.id;
   form.value = {
     name: category.name,
@@ -145,25 +176,74 @@ const openEdit = (category: CategoryRow) => {
 };
 
 const closeModal = () => {
+  clearCategoryImageSelection();
   modalOpen.value = false;
 };
 
+const selectCategoryImage = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+
+  try {
+    categoryImageProcessing.value = true;
+    errorMessage.value = "";
+    const optimizedFile = await optimizeImage(file);
+    clearCategoryImageSelection();
+    categoryImageFile.value = optimizedFile;
+    categoryImagePreview.value = URL.createObjectURL(optimizedFile);
+  } catch (error: unknown) {
+    errorMessage.value =
+      error instanceof Error && error.message === "Unsupported image type."
+        ? t("admin.unsupportedProductImageType")
+        : t("admin.imageOptimizationFailed");
+  } finally {
+    categoryImageProcessing.value = false;
+    input.value = "";
+  }
+};
+
+const uploadCategoryImage = async () => {
+  if (!categoryImageFile.value) return null;
+
+  const path = buildCategoryImagePath(categoryImageFile.value.name);
+  const { error: uploadError } = await supabase.storage.from("products").upload(path, categoryImageFile.value);
+  if (uploadError) throw uploadError;
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("products").getPublicUrl(path);
+
+  return { path, publicUrl };
+};
+
 const saveCategory = async () => {
+  let uploadedPath = "";
+
   try {
     saving.value = true;
     errorMessage.value = "";
+    const uploadedImage = await uploadCategoryImage();
+    if (uploadedImage) uploadedPath = uploadedImage.path;
+    const payload = {
+      ...form.value,
+      image: uploadedImage?.publicUrl || form.value.image,
+    };
 
     if (editingId.value) {
-      const { error } = await supabase.from("categories").update(form.value).eq("id", editingId.value);
+      const { error } = await supabase.from("categories").update(payload).eq("id", editingId.value);
       if (error) throw error;
     } else {
-      const { error } = await supabase.from("categories").insert(form.value);
+      const { error } = await supabase.from("categories").insert(payload);
       if (error) throw error;
     }
 
     await loadCategories();
     closeModal();
   } catch (error: unknown) {
+    if (uploadedPath) {
+      await supabase.storage.from("products").remove([uploadedPath]);
+    }
     errorMessage.value = error instanceof Error ? error.message : t("admin.unableSaveCategory");
   } finally {
     saving.value = false;
@@ -183,6 +263,7 @@ const deleteCategory = async (category: CategoryRow) => {
 };
 
 onMounted(loadCategories);
+onBeforeUnmount(clearCategoryImageSelection);
 </script>
 
 <style scoped>
