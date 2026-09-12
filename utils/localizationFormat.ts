@@ -17,6 +17,7 @@ const arabicCategoryBySlug: Record<string, string> = {
   "mouth-guards": "واقيات الفم",
   "2pcs": "طقم قطعتين",
   "medical-products": "منتجات طبية",
+  "Sports-equipment": "معدات رياضية",
   "gear-bundles": "مجموعة ادوات ",
 };
 

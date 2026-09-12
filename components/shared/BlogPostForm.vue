@@ -9,7 +9,7 @@
         <NuxtLink to="/admin/blog" class="rounded-2xl border border-white/10 px-5 py-3 font-bold transition hover:border-[#CF1D1D]">
           {{ t("common.cancel") }}
         </NuxtLink>
-        <button type="submit" :disabled="saving" class="rounded-2xl bg-[#CF1D1D] px-5 py-3 font-bold text-white transition hover:opacity-90 disabled:opacity-50">
+        <button type="submit" :disabled="saving || uploadingCover || uploadingOg" class="rounded-2xl bg-[#CF1D1D] px-5 py-3 font-bold text-white transition hover:opacity-90 disabled:opacity-50">
           {{ saving ? t("admin.saving") : t("admin.savePost") }}
         </button>
       </div>
@@ -75,9 +75,9 @@
             </label>
             <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-4 py-3 text-sm font-bold transition hover:border-[#CF1D1D]">
               {{ uploadingCover ? t("admin.uploading") : t("admin.uploadCoverImage") }}
-              <input type="file" accept="image/*" class="hidden" :disabled="uploadingCover" @change="uploadImage($event, 'cover')" />
+              <input type="file" accept="image/*" class="hidden" :disabled="uploadingCover || saving" @change="selectImage($event, 'cover')" />
             </label>
-            <img v-if="form.cover_image" :src="form.cover_image" alt="" class="h-44 w-full rounded-xl object-cover" loading="lazy" decoding="async" />
+            <img v-if="displayCoverImage" :src="displayCoverImage" alt="" class="h-44 w-full rounded-xl object-cover" loading="lazy" decoding="async" />
           </div>
         </section>
 
@@ -112,8 +112,9 @@
             </label>
             <label class="inline-flex cursor-pointer rounded-xl border border-white/10 px-4 py-3 text-sm font-bold transition hover:border-[#CF1D1D]">
               {{ uploadingOg ? t("admin.uploading") : t("admin.uploadOgImage") }}
-              <input type="file" accept="image/*" class="hidden" :disabled="uploadingOg" @change="uploadImage($event, 'og')" />
+              <input type="file" accept="image/*" class="hidden" :disabled="uploadingOg || saving" @change="selectImage($event, 'og')" />
             </label>
+            <img v-if="displayOgImage" :src="displayOgImage" alt="" class="h-36 w-full rounded-xl object-cover" loading="lazy" decoding="async" />
           </div>
         </section>
       </aside>
@@ -122,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, onBeforeUnmount, ref, watch } from "vue";
 import {
   buildBlogImagePath,
   buildBlogPostPayload,
@@ -131,6 +132,7 @@ import {
   type BlogPostId,
   type BlogPostLike,
 } from "../../utils/blog";
+import { optimizeImage } from "../../utils/imageOptimizer";
 
 const props = defineProps<{
   post?: (BlogPostLike & { id?: BlogPostId }) | null;
@@ -153,6 +155,16 @@ const uploadingOg = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 const savedPost = ref(props.post || null);
+type BlogImageTarget = "cover" | "og";
+
+const pendingImageFiles = ref<Record<BlogImageTarget, File | null>>({
+  cover: null,
+  og: null,
+});
+const localImagePreviews = ref<Record<BlogImageTarget, string>>({
+  cover: "",
+  og: "",
+});
 
 const toDatetimeLocal = (date?: string | null) => {
   if (!date) return "";
@@ -175,6 +187,8 @@ const form = ref({
   seo_description: props.post?.seo_description || "",
   og_image: props.post?.og_image || "",
 });
+const displayCoverImage = computed(() => localImagePreviews.value.cover || form.value.cover_image);
+const displayOgImage = computed(() => localImagePreviews.value.og || form.value.og_image);
 
 const editingId = computed(() => props.post?.id || null);
 
@@ -186,7 +200,21 @@ watch(
   },
 );
 
-const uploadImage = async (event: Event, target: "cover" | "og") => {
+const clearPendingImage = (target: BlogImageTarget) => {
+  if (localImagePreviews.value[target]) {
+    URL.revokeObjectURL(localImagePreviews.value[target]);
+  }
+
+  pendingImageFiles.value[target] = null;
+  localImagePreviews.value[target] = "";
+};
+
+const clearUploadedPendingImages = () => {
+  clearPendingImage("cover");
+  clearPendingImage("og");
+};
+
+const selectImage = async (event: Event, target: BlogImageTarget) => {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
@@ -196,31 +224,42 @@ const uploadImage = async (event: Event, target: "cover" | "og") => {
   errorMessage.value = "";
 
   try {
-    const path = buildBlogImagePath(file.name);
-    const { error: uploadError } = await supabase.storage.from("products").upload(path, file);
-    if (uploadError) throw uploadError;
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("products").getPublicUrl(path);
-
-    if (target === "cover") {
-      form.value.cover_image = publicUrl;
-    } else {
-      form.value.og_image = publicUrl;
-    }
+    const optimizedFile = await optimizeImage(file);
+    clearPendingImage(target);
+    pendingImageFiles.value[target] = optimizedFile;
+    localImagePreviews.value[target] = URL.createObjectURL(optimizedFile);
   } catch (error: unknown) {
-    errorMessage.value = error instanceof Error ? error.message : t("admin.uploadFailed");
+    errorMessage.value =
+      error instanceof Error && error.message === "Unsupported image type."
+        ? t("admin.unsupportedProductImageType")
+        : t("admin.imageOptimizationFailed");
   } finally {
     uploading.value = false;
     input.value = "";
   }
 };
 
+const uploadPendingImage = async (target: BlogImageTarget, uploadedPaths: string[]) => {
+  const file = pendingImageFiles.value[target];
+  if (!file) return target === "cover" ? form.value.cover_image : form.value.og_image;
+
+  const path = buildBlogImagePath(file.name);
+  const { error: uploadError } = await supabase.storage.from("products").upload(path, file);
+  if (uploadError) throw uploadError;
+  uploadedPaths.push(path);
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("products").getPublicUrl(path);
+
+  return publicUrl;
+};
+
 const savePost = async () => {
   saving.value = true;
   errorMessage.value = "";
   successMessage.value = "";
+  const uploadedPaths: string[] = [];
 
   try {
     form.value.slug = normalizeBlogSlug(form.value.slug);
@@ -236,7 +275,13 @@ const savePost = async () => {
     } = await supabase.auth.getUser();
     if (userError || !user) throw userError || new Error(t("admin.loadAdminFailed"));
 
-    const payload = buildBlogPostPayload(form.value, user.id);
+    const coverImage = await uploadPendingImage("cover", uploadedPaths);
+    const ogImage = await uploadPendingImage("og", uploadedPaths);
+    const payload = buildBlogPostPayload({
+      ...form.value,
+      cover_image: coverImage,
+      og_image: ogImage,
+    }, user.id);
     let savedId = editingId.value;
 
     if (savedId) {
@@ -260,13 +305,21 @@ const savePost = async () => {
     }
 
     successMessage.value = t("admin.blogSaved");
+    form.value.cover_image = coverImage;
+    form.value.og_image = ogImage;
+    clearUploadedPendingImages();
     await router.push(`/admin/blog/${savedId}/edit`);
   } catch (error: unknown) {
+    if (uploadedPaths.length) {
+      await supabase.storage.from("products").remove(uploadedPaths);
+    }
     errorMessage.value = error instanceof Error ? error.message : t("admin.blogSaveFailed");
   } finally {
     saving.value = false;
   }
 };
+
+onBeforeUnmount(clearUploadedPendingImages);
 </script>
 
 <style scoped>
