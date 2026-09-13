@@ -59,7 +59,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { isAdminProfile } from "../../utils/admin";
 
 definePageMeta({
   layout: false,
@@ -67,22 +66,22 @@ definePageMeta({
 
 const supabase = useSupabase();
 const { t } = useI18n();
+const adminAccess = useAdminAccess();
 const email = ref("");
 const password = ref("");
 const loading = ref(false);
 const errorMessage = ref("");
 
 const verifyAdmin = async (userId: string) => {
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
+  const { data: isAdmin, error } = await supabase.rpc("is_admin");
 
-  if (error || !isAdminProfile(profile)) {
+  if (error || isAdmin !== true) {
+    adminAccess.clear();
     await supabase.auth.signOut();
     throw new Error(t("admin.noAdminAccess"));
   }
+
+  adminAccess.markAllowed(userId);
 };
 
 const login = async () => {
@@ -118,6 +117,7 @@ onMounted(async () => {
     await verifyAdmin(user.id);
     await navigateTo("/admin");
   } catch {
+    adminAccess.clear();
     // Keep the login form visible for non-admin sessions.
   }
 });

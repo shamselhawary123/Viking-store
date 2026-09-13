@@ -1,11 +1,17 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
 
-  const supabase = createClient(
-    config.public.supabaseUrl,
-    config.public.supabaseKey,
+  const supabase = createBrowserClient(
+    String(config.public.supabaseUrl || ""),
+    String(config.public.supabaseKey || ""),
+    {
+      cookieOptions: {
+        path: "/",
+        sameSite: "lax",
+      },
+    },
   );
 
   return {

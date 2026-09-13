@@ -287,7 +287,7 @@ const categorySeoIntents: Record<
       alternateNames: ["منتجات طبية", "طب الرياضات", "علاج أولي"],
     },
   },
-  "Sports-equipment": {
+  "sports-equipment": {
     en: {
       label: "Sports Equipment",
       title: "Sports Equipment for All Activities",
@@ -382,30 +382,6 @@ const categorySeoIntents: Record<
         "هيد جارد كيك بوكس",
         "واقي رأس كيك بوكس",
         "واقي رأس للفنون القتالية",
-      ],
-    },
-  },
-  "mouth-guards": {
-    en: {
-      label: "Mouthguards",
-      title: "Mouthguards for Combat Sports",
-      description:
-        "Shop mouthguards for boxing, kickboxing, and combat-sports training protection.",
-      keywords: "mouthguard, boxing mouthguard, kickboxing mouthguard",
-      alternateNames: ["Mouthguard", "Boxing Mouthguard"],
-    },
-    ar: {
-      label: "ماوث جارد",
-      title: "ماوث جارد وواقي أسنان ملاكمة",
-      description:
-        "اختار ماوث جارد للتمرين والسبارينج، مع واقي أسنان مناسب للملاكمة والكيك بوكس والرياضات القتالية.",
-      keywords:
-        "ماوث جارد، واقي أسنان ملاكمة، واقي أسنان كيك بوكس، واقي أسنان للرياضات القتالية",
-      alternateNames: [
-        "ماوث جارد",
-        "واقي أسنان ملاكمة",
-        "واقي أسنان كيك بوكس",
-        "واقي أسنان للرياضات القتالية",
       ],
     },
   },

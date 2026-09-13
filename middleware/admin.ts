@@ -1,28 +1,22 @@
-import { isAdminProfile } from "../utils/admin";
-
 export default defineNuxtRouteMiddleware(async () => {
   if (process.server) {
     return;
   }
 
-  const supabase = useSupabase();
+  const adminAccess = useAdminAccess();
+  const access = await adminAccess.verify();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (access.status === "anonymous") {
     return navigateTo("/admin/login");
   }
 
-  const { data: profile, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  if (access.status === "error") {
+    return abortNavigation(
+      createError({ statusCode: 500, statusMessage: "Admin authorization failed" }),
+    );
+  }
 
-  if (error || !isAdminProfile(profile)) {
-    await supabase.auth.signOut();
-    return navigateTo("/admin/login");
+  if (access.status !== "admin") {
+    return abortNavigation(createError({ statusCode: 404, statusMessage: "Not Found" }));
   }
 });

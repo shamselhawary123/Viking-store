@@ -145,9 +145,14 @@ import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 
 const mobileOpen = ref(false);
 const supabase = useSupabase();
+const adminAccess = useAdminAccess();
 const route = useRoute();
 const { locale, t } = useI18n();
 const isRtl = computed(() => locale.value === "ar");
+
+useHead({
+  meta: [{ name: "robots", content: "noindex, nofollow" }],
+});
 
 const closeMobileNav = () => {
   mobileOpen.value = false;
@@ -196,6 +201,7 @@ const navItems = [
 
 const logout = async () => {
   closeMobileNav();
+  adminAccess.clear();
   await supabase.auth.signOut();
   await navigateTo("/admin/login");
 };
