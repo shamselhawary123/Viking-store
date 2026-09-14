@@ -4,6 +4,7 @@ import { describe, it } from "node:test";
 
 import {
   DEFAULT_SITE_URL,
+  buildAbsoluteImageUrl,
   buildCategorySeo,
   buildCanonicalUrl,
   buildOrganizationStructuredData,
@@ -18,6 +19,10 @@ import {
   publicSitemapEntries,
   SEO_DEFAULT_IMAGE,
 } from "../utils/seo.ts";
+import {
+  buildBlogSeoMeta,
+  buildBlogStructuredData,
+} from "../utils/blog.ts";
 
 const enLocaleSource = readFileSync(
   new URL("../locales/en.json", import.meta.url),
@@ -131,17 +136,82 @@ describe("SEO helpers", () => {
     assert.doesNotMatch(sitemap, /\/checkout/);
   });
 
-  it("uses the current Vercel production URL as the runtime SEO fallback", () => {
+  it("uses the custom production URL as the runtime SEO fallback", () => {
     assert.match(nuxtConfigSource, /DEFAULT_SITE_URL/);
-    assert.equal(DEFAULT_SITE_URL, "https://viking-store.vercel.app");
+    assert.equal(DEFAULT_SITE_URL, "https://vikingclubstore.com");
     assert.equal(
       buildCanonicalUrl("", "/shop"),
-      "https://viking-store.vercel.app/shop",
+      "https://vikingclubstore.com/shop",
     );
     assert.match(
       buildRobotsTxt(""),
-      /Sitemap: https:\/\/viking-store\.vercel\.app\/sitemap\.xml/,
+      /Sitemap: https:\/\/vikingclubstore\.com\/sitemap\.xml/,
     );
+  });
+
+  it("does not emit the old Vercel domain from production SEO fallbacks", () => {
+    const oldDomain = "viking-store.vercel.app";
+    const sitemap = buildSitemapXml([
+      ...publicSitemapEntries(""),
+      { loc: buildCanonicalUrl("", "/shop/pro-gloves") },
+      { loc: buildCanonicalUrl("", "/blog/boxing-guide") },
+    ]);
+    const robots = buildRobotsTxt("");
+    const canonical = buildCanonicalUrl("", "/shop");
+    const organization = buildOrganizationStructuredData("");
+    const website = buildWebsiteStructuredData("");
+
+    assert.doesNotMatch(DEFAULT_SITE_URL, new RegExp(oldDomain));
+    assert.doesNotMatch(sitemap, new RegExp(oldDomain));
+    assert.doesNotMatch(robots, new RegExp(oldDomain));
+    assert.doesNotMatch(canonical, new RegExp(oldDomain));
+    assert.doesNotMatch(JSON.stringify(organization), new RegExp(oldDomain));
+    assert.doesNotMatch(JSON.stringify(website), new RegExp(oldDomain));
+    assert.match(sitemap, /https:\/\/vikingclubstore\.com\/shop\/pro-gloves/);
+    assert.match(sitemap, /https:\/\/vikingclubstore\.com\/blog\/boxing-guide/);
+    assert.match(robots, /Sitemap: https:\/\/vikingclubstore\.com\/sitemap\.xml/);
+    assert.equal(organization.url, "https://vikingclubstore.com/");
+    assert.equal(organization.logo, "https://vikingclubstore.com/logo.png");
+    assert.equal(website.url, "https://vikingclubstore.com/");
+    assert.equal(
+      website.potentialAction.target,
+      "https://vikingclubstore.com/shop?search={search_term_string}",
+    );
+  });
+
+  it("uses the canonical production origin for relative OG and Twitter images", () => {
+    const blogMeta = buildBlogSeoMeta(
+      {
+        title: "Wrap Guide",
+        slug: "wrap-guide",
+        excerpt: "Guide",
+        og_image: "/blog/wrap-guide.webp",
+      },
+      "https://vikingclubstore.com/blog/wrap-guide",
+    );
+    const blogStructuredData = buildBlogStructuredData(
+      {
+        title: "Wrap Guide",
+        slug: "wrap-guide",
+        excerpt: "Guide",
+        cover_image: "/blog/wrap-guide-cover.webp",
+      },
+      "https://vikingclubstore.com/blog/wrap-guide",
+      "Viking Store",
+    );
+
+    assert.equal(
+      buildAbsoluteImageUrl("", "/products/glove.webp"),
+      "https://vikingclubstore.com/products/glove.webp",
+    );
+    assert.equal(blogMeta.ogImage, "https://vikingclubstore.com/blog/wrap-guide.webp");
+    assert.equal(blogMeta.twitterImage, "https://vikingclubstore.com/blog/wrap-guide.webp");
+    assert.equal(
+      blogStructuredData.article.image,
+      "https://vikingclubstore.com/blog/wrap-guide-cover.webp",
+    );
+    assert.match(productPageSource, /buildAbsoluteImageUrl/);
+    assert.match(productPageSource, /twitterImage/);
   });
 
   it("builds category SEO and links only for real filtered shop routes", () => {

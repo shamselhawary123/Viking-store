@@ -1,4 +1,4 @@
-export const DEFAULT_SITE_URL = "https://viking-store.vercel.app";
+export const DEFAULT_SITE_URL = "https://vikingclubstore.com";
 export const SEO_SITE_NAME = "Viking Store";
 export const SEO_DEFAULT_IMAGE = "/logo.png";
 export const SEO_PRICE_CURRENCY = "EGP";
@@ -585,7 +585,7 @@ export const buildRobotsTxt = (siteUrl: string) => {
   ].join("\n");
 };
 
-const absoluteImageUrl = (siteUrl: string, image?: string | null) => {
+export const buildAbsoluteImageUrl = (siteUrl: string, image?: string | null) => {
   if (!image) return undefined;
   if (/^https?:\/\//i.test(image)) return image;
 
@@ -599,8 +599,8 @@ export const buildOrganizationStructuredData = (siteUrl: string) => ({
   alternateName: SEO_ALTERNATE_NAMES,
   description: SEO_ORGANIZATION_DESCRIPTION,
   url: buildCanonicalUrl(siteUrl, "/"),
-  logo: absoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
-  image: absoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
+  logo: buildAbsoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
+  image: buildAbsoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
   sameAs: SEO_SOCIAL_LINKS,
 });
 
@@ -686,7 +686,7 @@ export const buildProductStructuredData = (
       : undefined,
     description: product.description || name,
     image: images.length
-      ? images.map((image) => absoluteImageUrl(siteUrl, image))
+      ? images.map((image) => buildAbsoluteImageUrl(siteUrl, image))
       : undefined,
     category: product.categories?.name || product.category || undefined,
     brand: {

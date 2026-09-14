@@ -172,10 +172,17 @@ export const calculateReadingTime = (content: string, wordsPerMinute = 180) => {
 export const buildBlogCanonicalUrl = (siteUrl: string, slug: string) =>
   `${siteUrl.replace(/\/$/, "")}/blog/${normalizeBlogSlug(slug)}`;
 
+const buildBlogAbsoluteImageUrl = (canonicalUrl: string, image?: string | null) => {
+  if (!image) return undefined;
+  if (/^https?:\/\//i.test(image)) return image;
+
+  return `${new URL(canonicalUrl).origin}${image.startsWith("/") ? image : `/${image}`}`;
+};
+
 export const buildBlogSeoMeta = (post: BlogPostLike, canonicalUrl: string) => {
   const title = post.seo_title || post.title;
   const description = post.seo_description || post.excerpt || "";
-  const image = post.og_image || post.cover_image || undefined;
+  const image = buildBlogAbsoluteImageUrl(canonicalUrl, post.og_image || post.cover_image || undefined);
 
   return {
     title,
@@ -184,6 +191,7 @@ export const buildBlogSeoMeta = (post: BlogPostLike, canonicalUrl: string) => {
     ogDescription: description,
     ogImage: image,
     ogUrl: canonicalUrl,
+    twitterImage: image,
     twitterCard: image ? "summary_large_image" : "summary",
   };
 };
@@ -199,7 +207,7 @@ export const buildBlogStructuredData = (
     "@type": "Article",
     headline: post.title,
     description: post.seo_description || post.excerpt || post.title,
-    image: post.og_image || post.cover_image || undefined,
+    image: buildBlogAbsoluteImageUrl(canonicalUrl, post.og_image || post.cover_image || undefined),
     datePublished: post.published_at || post.created_at || undefined,
     dateModified: post.updated_at || post.published_at || undefined,
     author: authorName

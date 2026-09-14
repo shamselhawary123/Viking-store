@@ -442,6 +442,7 @@ import {
 } from "../../utils/storefrontProductVariants";
 import {
   buildBreadcrumbStructuredData,
+  buildAbsoluteImageUrl,
   buildCanonicalUrl,
   buildProductImageAlt,
   buildProductSeoMeta,
@@ -751,6 +752,9 @@ const canonicalUrl = computed(() => buildCanonicalUrl(siteUrl, `/shop/${slug}`))
 const productSeoMeta = computed(() => (product.value ? buildProductSeoMeta(product.value, locale.value) : null));
 const productMetaTitle = computed(() => productSeoMeta.value?.title || t("seo.shopTitle"));
 const productMetaDescription = computed(() => productSeoMeta.value?.description || t("seo.shopDescription"));
+const productSeoImage = computed(() =>
+  buildAbsoluteImageUrl(siteUrl, product.value?.cover_image || product.value?.image || undefined),
+);
 const productImageAlt = computed(() => (product.value ? buildProductImageAlt(product.value, locale.value) : t("shop.combatGear")));
 const productStructuredData = computed(() =>
   product.value
@@ -777,9 +781,10 @@ useSeoMeta({
   description: () => productMetaDescription.value,
   ogTitle: () => productMetaTitle.value,
   ogDescription: () => productMetaDescription.value,
-  ogImage: () => product.value?.cover_image || product.value?.image || undefined,
+  ogImage: () => productSeoImage.value,
   ogUrl: () => canonicalUrl.value,
   twitterCard: "summary_large_image",
+  twitterImage: () => productSeoImage.value,
 });
 
 useHead(() => ({
