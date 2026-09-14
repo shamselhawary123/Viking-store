@@ -6,9 +6,17 @@
         <h2 class="mt-2 text-3xl font-black">{{ t("admin.products") }}</h2>
       </div>
 
-      <button class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white transition hover:opacity-90" @click="openCreate">
-        {{ t("admin.addProduct") }}
-      </button>
+      <div class="flex flex-wrap gap-3">
+        <button class="rounded-2xl border border-[#FF4D00]/40 bg-[#FF4D00]/10 px-5 py-3 font-bold text-[#FF4D00] transition hover:border-[#FF4D00] hover:bg-[#FF4D00]/15" @click="openBulkPricing">
+          {{ t("admin.bulkPriceUpdate") }}
+        </button>
+        <button class="rounded-2xl border border-[#CF1D1D]/50 bg-[#CF1D1D]/10 px-5 py-3 font-bold text-red-200 transition hover:border-[#CF1D1D] hover:bg-[#CF1D1D]/15" @click="openBulkSale">
+          {{ t("admin.createSale") }}
+        </button>
+        <button class="rounded-2xl bg-[#FF4D00] px-5 py-3 font-bold text-white transition hover:opacity-90" @click="openCreate">
+          {{ t("admin.addProduct") }}
+        </button>
+      </div>
     </div>
 
     <div class="grid gap-3 rounded-3xl border border-white/10 bg-[#111111] p-4 md:grid-cols-[1fr_14rem_12rem_12rem]">
@@ -267,6 +275,10 @@
                     {{ t("admin.variantPriceSyncHint") }}
                   </p>
                 </label>
+                <label v-if="!isVariantEditor" class="block">
+                  <span class="field-label">{{ t("admin.costPrice") }} (EGP)</span>
+                  <input v-model.number="form.cost_price" type="number" min="0" step="0.01" class="field mt-2" />
+                </label>
                 <label class="block">
                   <span class="field-label">{{ t("admin.oldPrice") }}</span>
                   <input v-model.number="form.old_price" type="number" min="0" step="0.01" class="field mt-2" />
@@ -390,9 +402,10 @@
                   </div>
 
                   <div class="mt-4 space-y-3">
-                    <div v-for="variant in standaloneVariantRows" :key="variant.key" class="grid gap-3 lg:grid-cols-[minmax(10rem,1fr)_10rem_10rem_8rem_auto] lg:items-center">
+                    <div v-for="variant in standaloneVariantRows" :key="variant.key" class="grid gap-3 lg:grid-cols-[minmax(10rem,1fr)_10rem_10rem_10rem_8rem_auto] lg:items-center">
                       <input v-model="variant.size" :placeholder="t('admin.optionalSizePlaceholder')" class="field" />
                       <input v-model.number="variant.price" type="number" min="0" step="0.01" :placeholder="t('admin.variantPrice')" class="field" />
+                      <input v-model.number="variant.cost_price" type="number" min="0" step="0.01" :placeholder="t('admin.costPrice')" class="field" />
                       <input v-model.number="variant.stock_quantity" type="number" min="0" step="1" :placeholder="t('admin.stockQuantity')" class="field" />
                       <label class="flex min-h-12 items-center gap-2 rounded-xl border border-white/10 px-3 text-sm font-bold text-gray-300">
                         <input v-model="variant.is_active" type="checkbox" class="h-4 w-4 accent-[#FF4D00]" />
@@ -447,9 +460,10 @@
                       </button>
                     </div>
                     <div class="mt-3 space-y-3">
-                      <div v-for="variant in colorVariantRows(color)" :key="variant.key" class="grid gap-3 lg:grid-cols-[minmax(10rem,1fr)_10rem_10rem_8rem_auto] lg:items-center">
+                      <div v-for="variant in colorVariantRows(color)" :key="variant.key" class="grid gap-3 lg:grid-cols-[minmax(10rem,1fr)_10rem_10rem_10rem_8rem_auto] lg:items-center">
                         <input v-model="variant.size" :placeholder="t('admin.optionalSizePlaceholder')" class="field" />
                         <input v-model.number="variant.price" type="number" min="0" step="0.01" :placeholder="t('admin.variantPrice')" class="field" />
+                        <input v-model.number="variant.cost_price" type="number" min="0" step="0.01" :placeholder="t('admin.costPrice')" class="field" />
                         <input v-model.number="variant.stock_quantity" type="number" min="0" step="1" :placeholder="t('admin.stockQuantity')" class="field" />
                         <label class="flex min-h-12 items-center gap-2 rounded-xl border border-white/10 px-3 text-sm font-bold text-gray-300">
                           <input v-model="variant.is_active" type="checkbox" class="h-4 w-4 accent-[#FF4D00]" />
@@ -481,6 +495,559 @@
         </form>
       </div>
     </Teleport>
+
+    <Teleport to="body">
+      <div v-if="bulkModalOpen" class="fixed inset-0 z-[90] flex items-stretch justify-center overflow-hidden bg-black/80 p-0 backdrop-blur sm:items-start sm:overflow-y-auto sm:p-6">
+        <div class="flex h-[100dvh] w-full flex-col overflow-hidden border border-white/10 bg-[#111111] shadow-2xl sm:h-auto sm:max-h-[90dvh] sm:max-w-7xl sm:rounded-3xl">
+          <div class="flex flex-col gap-4 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[0.24em] text-[#FF4D00]">{{ t("admin.catalog") }}</p>
+              <h3 class="mt-1 text-2xl font-black">{{ t("admin.bulkPriceUpdate") }}</h3>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <div class="grid grid-cols-2 rounded-2xl border border-white/10 bg-black/50 p-1 text-sm font-black">
+                <button
+                  class="rounded-xl px-4 py-2 transition"
+                  :class="bulkActiveTab === 'update' ? 'bg-[#FF4D00] text-white shadow-lg shadow-[#FF4D00]/20' : 'text-gray-400 hover:text-white'"
+                  type="button"
+                  @click="bulkActiveTab = 'update'"
+                >
+                  {{ t("admin.updatePrices") }}
+                </button>
+                <button
+                  class="rounded-xl px-4 py-2 transition"
+                  :class="bulkActiveTab === 'history' ? 'bg-[#FF4D00] text-white shadow-lg shadow-[#FF4D00]/20' : 'text-gray-400 hover:text-white'"
+                  type="button"
+                  @click="bulkActiveTab = 'history'"
+                >
+                  {{ t("admin.priceUpdateHistory") }}
+                </button>
+              </div>
+              <button class="rounded-xl border border-white/10 px-3 py-2 font-bold hover:border-[#FF4D00]" type="button" @click="bulkModalOpen = false">
+                {{ t("common.close") }}
+              </button>
+            </div>
+          </div>
+
+          <div v-if="bulkActiveTab === 'update'" class="grid min-h-0 flex-1 gap-5 overflow-y-auto p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:overflow-hidden">
+            <aside class="space-y-4 rounded-2xl border border-white/10 bg-black/40 p-4 lg:col-start-2 lg:row-start-1 lg:max-h-full lg:overflow-y-auto">
+              <div class="space-y-2">
+                <span class="field-label">{{ t("admin.productScope") }}</span>
+                <div class="grid gap-2">
+                  <label v-for="option in bulkScopeOptions" :key="option.value" class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm font-bold transition" :class="bulkForm.scope_type === option.value ? 'border-[#FF4D00] bg-[#FF4D00]/10 text-white' : 'border-white/10 text-gray-300 hover:border-[#FF4D00]/60'">
+                    <input v-model="bulkForm.scope_type" class="h-4 w-4 accent-[#FF4D00]" type="radio" :value="option.value" />
+                    {{ option.label }}
+                  </label>
+                </div>
+              </div>
+
+              <label v-if="bulkForm.scope_type === 'category'" class="block">
+                <span class="field-label">{{ t("common.category") }}</span>
+                <select v-model.number="bulkForm.category_id" class="field mt-2">
+                  <option :value="0">{{ t("admin.allCategories") }}</option>
+                  <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+                </select>
+              </label>
+
+              <div v-if="bulkForm.scope_type === 'selected_products'" class="rounded-2xl border border-white/10 bg-black/30 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="field-label">{{ t("admin.selectedProducts") }}</span>
+                  <button class="text-xs font-black text-[#FF4D00] hover:text-white" type="button" @click="clearBulkProductSelection">
+                    {{ t("admin.clearSelection") }}
+                  </button>
+                </div>
+                <input v-model="bulkProductSearch" class="field mt-2" type="search" :placeholder="t('admin.searchProducts')" />
+                <p class="mt-2 text-xs font-bold text-gray-500">{{ t("admin.selectedProductsCount", { count: bulkSelectedProductIds.length }) }}</p>
+                <div class="mt-3 max-h-64 space-y-2 overflow-y-auto pe-1">
+                  <label v-for="product in filteredBulkProducts" :key="product.id" class="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-[#111]/80 p-3 text-sm transition hover:border-[#FF4D00]/60">
+                    <input class="h-4 w-4 accent-[#FF4D00]" type="checkbox" :checked="bulkSelectedProductIds.includes(String(product.id))" @change="toggleBulkProductSelection(product.id)" />
+                    <span class="min-w-0 flex-1">
+                      <span class="block truncate font-bold text-white">{{ product.title }}</span>
+                      <span class="block truncate text-xs text-gray-500">{{ product.slug || product.categories?.name || t("admin.uncategorized") }}</span>
+                    </span>
+                  </label>
+                  <p v-if="!filteredBulkProducts.length" class="rounded-xl border border-white/10 p-3 text-sm text-gray-500">{{ t("admin.noProducts") }}</p>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <span class="field-label">{{ t("admin.confirmPriceUpdate") }}</span>
+                <div class="grid gap-2">
+                  <label class="flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition" :class="bulkForm.method === 'current_price' ? 'border-[#FF4D00] bg-[#FF4D00]/10 text-white' : 'border-white/10 text-gray-300 hover:border-[#FF4D00]/60'">
+                    <input v-model="bulkForm.method" class="mt-1 h-4 w-4 accent-[#FF4D00]" type="radio" value="current_price" />
+                    <span>
+                      <span class="block font-black">{{ t("admin.adjustCurrentSellingPrice") }}</span>
+                      <span class="text-xs text-gray-500">{{ t("admin.adjustCurrentSellingPriceHint") }}</span>
+                    </span>
+                  </label>
+                  <label class="flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition" :class="bulkForm.method === 'cost_markup' ? 'border-[#FF4D00] bg-[#FF4D00]/10 text-white' : 'border-white/10 text-gray-300 hover:border-[#FF4D00]/60'">
+                    <input v-model="bulkForm.method" class="mt-1 h-4 w-4 accent-[#FF4D00]" type="radio" value="cost_markup" />
+                    <span>
+                      <span class="block font-black">{{ t("admin.setSellingPriceFromCost") }}</span>
+                      <span class="text-xs text-gray-500">{{ t("admin.setSellingPriceFromCostHint") }}</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div v-if="bulkForm.method === 'current_price'" class="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-3">
+                <span class="field-label">{{ t("admin.adjustment") }}</span>
+                <div class="grid grid-cols-2 gap-3">
+                  <select v-model="bulkForm.direction" class="field">
+                    <option value="increase">{{ t("admin.increase") }}</option>
+                    <option value="decrease">{{ t("admin.decrease") }}</option>
+                  </select>
+                  <select v-model="bulkForm.adjustment_type" class="field">
+                    <option value="percent">{{ t("admin.percentage") }}</option>
+                    <option value="fixed">{{ t("admin.fixedAmount") }}</option>
+                  </select>
+                </div>
+                <label class="block">
+                  <span class="field-label">{{ t("admin.adjustmentValue") }}</span>
+                  <div class="mt-2 flex items-center rounded-2xl border border-white/10 bg-black/50 focus-within:border-[#FF4D00]">
+                    <input v-model.number="bulkForm.value" class="w-full bg-transparent px-4 py-3 font-black text-white outline-none" type="number" min="0" step="0.01" />
+                    <span class="px-4 text-sm font-black text-[#FF4D00]">{{ bulkForm.adjustment_type === "percent" ? "%" : "EGP" }}</span>
+                  </div>
+                </label>
+              </div>
+
+              <div v-if="bulkForm.method === 'cost_markup'" class="space-y-3 rounded-2xl border border-white/10 bg-black/30 p-3">
+                <label class="block">
+                  <span class="field-label">{{ t("admin.targetMarkupPercent") }}</span>
+                  <div class="mt-2 flex items-center rounded-2xl border border-white/10 bg-black/50 focus-within:border-[#FF4D00]">
+                    <input v-model.number="bulkForm.value" class="w-full bg-transparent px-4 py-3 font-black text-white outline-none" type="number" min="0" step="0.01" />
+                    <span class="px-4 text-sm font-black text-[#FF4D00]">%</span>
+                  </div>
+                </label>
+                <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 text-sm text-gray-300">
+                  <input v-model="bulkForm.exclude_missing_cost" class="mt-1 h-4 w-4 accent-[#FF4D00]" type="checkbox" />
+                  <span>
+                    <span class="block font-black text-white">{{ t("admin.excludeMissingCost") }}</span>
+                    <span class="text-xs text-gray-500">{{ t("admin.excludeMissingCostHint") }}</span>
+                  </span>
+                </label>
+              </div>
+
+              <button class="w-full rounded-2xl bg-[#FF4D00] px-5 py-3 font-black text-white shadow-lg shadow-[#FF4D00]/20 disabled:opacity-50" type="button" :disabled="bulkLoading" @click="previewBulkPricing">
+                {{ bulkLoading ? t("admin.saving") : t("admin.previewChanges") }}
+              </button>
+            </aside>
+
+            <section class="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1 lg:max-h-full lg:overflow-y-auto">
+              <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.preview") }}</p>
+                  <p class="mt-1 text-2xl font-black text-white">{{ bulkSummary.eligible }}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.missingCostCount") }}</p>
+                  <p class="mt-1 text-2xl font-black text-amber-300">{{ bulkSummary.missingCost }}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.belowCostCount") }}</p>
+                  <p class="mt-1 text-2xl font-black text-red-300">{{ bulkSummary.belowCost }}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.noChangeCount") }}</p>
+                  <p class="mt-1 text-2xl font-black text-gray-300">{{ bulkSummary.noChange }}</p>
+                </div>
+              </div>
+
+              <p v-if="bulkError" class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ bulkError }}</p>
+              <p v-if="bulkSuccess" class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">{{ bulkSuccess }}</p>
+
+              <div class="hidden min-w-0 overflow-hidden rounded-2xl border border-white/10 md:block">
+                <div class="max-h-[28rem] overflow-auto">
+                  <table class="w-full min-w-[820px] text-sm">
+                    <thead class="sticky top-0 bg-black text-gray-500">
+                      <tr>
+                        <th class="px-4 py-3 text-start">{{ t("common.product") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.costPrice") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.currentSellingPrice") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.newSellingPrice") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.expectedProfit") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("common.status") }}</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/10">
+                      <tr v-for="row in bulkPreviewRows" :key="`${row.product_id}-${row.variant_id || 'legacy'}`">
+                        <td class="px-4 py-3">
+                          <p class="truncate font-bold text-white">{{ row.product_title }}</p>
+                          <p class="text-xs text-gray-500">{{ row.variant_label || row.item_type }}</p>
+                        </td>
+                        <td class="px-4 py-3 text-gray-300">{{ row.cost_price === null || row.cost_price === undefined ? "-" : formatProductPrice(row.cost_price) }}</td>
+                        <td class="px-4 py-3 text-gray-300">{{ formatProductPrice(row.current_price) }}</td>
+                        <td class="px-4 py-3 font-black text-[#FF4D00]">{{ row.new_price === null ? "-" : formatProductPrice(row.new_price) }}</td>
+                        <td class="px-4 py-3 text-gray-300">{{ row.new_gross_profit === null || row.new_gross_profit === undefined ? "-" : formatProductPrice(row.new_gross_profit) }}</td>
+                        <td class="px-4 py-3">
+                          <span class="rounded-full border px-3 py-1 text-xs font-black" :class="row.is_valid && !row.excluded ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-amber-400/30 bg-amber-400/10 text-amber-200'">
+                            {{ row.warning || (row.is_active ? t("admin.active") : t("admin.inactive")) }}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr v-if="!bulkPreviewRows.length">
+                        <td class="px-4 py-6 text-center text-gray-500" colspan="6">{{ t("admin.bulkPricingNoPreview") }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="grid gap-3 md:hidden">
+                <article v-for="row in bulkPreviewRows" :key="`${row.product_id}-${row.variant_id || 'legacy'}-bulk-card`" class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="truncate font-black text-white">{{ row.product_title }}</p>
+                      <p class="text-xs text-gray-500">{{ row.variant_label || row.item_type }}</p>
+                    </div>
+                    <span class="rounded-full border px-3 py-1 text-xs font-black" :class="row.is_valid && !row.excluded ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-amber-400/30 bg-amber-400/10 text-amber-200'">
+                      {{ row.warning || (row.is_active ? t("admin.active") : t("admin.inactive")) }}
+                    </span>
+                  </div>
+                  <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.currentSellingPrice") }}</p>
+                      <p class="font-black text-white">{{ formatProductPrice(row.current_price) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.newSellingPrice") }}</p>
+                      <p class="font-black text-[#FF4D00]">{{ row.new_price === null ? "-" : formatProductPrice(row.new_price) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.costPrice") }}</p>
+                      <p class="font-bold text-gray-300">{{ row.cost_price === null || row.cost_price === undefined ? "-" : formatProductPrice(row.cost_price) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.expectedProfit") }}</p>
+                      <p class="font-bold text-gray-300">{{ row.new_gross_profit === null || row.new_gross_profit === undefined ? "-" : formatProductPrice(row.new_gross_profit) }}</p>
+                    </div>
+                  </div>
+                </article>
+                <p v-if="!bulkPreviewRows.length" class="rounded-2xl border border-white/10 bg-black/40 p-4 text-center text-sm text-gray-500">{{ t("admin.bulkPricingNoPreview") }}</p>
+              </div>
+
+              <div class="sticky bottom-0 z-10 -mx-4 border-t border-white/10 bg-[#111111]/95 p-4 backdrop-blur sm:-mx-5 sm:px-5 lg:static lg:mx-0 lg:rounded-2xl lg:border lg:bg-black/40">
+                <button class="w-full rounded-2xl bg-[#FF4D00] px-5 py-3 font-black text-white shadow-lg shadow-[#FF4D00]/20 disabled:opacity-50 sm:w-auto" type="button" :disabled="bulkApplying || !bulkCanApply" @click="applyBulkPricing">
+                  {{ bulkApplying ? t("admin.saving") : t("admin.confirmPriceUpdate") }}
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <div v-else class="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 sm:p-5">
+            <p v-if="bulkError" class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ bulkError }}</p>
+            <p v-if="bulkSuccess" class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">{{ bulkSuccess }}</p>
+
+            <section>
+              <div class="mb-3 flex items-center justify-between gap-3">
+                <h4 class="font-black text-white">{{ t("admin.priceUpdateHistory") }}</h4>
+                <span class="text-sm font-bold text-gray-500">{{ bulkOperations.length }}</span>
+              </div>
+              <div class="grid gap-3 lg:grid-cols-2">
+                <article v-for="operation in bulkActiveOperations" :key="operation.id" class="rounded-2xl border border-[#FF4D00]/30 bg-[#FF4D00]/5 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-xs font-black uppercase tracking-[0.2em] text-[#FF4D00]">{{ t("admin.updatePrices") }}</p>
+                      <p class="mt-1 font-black text-white">{{ formatBulkOperationTitle(operation) }}</p>
+                    </div>
+                    <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-black text-emerald-300">{{ t("admin.active") }}</span>
+                  </div>
+                  <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-xl border border-white/10 bg-black/40 p-3">
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.preview") }}</p>
+                      <p class="font-black text-white">{{ operation.applied_item_count }}</p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-black/40 p-3">
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("common.created") }}</p>
+                      <p class="font-bold text-gray-300">{{ formatDate(operation.created_at) }}</p>
+                    </div>
+                  </div>
+                  <button class="mt-4 w-full rounded-2xl border border-[#FF4D00]/50 bg-black/50 px-4 py-3 text-sm font-black text-white transition hover:bg-[#FF4D00]/15 disabled:opacity-40" type="button" :disabled="undoingBulkOperationId === operation.id || bulkApplying" @click="undoBulkPricingOperation(operation.id)">
+                    {{ undoingBulkOperationId === operation.id ? t("admin.saving") : t("admin.undoPriceUpdate") }}
+                  </button>
+                </article>
+              </div>
+              <p v-if="!bulkActiveOperations.length && !bulkOperations.length" class="rounded-2xl border border-white/10 bg-black/40 p-4 text-sm text-gray-500">{{ t("admin.noPriceUpdateHistory") }}</p>
+            </section>
+
+            <section v-if="bulkUndoneOperations.length">
+              <h4 class="mb-3 font-black text-white">{{ t("admin.undone") }}</h4>
+              <div class="grid gap-2">
+                <div v-for="operation in bulkUndoneOperations" :key="operation.id" class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/40 p-3">
+                  <div>
+                    <p class="font-bold">{{ formatBulkOperationTitle(operation) }}</p>
+                    <p class="text-xs text-gray-500">{{ formatDate(operation.created_at) }} - {{ operation.applied_item_count }}</p>
+                  </div>
+                  <span class="rounded-full border border-white/10 px-3 py-1 text-xs font-black text-gray-400">{{ t("admin.undone") }}</span>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div v-if="saleModalOpen" class="fixed inset-0 z-[91] flex items-stretch justify-center overflow-hidden bg-black/80 p-0 backdrop-blur sm:items-start sm:overflow-y-auto sm:p-6">
+        <div class="flex h-[100dvh] w-full flex-col overflow-hidden border border-white/10 bg-[#111111] shadow-2xl sm:h-auto sm:max-h-[90dvh] sm:max-w-7xl sm:rounded-3xl">
+          <div class="flex flex-col gap-4 border-b border-white/10 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div>
+              <p class="text-xs font-black uppercase tracking-[0.24em] text-[#CF1D1D]">{{ t("admin.promotions") }}</p>
+              <h3 class="mt-1 text-2xl font-black">{{ t("admin.createSale") }}</h3>
+            </div>
+            <div class="flex items-center justify-between gap-3">
+              <div class="grid grid-cols-2 rounded-2xl border border-white/10 bg-black/50 p-1 text-sm font-black">
+                <button
+                  class="rounded-xl px-4 py-2 transition"
+                  :class="saleActiveTab === 'create' ? 'bg-[#CF1D1D] text-white shadow-lg shadow-[#CF1D1D]/20' : 'text-gray-400 hover:text-white'"
+                  type="button"
+                  @click="saleActiveTab = 'create'"
+                >
+                  {{ t("admin.createSale") }}
+                </button>
+                <button
+                  class="rounded-xl px-4 py-2 transition"
+                  :class="saleActiveTab === 'active' ? 'bg-[#CF1D1D] text-white shadow-lg shadow-[#CF1D1D]/20' : 'text-gray-400 hover:text-white'"
+                  type="button"
+                  @click="saleActiveTab = 'active'"
+                >
+                  {{ t("admin.activeSales") }}
+                </button>
+              </div>
+              <button class="rounded-xl border border-white/10 px-3 py-2 font-bold hover:border-[#CF1D1D]" type="button" @click="saleModalOpen = false">
+                {{ t("common.close") }}
+              </button>
+            </div>
+          </div>
+
+          <div v-if="saleActiveTab === 'create'" class="grid min-h-0 flex-1 gap-5 overflow-y-auto p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_22rem] lg:overflow-hidden">
+            <aside class="space-y-4 rounded-2xl border border-white/10 bg-black/40 p-4 lg:col-start-2 lg:row-start-1 lg:max-h-full lg:overflow-y-auto">
+              <div class="space-y-2">
+                <span class="field-label">{{ t("admin.productScope") }}</span>
+                <div class="grid gap-2">
+                  <label v-for="option in saleScopeOptions" :key="option.value" class="flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm font-bold transition" :class="saleForm.scope_type === option.value ? 'border-[#CF1D1D] bg-[#CF1D1D]/10 text-white' : 'border-white/10 text-gray-300 hover:border-[#CF1D1D]/60'">
+                    <input v-model="saleForm.scope_type" class="h-4 w-4 accent-[#CF1D1D]" type="radio" :value="option.value" />
+                    {{ option.label }}
+                  </label>
+                </div>
+              </div>
+
+              <label v-if="saleForm.scope_type === 'category'" class="block">
+                <span class="field-label">{{ t("common.category") }}</span>
+                <select v-model.number="saleForm.category_id" class="field mt-2">
+                  <option :value="0">{{ t("admin.allCategories") }}</option>
+                  <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+                </select>
+              </label>
+
+              <div v-if="saleForm.scope_type === 'selected_products'" class="rounded-2xl border border-white/10 bg-black/30 p-3">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="field-label">{{ t("admin.selectedProducts") }}</span>
+                  <button class="text-xs font-black text-[#CF1D1D] hover:text-white" type="button" @click="clearSaleProductSelection">
+                    {{ t("admin.clearSelection") }}
+                  </button>
+                </div>
+                <input v-model="saleProductSearch" class="field mt-2" type="search" :placeholder="t('admin.searchProducts')" />
+                <p class="mt-2 text-xs font-bold text-gray-500">{{ t("admin.selectedProductsCount", { count: saleSelectedProductIds.length }) }}</p>
+                <div class="mt-3 max-h-64 space-y-2 overflow-y-auto pe-1">
+                  <label v-for="product in filteredSaleProducts" :key="product.id" class="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-[#111]/80 p-3 text-sm transition hover:border-[#CF1D1D]/60">
+                    <input class="h-4 w-4 accent-[#CF1D1D]" type="checkbox" :checked="saleSelectedProductIds.includes(String(product.id))" @change="toggleSaleProductSelection(product.id)" />
+                    <span class="min-w-0 flex-1">
+                      <span class="block truncate font-bold text-white">{{ product.title }}</span>
+                      <span class="block truncate text-xs text-gray-500">{{ product.slug || product.categories?.name || t("admin.uncategorized") }}</span>
+                    </span>
+                  </label>
+                  <p v-if="!filteredSaleProducts.length" class="rounded-xl border border-white/10 p-3 text-sm text-gray-500">{{ t("admin.noProducts") }}</p>
+                </div>
+              </div>
+
+              <label class="block">
+                <span class="field-label">{{ t("admin.discountPercent") }}</span>
+                <div class="mt-2 flex items-center rounded-2xl border border-white/10 bg-black/50 focus-within:border-[#CF1D1D]">
+                  <input v-model.number="saleForm.discount_percent" class="w-full bg-transparent px-4 py-3 font-black text-white outline-none" type="number" min="1" max="99" step="0.01" />
+                  <span class="px-4 text-sm font-black text-[#CF1D1D]">%</span>
+                </div>
+              </label>
+
+              <div class="space-y-2">
+                <span class="field-label">{{ t("admin.restrictions") }}</span>
+                <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 text-sm text-gray-300">
+                  <input v-model="saleForm.exclude_missing_cost" class="mt-1 h-4 w-4 accent-[#CF1D1D]" type="checkbox" />
+                  <span>
+                    <span class="block font-black text-white">{{ t("admin.excludeMissingCost") }}</span>
+                    <span class="text-xs text-gray-500">{{ t("admin.excludeMissingCostHint") }}</span>
+                  </span>
+                </label>
+                <label class="flex items-start gap-3 rounded-xl border border-white/10 p-3 text-sm text-gray-300">
+                  <input v-model="saleForm.exclude_below_cost" class="mt-1 h-4 w-4 accent-[#CF1D1D]" type="checkbox" />
+                  <span>
+                    <span class="block font-black text-white">{{ t("admin.excludeBelowCost") }}</span>
+                    <span class="text-xs text-gray-500">{{ t("admin.excludeBelowCostHint") }}</span>
+                  </span>
+                </label>
+              </div>
+
+              <button class="w-full rounded-2xl bg-[#CF1D1D] px-5 py-3 font-black text-white shadow-lg shadow-[#CF1D1D]/20 disabled:opacity-50" type="button" :disabled="saleLoading" @click="previewBulkSale">
+                {{ saleLoading ? t("admin.saving") : t("admin.previewChanges") }}
+              </button>
+            </aside>
+
+            <section class="min-w-0 space-y-4 lg:col-start-1 lg:row-start-1 lg:max-h-full lg:overflow-y-auto">
+              <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.preview") }}</p>
+                  <p class="mt-1 text-2xl font-black text-white">{{ saleSummary.eligible }}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.missingCostCount") }}</p>
+                  <p class="mt-1 text-2xl font-black text-amber-300">{{ saleSummary.missingCost }}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.belowCostCount") }}</p>
+                  <p class="mt-1 text-2xl font-black text-red-300">{{ saleSummary.belowCost }}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.excludedItems") }}</p>
+                  <p class="mt-1 text-2xl font-black text-gray-300">{{ saleSummary.excluded }}</p>
+                </div>
+              </div>
+
+              <p v-if="saleError" class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ saleError }}</p>
+              <p v-if="saleSuccess" class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">{{ saleSuccess }}</p>
+
+              <div class="hidden min-w-0 overflow-hidden rounded-2xl border border-white/10 md:block">
+                <div class="max-h-[28rem] overflow-auto">
+                  <table class="w-full min-w-[860px] text-sm">
+                    <thead class="sticky top-0 bg-black text-gray-500">
+                      <tr>
+                        <th class="px-4 py-3 text-start">{{ t("common.product") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.costPrice") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.currentSellingPrice") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.saleOldPrice") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.saleNewPrice") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("admin.expectedProfit") }}</th>
+                        <th class="px-4 py-3 text-start">{{ t("common.status") }}</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/10">
+                      <tr v-for="row in salePreviewRows" :key="`${row.product_id}-${row.variant_id || 'legacy'}`">
+                        <td class="px-4 py-3">
+                          <p class="font-bold text-white">{{ row.product_title }}</p>
+                          <p class="text-xs text-gray-500">{{ row.variant_label || row.item_type }}</p>
+                        </td>
+                        <td class="px-4 py-3 text-gray-300">{{ row.cost_price === null || row.cost_price === undefined ? "-" : formatProductPrice(row.cost_price) }}</td>
+                        <td class="px-4 py-3 text-gray-300">{{ formatProductPrice(row.current_price) }}</td>
+                        <td class="px-4 py-3 text-gray-300">{{ formatProductPrice(row.sale_old_price) }}</td>
+                        <td class="px-4 py-3 font-black text-[#CF1D1D]">{{ row.sale_price === null ? "-" : formatProductPrice(row.sale_price) }}</td>
+                        <td class="px-4 py-3 text-gray-300">{{ row.sale_gross_profit === null || row.sale_gross_profit === undefined ? "-" : formatProductPrice(row.sale_gross_profit) }}</td>
+                        <td class="px-4 py-3">
+                          <span class="rounded-full border px-3 py-1 text-xs font-black" :class="row.is_valid && !row.excluded ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-amber-400/30 bg-amber-400/10 text-amber-200'">
+                            {{ row.warning || (row.is_active ? t("admin.active") : t("admin.inactive")) }}
+                          </span>
+                        </td>
+                      </tr>
+                      <tr v-if="!salePreviewRows.length">
+                        <td class="px-4 py-6 text-center text-gray-500" colspan="7">{{ t("admin.saleNoPreview") }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="grid gap-3 md:hidden">
+                <article v-for="row in salePreviewRows" :key="`${row.product_id}-${row.variant_id || 'legacy'}-card`" class="rounded-2xl border border-white/10 bg-black/40 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <p class="truncate font-black text-white">{{ row.product_title }}</p>
+                      <p class="text-xs text-gray-500">{{ row.variant_label || row.item_type }}</p>
+                    </div>
+                    <span class="rounded-full border px-3 py-1 text-xs font-black" :class="row.is_valid && !row.excluded ? 'border-emerald-400/30 bg-emerald-400/10 text-emerald-300' : 'border-amber-400/30 bg-amber-400/10 text-amber-200'">
+                      {{ row.warning || (row.is_active ? t("admin.active") : t("admin.inactive")) }}
+                    </span>
+                  </div>
+                  <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.currentSellingPrice") }}</p>
+                      <p class="font-black text-white">{{ formatProductPrice(row.current_price) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.saleNewPrice") }}</p>
+                      <p class="font-black text-[#CF1D1D]">{{ row.sale_price === null ? "-" : formatProductPrice(row.sale_price) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.costPrice") }}</p>
+                      <p class="font-bold text-gray-300">{{ row.cost_price === null || row.cost_price === undefined ? "-" : formatProductPrice(row.cost_price) }}</p>
+                    </div>
+                    <div>
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.expectedProfit") }}</p>
+                      <p class="font-bold text-gray-300">{{ row.sale_gross_profit === null || row.sale_gross_profit === undefined ? "-" : formatProductPrice(row.sale_gross_profit) }}</p>
+                    </div>
+                  </div>
+                </article>
+                <p v-if="!salePreviewRows.length" class="rounded-2xl border border-white/10 bg-black/40 p-4 text-center text-sm text-gray-500">{{ t("admin.saleNoPreview") }}</p>
+              </div>
+
+              <div class="sticky bottom-0 z-10 -mx-4 border-t border-white/10 bg-[#111111]/95 p-4 backdrop-blur sm:-mx-5 sm:px-5 lg:static lg:mx-0 lg:rounded-2xl lg:border lg:bg-black/40">
+                <button class="w-full rounded-2xl bg-[#CF1D1D] px-5 py-3 font-black text-white shadow-lg shadow-[#CF1D1D]/20 disabled:opacity-50 sm:w-auto" type="button" :disabled="saleApplying || !saleCanApply" @click="applyBulkSale">
+                  {{ saleApplying ? t("admin.saving") : t("admin.createSale") }}
+                </button>
+              </div>
+            </section>
+          </div>
+
+          <div v-else class="min-h-0 flex-1 space-y-5 overflow-y-auto p-4 sm:p-5">
+            <p v-if="saleError" class="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">{{ saleError }}</p>
+            <p v-if="saleSuccess" class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">{{ saleSuccess }}</p>
+
+            <section>
+              <div class="mb-3 flex items-center justify-between gap-3">
+                <h4 class="font-black text-white">{{ t("admin.activeSales") }}</h4>
+                <span class="text-sm font-bold text-gray-500">{{ saleActiveOperations.length }}</span>
+              </div>
+              <div class="grid gap-3 lg:grid-cols-2">
+                <article v-for="operation in saleActiveOperations" :key="operation.id" class="rounded-2xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/5 p-4">
+                  <div class="flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-xs font-black uppercase tracking-[0.2em] text-[#CF1D1D]">{{ t("admin.createSale") }}</p>
+                      <p class="mt-1 text-2xl font-black text-white">{{ operation.discount_percent }}%</p>
+                    </div>
+                    <span class="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-black text-emerald-300">{{ t("admin.active") }}</span>
+                  </div>
+                  <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div class="rounded-xl border border-white/10 bg-black/40 p-3">
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("admin.preview") }}</p>
+                      <p class="font-black text-white">{{ operation.applied_item_count }}</p>
+                    </div>
+                    <div class="rounded-xl border border-white/10 bg-black/40 p-3">
+                      <p class="text-xs font-bold uppercase text-gray-500">{{ t("common.created") }}</p>
+                      <p class="font-bold text-gray-300">{{ formatDate(operation.created_at) }}</p>
+                    </div>
+                  </div>
+                  <button class="mt-4 w-full rounded-2xl border border-[#CF1D1D]/50 bg-black/50 px-4 py-3 text-sm font-black text-white transition hover:bg-[#CF1D1D]/15 disabled:opacity-40" type="button" :disabled="endingSaleId === operation.id || saleApplying" @click="endBulkSale(operation.id)">
+                    {{ endingSaleId === operation.id ? t("admin.saving") : t("admin.endSale") }}
+                  </button>
+                </article>
+              </div>
+              <p v-if="!saleActiveOperations.length" class="rounded-2xl border border-white/10 bg-black/40 p-4 text-sm text-gray-500">{{ t("admin.noActiveSales") }}</p>
+            </section>
+
+            <section>
+              <h4 class="mb-3 font-black text-white">{{ t("admin.saleHistory") }}</h4>
+              <div class="grid gap-2">
+                <div v-for="operation in saleEndedOperations" :key="operation.id" class="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/40 p-3">
+                  <div>
+                    <p class="font-bold">{{ t("admin.createSale") }} - {{ operation.discount_percent }}%</p>
+                    <p class="text-xs text-gray-500">{{ formatDate(operation.created_at) }} - {{ operation.applied_item_count }}</p>
+                  </div>
+                  <span class="rounded-full border border-white/10 px-3 py-1 text-xs font-black text-gray-400">{{ t("admin.ended") }}</span>
+                </div>
+                <p v-if="!saleEndedOperations.length && !saleOperations.length" class="rounded-xl border border-white/10 bg-black/40 p-3 text-sm text-gray-500">{{ t("admin.saleHistoryEmpty") }}</p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </section>
 </template>
 
@@ -499,9 +1066,14 @@ import {
   sortProductsByShopPosition,
 } from "../../utils/admin";
 import {
+  applyLoadedVariantCosts,
+  buildProductCostLookup,
   buildVariantProductRpcPayload,
+  getLoadedCostPrice,
   getVariantInventorySummary,
   validateVariantProduct,
+  type AdminLoadedProductCostRow,
+  type AdminLoadedVariantCostRow,
   type AdminVariantRowInput,
 } from "../../utils/adminProductVariants";
 import { optimizeImage } from "../../utils/imageOptimizer";
@@ -544,8 +1116,16 @@ type ProductVariantRow = {
   color_id?: number | null;
   size_id?: number | null;
   price: number;
+  old_price?: number | string | null;
+  cost_price?: number | string | null;
   stock_quantity: number;
   is_active: boolean;
+  product_variant_costs?: ProductCostRow[];
+};
+
+type ProductCostRow = {
+  product_id?: number | string;
+  cost_price?: number | string | null;
 };
 
 type ProductRow = {
@@ -562,6 +1142,7 @@ type ProductRow = {
   shop_position?: number | null;
   inventory_model?: "legacy" | "variants" | string | null;
   categories?: { name?: string };
+  product_costs?: ProductCostRow[];
   product_colors?: ProductColorRow[];
   product_sizes?: ProductSizeRow[];
   product_variants?: ProductVariantRow[];
@@ -591,6 +1172,62 @@ type ColorForm = {
 };
 
 type VariantForm = AdminVariantRowInput;
+
+type BulkScopeType = "all" | "category" | "selected_products";
+type BulkPricingMethod = "current_price" | "cost_markup";
+type BulkAdjustmentType = "percent" | "fixed" | "markup_percent";
+type BulkDirection = "increase" | "decrease";
+
+type BulkPreviewRow = {
+  product_id: number;
+  variant_id: number | null;
+  item_type: string;
+  product_title: string;
+  variant_label: string | null;
+  is_active: boolean;
+  cost_price: number | null;
+  current_price: number;
+  new_price: number | null;
+  new_gross_profit: number | null;
+  warning: string | null;
+  is_valid: boolean;
+  excluded: boolean;
+};
+
+type BulkOperationRow = {
+  id: string;
+  created_at: string;
+  pricing_method: string;
+  adjustment_value: number;
+  applied_item_count: number;
+  status: string;
+};
+
+type BulkSalePreviewRow = {
+  product_id: number;
+  variant_id: number | null;
+  item_type: string;
+  product_title: string;
+  variant_label: string | null;
+  is_active: boolean;
+  cost_price: number | null;
+  current_price: number;
+  current_old_price: number | null;
+  sale_price: number | null;
+  sale_old_price: number;
+  sale_gross_profit: number | null;
+  warning: string | null;
+  is_valid: boolean;
+  excluded: boolean;
+};
+
+type BulkSaleOperationRow = {
+  id: string;
+  created_at: string;
+  discount_percent: number;
+  applied_item_count: number;
+  status: string;
+};
 
 const supabase = useSupabase();
 const { t } = useI18n();
@@ -622,6 +1259,44 @@ const reorderProductsLoaded = ref(false);
 const reorderError = ref("");
 const productTableBody = ref<HTMLElement | null>(null);
 const productCardList = ref<HTMLElement | null>(null);
+const bulkModalOpen = ref(false);
+const bulkLoading = ref(false);
+const bulkApplying = ref(false);
+const bulkError = ref("");
+const bulkSuccess = ref("");
+const bulkPreviewRows = ref<BulkPreviewRow[]>([]);
+const bulkOperations = ref<BulkOperationRow[]>([]);
+const bulkSelectedProductIds = ref<string[]>([]);
+const bulkProductSearch = ref("");
+const bulkActiveTab = ref<"update" | "history">("update");
+const undoingBulkOperationId = ref<string | null>(null);
+const bulkForm = ref({
+  scope_type: "all" as BulkScopeType,
+  category_id: 0,
+  method: "current_price" as BulkPricingMethod,
+  adjustment_type: "percent" as BulkAdjustmentType,
+  direction: "increase" as BulkDirection,
+  value: 20,
+  exclude_missing_cost: false,
+});
+const saleModalOpen = ref(false);
+const saleLoading = ref(false);
+const saleApplying = ref(false);
+const saleError = ref("");
+const saleSuccess = ref("");
+const salePreviewRows = ref<BulkSalePreviewRow[]>([]);
+const saleOperations = ref<BulkSaleOperationRow[]>([]);
+const saleSelectedProductIds = ref<string[]>([]);
+const saleProductSearch = ref("");
+const saleActiveTab = ref<"create" | "active">("create");
+const endingSaleId = ref<string | null>(null);
+const saleForm = ref({
+  scope_type: "all" as BulkScopeType,
+  category_id: 0,
+  discount_percent: 30,
+  exclude_missing_cost: false,
+  exclude_below_cost: false,
+});
 const sizes = ref<SizeForm[]>([]);
 const colors = ref<ColorForm[]>([]);
 const variants = ref<VariantForm[]>([]);
@@ -633,6 +1308,7 @@ const form = ref({
   slug: "",
   description: "",
   price: 0,
+  cost_price: null as number | string | null,
   old_price: null as number | null,
   badge: "",
   category_id: 0,
@@ -669,6 +1345,83 @@ const colorVariantRows = (color: ColorForm) =>
 
 const orderedProducts = computed(() => sortProductsByShopPosition(products.value));
 
+const bulkScopeOptions = computed(() => [
+  { value: "all" as BulkScopeType, label: t("admin.allProducts") },
+  { value: "category" as BulkScopeType, label: t("admin.selectedCategory") },
+  { value: "selected_products" as BulkScopeType, label: t("admin.selectedProducts") },
+]);
+
+const filteredBulkProducts = computed(() => {
+  const term = bulkProductSearch.value.trim().toLowerCase();
+  if (!term) return orderedProducts.value;
+
+  return orderedProducts.value.filter((product) =>
+    [product.title, product.slug, product.categories?.name]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(term)),
+  );
+});
+
+const bulkActiveOperations = computed(() =>
+  bulkOperations.value.filter((operation) => operation.status !== "undone"),
+);
+
+const bulkUndoneOperations = computed(() =>
+  bulkOperations.value.filter((operation) => operation.status === "undone"),
+);
+
+const toggleBulkProductSelection = (productId: number) => {
+  const id = String(productId);
+  bulkSelectedProductIds.value = bulkSelectedProductIds.value.includes(id)
+    ? bulkSelectedProductIds.value.filter((selectedId) => selectedId !== id)
+    : [...bulkSelectedProductIds.value, id];
+};
+
+const clearBulkProductSelection = () => {
+  bulkSelectedProductIds.value = [];
+};
+
+const formatBulkOperationTitle = (operation: BulkOperationRow) =>
+  operation.pricing_method === "cost_markup"
+    ? t("admin.targetMarkupOperation", { value: operation.adjustment_value })
+    : t("admin.priceAdjustmentOperation", { value: operation.adjustment_value });
+
+const saleScopeOptions = computed(() => [
+  { value: "all" as BulkScopeType, label: t("admin.allProducts") },
+  { value: "category" as BulkScopeType, label: t("admin.selectedCategory") },
+  { value: "selected_products" as BulkScopeType, label: t("admin.selectedProducts") },
+]);
+
+const filteredSaleProducts = computed(() => {
+  const term = saleProductSearch.value.trim().toLowerCase();
+  if (!term) return orderedProducts.value;
+
+  return orderedProducts.value.filter((product) =>
+    [product.title, product.slug, product.categories?.name]
+      .filter(Boolean)
+      .some((value) => String(value).toLowerCase().includes(term)),
+  );
+});
+
+const saleActiveOperations = computed(() =>
+  saleOperations.value.filter((operation) => operation.status !== "ended"),
+);
+
+const saleEndedOperations = computed(() =>
+  saleOperations.value.filter((operation) => operation.status === "ended"),
+);
+
+const toggleSaleProductSelection = (productId: number) => {
+  const id = String(productId);
+  saleSelectedProductIds.value = saleSelectedProductIds.value.includes(id)
+    ? saleSelectedProductIds.value.filter((selectedId) => selectedId !== id)
+    : [...saleSelectedProductIds.value, id];
+};
+
+const clearSaleProductSelection = () => {
+  saleSelectedProductIds.value = [];
+};
+
 const filteredProducts = computed(() => {
   const term = search.value.trim().toLowerCase();
   let result = [...products.value];
@@ -704,6 +1457,39 @@ const filteredProducts = computed(() => {
 });
 
 const visibleProducts = computed(() => filteredProducts.value.slice(0, limit.value));
+
+const bulkEligibleRows = computed(() =>
+  bulkPreviewRows.value.filter(
+    (row) => row.is_valid && !row.excluded && row.new_price !== null && row.new_price !== row.current_price,
+  ),
+);
+
+const bulkCanApply = computed(() => bulkEligibleRows.value.length > 0);
+
+const bulkSummary = computed(() => ({
+  eligible: bulkEligibleRows.value.length,
+  missingCost: bulkPreviewRows.value.filter((row) => row.warning === "Missing Cost Price").length,
+  belowCost: bulkPreviewRows.value.filter((row) => row.warning === "New selling price is below cost").length,
+  noChange: bulkPreviewRows.value.filter((row) => row.warning === "No price change").length,
+}));
+
+const saleEligibleRows = computed(() =>
+  salePreviewRows.value.filter(
+    (row) => row.is_valid && !row.excluded && row.sale_price !== null && row.sale_price !== row.current_price,
+  ),
+);
+
+const saleCanApply = computed(() => saleEligibleRows.value.length > 0);
+
+const saleSummary = computed(() => ({
+  eligible: saleEligibleRows.value.length,
+  missingCost: salePreviewRows.value.filter((row) => row.warning === "Cost unavailable").length,
+  belowCost: salePreviewRows.value.filter((row) => row.warning === "Below Cost").length,
+  excluded: salePreviewRows.value.filter((row) => row.excluded).length,
+  alreadyDiscounted: salePreviewRows.value.filter(
+    (row) => row.current_old_price !== null && Number(row.current_old_price) > Number(row.current_price),
+  ).length,
+}));
 
 const isReorderMode = computed(() =>
   isProductReorderMode({
@@ -806,9 +1592,328 @@ const loadData = async () => {
   if (productsError) alert(productsError.message);
   if (categoriesError) alert(categoriesError.message);
 
-  products.value = (productsData || []) as ProductRow[];
+  const loadedProducts = (productsData || []) as ProductRow[];
+  const productIds = loadedProducts.map((product) => product.id);
+  const variantIds = loadedProducts.flatMap((product) =>
+    (product.product_variants || []).map((variant) => variant.id),
+  );
+
+  let productCostRows: AdminLoadedProductCostRow[] = [];
+  let variantCostRows: AdminLoadedVariantCostRow[] = [];
+
+  if (productIds.length) {
+    const { data, error } = await supabase
+      .from("product_costs")
+      .select("product_id, cost_price")
+      .in("product_id", productIds);
+
+    if (error) {
+      alert(error.message);
+    } else {
+      productCostRows = (data || []) as AdminLoadedProductCostRow[];
+    }
+  }
+
+  if (variantIds.length) {
+    const { data, error } = await supabase
+      .from("product_variant_costs")
+      .select("variant_id, cost_price")
+      .in("variant_id", variantIds);
+
+    if (error) {
+      alert(error.message);
+    } else {
+      variantCostRows = (data || []) as AdminLoadedVariantCostRow[];
+    }
+  }
+
+  const productCostLookup = buildProductCostLookup(productCostRows);
+  products.value = loadedProducts.map((product) => ({
+    ...product,
+    product_costs: productCostLookup.has(product.id)
+      ? [{ product_id: product.id, cost_price: getLoadedCostPrice(productCostLookup, product.id) }]
+      : [],
+    product_variants: applyLoadedVariantCosts(product.product_variants || [], variantCostRows) as ProductVariantRow[],
+  }));
   categories.value = (categoriesData || []) as CategoryRow[];
   loading.value = false;
+};
+
+const buildBulkScopePayload = () => {
+  if (bulkForm.value.scope_type === "category") {
+    return {
+      type: "category",
+      category_id: bulkForm.value.category_id,
+    };
+  }
+
+  if (bulkForm.value.scope_type === "selected_products") {
+    return {
+      type: "selected_products",
+      product_ids: bulkSelectedProductIds.value.map((id) => Number(id)).filter(Boolean),
+    };
+  }
+
+  return { type: "all" };
+};
+
+const buildBulkPricingPayload = () => ({
+  method: bulkForm.value.method,
+  adjustment_type:
+    bulkForm.value.method === "cost_markup"
+      ? "markup_percent"
+      : bulkForm.value.adjustment_type,
+  direction: bulkForm.value.direction,
+  value: Number(bulkForm.value.value || 0),
+  exclude_missing_cost: bulkForm.value.exclude_missing_cost,
+});
+
+const loadBulkPricingHistory = async () => {
+  const { data, error } = await supabase
+    .from("bulk_price_operations")
+    .select("id, created_at, pricing_method, adjustment_value, applied_item_count, status")
+    .order("created_at", { ascending: false })
+    .limit(8);
+
+  if (error) throw error;
+  bulkOperations.value = (data || []) as BulkOperationRow[];
+};
+
+const openBulkPricing = async () => {
+  bulkModalOpen.value = true;
+  bulkActiveTab.value = "update";
+  bulkProductSearch.value = "";
+  bulkError.value = "";
+  bulkSuccess.value = "";
+  bulkPreviewRows.value = [];
+
+  try {
+    await loadBulkPricingHistory();
+  } catch (error: unknown) {
+    bulkError.value = error instanceof Error ? error.message : t("admin.bulkPricingLoadFailed");
+  }
+};
+
+const previewBulkPricing = async () => {
+  try {
+    bulkLoading.value = true;
+    bulkError.value = "";
+    bulkSuccess.value = "";
+
+    const { data, error } = await supabase.rpc("preview_bulk_price_update", {
+      p_scope: buildBulkScopePayload(),
+      p_pricing: buildBulkPricingPayload(),
+    });
+
+    if (error) throw error;
+    bulkPreviewRows.value = (data || []) as BulkPreviewRow[];
+  } catch (error: unknown) {
+    bulkError.value = error instanceof Error ? error.message : t("admin.bulkPricingLoadFailed");
+  } finally {
+    bulkLoading.value = false;
+  }
+};
+
+const applyBulkPricing = async () => {
+  if (!bulkCanApply.value) {
+    bulkError.value = t("admin.bulkPricingNoEligibleRows");
+    return;
+  }
+
+  if (!window.confirm(t("admin.applyBulkPricingConfirm", { count: bulkEligibleRows.value.length }))) return;
+
+  try {
+    bulkApplying.value = true;
+    bulkError.value = "";
+    bulkSuccess.value = "";
+
+    const expectedItems = bulkEligibleRows.value.map((row) => ({
+      product_id: row.product_id,
+      variant_id: row.variant_id,
+      current_price: row.current_price,
+      new_price: row.new_price,
+    }));
+
+    const { error } = await supabase.rpc("apply_bulk_price_update", {
+      p_scope: buildBulkScopePayload(),
+      p_pricing: buildBulkPricingPayload(),
+      p_expected_items: expectedItems,
+    });
+
+    if (error) throw error;
+
+    bulkSuccess.value = t("admin.bulkPricingApplied");
+    bulkPreviewRows.value = [];
+    await Promise.all([loadData(), loadBulkPricingHistory()]);
+  } catch (error: unknown) {
+    bulkError.value = error instanceof Error ? error.message : t("admin.bulkPricingApplyFailed");
+  } finally {
+    bulkApplying.value = false;
+  }
+};
+
+const undoBulkPricingOperation = async (operationId: string) => {
+  if (!window.confirm(t("admin.undoBulkPricingConfirm"))) return;
+
+  try {
+    bulkApplying.value = true;
+    undoingBulkOperationId.value = operationId;
+    bulkError.value = "";
+    bulkSuccess.value = "";
+
+    const { error } = await supabase.rpc("undo_bulk_price_operation", {
+      p_operation_id: operationId,
+    });
+
+    if (error) throw error;
+
+    bulkSuccess.value = t("admin.bulkPricingUndone");
+    await Promise.all([loadData(), loadBulkPricingHistory()]);
+  } catch (error: unknown) {
+    bulkError.value = error instanceof Error ? error.message : t("admin.bulkPricingUndoFailed");
+  } finally {
+    bulkApplying.value = false;
+    undoingBulkOperationId.value = null;
+  }
+};
+
+const buildSaleScopePayload = () => {
+  if (saleForm.value.scope_type === "category") {
+    return {
+      type: "category",
+      category_id: saleForm.value.category_id,
+    };
+  }
+
+  if (saleForm.value.scope_type === "selected_products") {
+    return {
+      type: "selected_products",
+      product_ids: saleSelectedProductIds.value.map((id) => Number(id)).filter(Boolean),
+    };
+  }
+
+  return { type: "all" };
+};
+
+const buildSalePayload = () => ({
+  discount_percent: Number(saleForm.value.discount_percent || 0),
+  exclude_missing_cost: saleForm.value.exclude_missing_cost,
+  exclude_below_cost: saleForm.value.exclude_below_cost,
+});
+
+const loadBulkSaleHistory = async () => {
+  const { data, error } = await supabase
+    .from("bulk_sale_operations")
+    .select("id, created_at, discount_percent, applied_item_count, status")
+    .order("created_at", { ascending: false })
+    .limit(8);
+
+  if (error) throw error;
+  saleOperations.value = (data || []) as BulkSaleOperationRow[];
+};
+
+const openBulkSale = async () => {
+  saleModalOpen.value = true;
+  saleActiveTab.value = "create";
+  saleProductSearch.value = "";
+  saleError.value = "";
+  saleSuccess.value = "";
+  salePreviewRows.value = [];
+
+  try {
+    await loadBulkSaleHistory();
+  } catch (error: unknown) {
+    saleError.value = error instanceof Error ? error.message : t("admin.saleLoadFailed");
+  }
+};
+
+const previewBulkSale = async () => {
+  try {
+    saleLoading.value = true;
+    saleError.value = "";
+    saleSuccess.value = "";
+
+    const { data, error } = await supabase.rpc("preview_bulk_sale", {
+      p_scope: buildSaleScopePayload(),
+      p_sale: buildSalePayload(),
+    });
+
+    if (error) throw error;
+    salePreviewRows.value = (data || []) as BulkSalePreviewRow[];
+  } catch (error: unknown) {
+    saleError.value = error instanceof Error ? error.message : t("admin.saleLoadFailed");
+  } finally {
+    saleLoading.value = false;
+  }
+};
+
+const applyBulkSale = async () => {
+  if (!saleCanApply.value) {
+    saleError.value = t("admin.saleNoEligibleRows");
+    return;
+  }
+
+  if (!window.confirm(t("admin.applySaleConfirm", { count: saleEligibleRows.value.length, percent: saleForm.value.discount_percent }))) return;
+
+  try {
+    saleApplying.value = true;
+    saleError.value = "";
+    saleSuccess.value = "";
+
+    const expectedItems = salePreviewRows.value.map((row) => ({
+      product_id: row.product_id,
+      variant_id: row.variant_id,
+      is_active: row.is_active,
+      current_price: row.current_price,
+      current_old_price: row.current_old_price,
+      cost_price: row.cost_price,
+      sale_price: row.sale_price,
+      sale_old_price: row.sale_old_price,
+      is_valid: row.is_valid,
+      excluded: row.excluded,
+    }));
+
+    const { error } = await supabase.rpc("apply_bulk_sale", {
+      p_scope: buildSaleScopePayload(),
+      p_sale: buildSalePayload(),
+      p_expected_items: expectedItems,
+    });
+
+    if (error) throw error;
+
+    saleSuccess.value = t("admin.saleApplied");
+    salePreviewRows.value = [];
+    await Promise.all([loadData(), loadBulkSaleHistory()]);
+  } catch (error: unknown) {
+    saleError.value = error instanceof Error ? error.message : t("admin.saleApplyFailed");
+  } finally {
+    saleApplying.value = false;
+  }
+};
+
+const endBulkSale = async (operationId: string) => {
+  if (!window.confirm(t("admin.endSaleConfirm"))) return;
+
+  try {
+    saleApplying.value = true;
+    endingSaleId.value = operationId;
+    saleError.value = "";
+    saleSuccess.value = "";
+
+    const { error } = await supabase.rpc("end_bulk_sale", {
+      p_operation_id: operationId,
+    });
+
+    if (error) throw error;
+
+    saleSuccess.value = t("admin.saleEnded");
+    await Promise.all([loadData(), loadBulkSaleHistory()]);
+  } catch (error: unknown) {
+    saleError.value = error instanceof Error ? error.message : t("admin.saleEndFailed");
+  } finally {
+    saleApplying.value = false;
+    endingSaleId.value = null;
+  }
 };
 
 const loadReorderProducts = async () => {
@@ -847,6 +1952,7 @@ const resetForm = () => {
     slug: "",
     description: "",
     price: 0,
+    cost_price: null,
     old_price: null,
     badge: "",
     category_id: categories.value[0]?.id || 0,
@@ -877,6 +1983,7 @@ const openEdit = (product: ProductRow) => {
     slug: product.slug,
     description: product.description || "",
     price: Number(product.price || 0),
+    cost_price: product.product_costs?.[0]?.cost_price ?? null,
     old_price: product.old_price || null,
     badge: product.badge || "",
     category_id: product.category_id || 0,
@@ -957,6 +2064,7 @@ const createVariantForm = (input: Partial<VariantForm> = {}): VariantForm => ({
   colorId: null,
   size: "",
   price: 0,
+  cost_price: null,
   stock_quantity: 0,
   is_active: true,
   ...input,
@@ -1034,6 +2142,7 @@ const setupVariantEditor = (product: ProductRow) => {
       sizeId: variant.size_id || null,
       size: variant.size_id ? sizeById.get(variant.size_id) || "" : "",
       price: Number(variant.price || 0),
+      cost_price: variant.cost_price ?? variant.product_variant_costs?.[0]?.cost_price ?? null,
       stock_quantity: Number(variant.stock_quantity || 0),
       is_active: variant.is_active !== false,
     }),
@@ -1120,6 +2229,10 @@ const validateForm = () => {
   if (!form.value.slug.trim()) return t("admin.productSlugRequired");
   if (!form.value.category_id) return t("admin.categoryRequired");
   if (!isVariantEditor.value && Number(form.value.price) < 0) return t("admin.priceInvalid");
+  const productCostPrice = optionalCostPrice(form.value.cost_price);
+  if (!isVariantEditor.value && productCostPrice !== null && (!Number.isFinite(productCostPrice) || productCostPrice < 0)) {
+    return t("admin.costPriceInvalid");
+  }
 
   if (isVariantEditor.value) {
     const variantError = validateVariantProduct({
@@ -1138,6 +2251,26 @@ const validateForm = () => {
   if (invalidColor) return t("admin.colorValueRequired", { name: invalidColor.name });
 
   return "";
+};
+
+const optionalCostPrice = (value: number | string | null | undefined) => {
+  if (value === "" || value === null || value === undefined) return null;
+  return Number(value);
+};
+
+const saveProductCost = async (productId: number) => {
+  const costPrice = optionalCostPrice(form.value.cost_price);
+
+  if (costPrice === null) {
+    const { error } = await supabase.from("product_costs").delete().eq("product_id", productId);
+    if (error) throw error;
+    return;
+  }
+
+  const { error } = await supabase
+    .from("product_costs")
+    .upsert({ product_id: productId, cost_price: costPrice }, { onConflict: "product_id" });
+  if (error) throw error;
 };
 
 const saveSizes = async (productId: number) => {
@@ -1447,6 +2580,7 @@ const saveProduct = async () => {
       productId = data.id;
     }
 
+    await saveProductCost(productId);
     await saveSizes(productId);
     await saveColorsAndImages(productId);
 

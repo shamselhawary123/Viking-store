@@ -41,6 +41,30 @@ export const formatStorePrice = (
   return `${trimTrailingZeros(amount)} EGP`;
 };
 
+export const getDiscountPercent = (
+  oldPrice: number | string | null | undefined,
+  currentPrice: number | string | null | undefined,
+) => {
+  const oldAmount = toFinitePrice(oldPrice);
+  const currentAmount = toFinitePrice(currentPrice);
+
+  if (!oldAmount || !currentAmount || oldAmount <= currentAmount) return 0;
+
+  return Math.max(0, Math.round(((oldAmount - currentAmount) / oldAmount) * 100));
+};
+
+export const getSavingsAmount = (
+  oldPrice: number | string | null | undefined,
+  currentPrice: number | string | null | undefined,
+) => {
+  const oldAmount = toFinitePrice(oldPrice);
+  const currentAmount = toFinitePrice(currentPrice);
+
+  if (!oldAmount || !currentAmount || oldAmount <= currentAmount) return 0;
+
+  return oldAmount - currentAmount;
+};
+
 export const getLocalizedCategoryName = (
   category:
     | { slug?: string | null; name?: string | null }

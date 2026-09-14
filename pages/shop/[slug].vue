@@ -79,7 +79,10 @@
               <span class="text-4xl font-black text-white">{{ displayPriceText }}</span>
               <span v-if="oldPrice" class="text-2xl text-neutral-500 line-through">{{ formatStorePrice(oldPrice, locale) }}</span>
               <span v-if="discountPercent" class="rounded-full bg-[#CF1D1D] px-3 py-1 text-sm font-black text-white">
-                -{{ discountPercent }}%
+                {{ t('shop.discountOff', { percent: discountPercent }) }}
+              </span>
+              <span v-if="savingsAmount" class="rounded-full border border-[#CF1D1D]/40 bg-[#CF1D1D]/10 px-3 py-1 text-sm font-black text-[#ff6b35]">
+                {{ t('shop.saveAmount', { amount: formatStorePrice(savingsAmount, locale) }) }}
               </span>
               <span
                 class="rounded-full border px-3 py-1 text-sm font-bold"
@@ -88,6 +91,9 @@
                 {{ isAvailable ? t('shop.inStock') : t('shop.outOfStock') }}
               </span>
             </div>
+            <p v-if="lowStockMessage" class="text-sm font-bold text-amber-300">
+              {{ lowStockMessage }}
+            </p>
 
             <div class="grid grid-cols-2 gap-3 text-sm sm:grid-cols-3">
               <div class="rounded-xl border border-white/10 bg-black/30 p-3">
@@ -169,11 +175,11 @@
           </div>
 
           <div class="hidden grid-cols-[1fr_1fr_auto] gap-3 sm:grid">
-            <button class="premium-button premium-button-primary flex-1 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || addLoading" @click="handleAddToCart">
+            <button class="premium-button premium-button-primary purchase-cta-shine flex-1 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || addLoading" @click="handleAddToCart">
               <Icon :name="addLoading ? 'i-heroicons-arrow-path' : 'i-heroicons-shopping-bag'" :class="{ 'animate-spin': addLoading }" />
               {{ addLoading ? t('shop.adding') : t('shop.addToCart') }}
             </button>
-            <button class="premium-button premium-button-secondary flex-1 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || buyLoading" @click="handleBuyNow">
+            <button class="premium-button premium-button-secondary purchase-cta-shine flex-1 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || buyLoading" @click="handleBuyNow">
               <Icon v-if="buyLoading" name="i-heroicons-arrow-path" class="animate-spin" />
               {{ buyLoading ? t('shop.loading') : t('shop.buyNow') }}
             </button>
@@ -400,8 +406,8 @@
           <p class="text-[0.65rem] font-bold uppercase tracking-[0.18em] text-neutral-500">{{ t('common.price') }}</p>
           <p class="text-lg font-black text-white">{{ displayPriceText }}</p>
         </div>
-        <button class="premium-button premium-button-secondary min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || buyLoading" @click="handleBuyNow">{{ t('shop.buyNow') }}</button>
-        <button class="premium-button premium-button-primary min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || addLoading" @click="handleAddToCart">{{ t('shop.addToCart') }}</button>
+        <button class="premium-button premium-button-secondary purchase-cta-shine min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || buyLoading" @click="handleBuyNow">{{ t('shop.buyNow') }}</button>
+        <button class="premium-button premium-button-primary purchase-cta-shine min-h-12 rounded-xl px-3 text-sm active:scale-[0.98] disabled:pointer-events-none disabled:opacity-45" :disabled="!canPurchase || addLoading" @click="handleAddToCart">{{ t('shop.addToCart') }}</button>
       </div>
     </div>
   </Teleport>
@@ -420,7 +426,7 @@ import { useRoute } from "vue-router";
 import { useCartStore } from "../../stores/cart";
 import { useProductsStore } from "../../stores/products";
 import { useWishlistStore } from "../../stores/wishlist";
-import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
+import { formatStorePrice, getDiscountPercent, getLocalizedCategoryName, getSavingsAmount } from "../../utils/localizationFormat";
 import { getPublicSupabaseClient } from "../../utils/publicSupabase";
 import { SHOP_PRODUCT_DETAIL_SELECT } from "../../utils/shopProducts";
 import {
@@ -554,7 +560,6 @@ const trustFeatures = [
   { icon: "i-heroicons-lock-closed", titleKey: "shop.securePayment", labelKey: "shop.protectedCheckout" },
   { icon: "i-heroicons-truck", titleKey: "shop.fastShipping", labelKey: "shop.quickDelivery" },
   { icon: "i-heroicons-arrow-path-rounded-square", titleKey: "shop.easyReturns", labelKey: "shop.returnSupport" },
-  { icon: "i-heroicons-shield-check", titleKey: "shop.premiumQuality", labelKey: "shop.builtForTraining" },
 ];
 
 const tabs = [
@@ -573,7 +578,17 @@ const galleryImages = computed(() => {
   return images.length ? images : [product.value?.cover_image || product.value?.image].filter(Boolean);
 });
 
-const oldPrice = computed(() => product.value?.old_price || product.value?.oldPrice || null);
+const selectedVariantOldPrice = computed(() =>
+  isVariantProduct.value
+    ? selectedVariant.value?.old_price ?? displayPriceState.value.oldPrice ?? null
+    : null,
+);
+const oldPrice = computed(() => {
+  if (isVariantProduct.value) return selectedVariantOldPrice.value;
+
+  const fallbackOldPrice = product.value?.old_price || product.value?.oldPrice || null;
+  return fallbackOldPrice;
+});
 const brandName = computed(() => product.value?.brand?.name || product.value?.brands?.name || product.value?.brand_name || product.value?.brand || "");
 const isVariantProduct = computed(() => Boolean(product.value && !isLegacyInventoryProduct(product.value)));
 const variantState = computed(() => buildVariantSelectionState(product.value));
@@ -625,7 +640,7 @@ const displayPriceState = computed(() =>
       colorId: selectedColor.value?.id ?? null,
       sizeId: selectedSizeOption.value?.id ?? null,
     })
-    : { type: "selected" as const, price: Number(product.value?.price || 0) },
+    : { type: "selected" as const, price: Number(product.value?.price || 0), oldPrice: null },
 );
 const displayPriceText = computed(() => {
   const formatted = formatStorePrice(displayPriceState.value.price, locale.value);
@@ -692,9 +707,14 @@ watch(selectedVariant, (variant) => {
   }
 });
 const discountPercent = computed(() => {
-  if (!oldPrice.value || !product.value?.price) return 0;
+  return getDiscountPercent(oldPrice.value, displayPriceState.value.price);
+});
+const savingsAmount = computed(() => getSavingsAmount(oldPrice.value, displayPriceState.value.price));
+const lowStockMessage = computed(() => {
+  if (!isVariantProduct.value || !selectedVariant.value) return "";
 
-  return Math.max(0, Math.round(((oldPrice.value - product.value.price) / oldPrice.value) * 100));
+  const stock = Number(selectedVariant.value.stock_quantity || 0);
+  return stock > 0 && stock <= 5 ? t("shop.lowStockOnly", { count: stock }) : "";
 });
 const reviewSummary = computed(() => getProductReviewSummary(reviews.value));
 const filledReviewStars = computed(() => Math.round(reviewSummary.value.average));

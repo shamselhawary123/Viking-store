@@ -218,7 +218,7 @@ describe("admin product variant UI source", () => {
   it("keeps legacy products on the existing editor path and adds mobile-safe variant sections", () => {
     assert.match(productsPage, /isVariantEditor/);
     assert.match(productsPage, /admin-variant-card/);
-    assert.match(productsPage, /grid gap-3 lg:grid-cols-\[minmax\(10rem,1fr\)_10rem_10rem_8rem_auto\]/);
+    assert.match(productsPage, /grid gap-3 lg:grid-cols-\[minmax\(10rem,1fr\)_10rem_10rem_10rem_8rem_auto\]/);
     assert.match(productsPage, /legacy/i);
   });
 
@@ -228,7 +228,7 @@ describe("admin product variant UI source", () => {
     assert.match(productsPage, /class="flex-1 overflow-y-auto/);
     assert.match(productsPage, /class="sticky bottom-0/);
     assert.match(productsPage, /lg:grid-cols-\[minmax\(0,1fr\)_minmax\(0,1fr\)\]/);
-    assert.match(productsPage, /lg:grid-cols-\[minmax\(10rem,1fr\)_10rem_10rem_8rem_auto\]/);
+    assert.match(productsPage, /lg:grid-cols-\[minmax\(10rem,1fr\)_10rem_10rem_10rem_8rem_auto\]/);
     assert.doesNotMatch(productsPage, /lg:grid-cols-\[1fr_0\.9fr\]/);
   });
 

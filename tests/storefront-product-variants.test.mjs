@@ -101,6 +101,7 @@ describe("storefront product variants", () => {
     assert.deepEqual(getVariantPriceState(state, { colorId: selection.color?.id, sizeId: selection.size?.id }), {
       type: "selected",
       price: 850,
+      oldPrice: null,
     });
   });
 
@@ -169,10 +170,12 @@ describe("storefront product variants", () => {
     assert.deepEqual(getVariantPriceState(state, { colorId: 1, sizeId: 12 }), {
       type: "selected",
       price: 850,
+      oldPrice: null,
     });
     assert.deepEqual(getVariantPriceState(state, { colorId: 1, sizeId: null }), {
       type: "from",
       price: 850,
+      oldPrice: null,
     });
   });
 
@@ -187,6 +190,7 @@ describe("storefront product variants", () => {
     assert.deepEqual(getVariantPriceState(state, { colorId: 1, sizeId: null }), {
       type: "single",
       price: 700,
+      oldPrice: null,
     });
   });
 

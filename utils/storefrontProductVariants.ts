@@ -3,6 +3,7 @@ export type StorefrontVariantRow = {
   color_id?: number | null;
   size_id?: number | null;
   price?: number | string | null;
+  old_price?: number | string | null;
   stock_quantity?: number | string | null;
   is_active?: boolean | null;
 };
@@ -211,7 +212,11 @@ export const getVariantPriceState = (
 ) => {
   const selectedVariant = resolveSelectedVariant(state, selection);
   if (selectedVariant) {
-    return { type: "selected" as const, price: Number(selectedVariant.price || 0) };
+    return {
+      type: "selected" as const,
+      price: Number(selectedVariant.price || 0),
+      oldPrice: selectedVariant.old_price ?? null,
+    };
   }
 
   const relevantVariants = state.mode === "color_size" && selection.colorId != null
@@ -220,10 +225,10 @@ export const getVariantPriceState = (
   const prices = relevantVariants.map((variant) => Number(variant.price || 0)).filter((price) => Number.isFinite(price));
   const minPrice = Math.min(...prices);
 
-  if (!prices.length || !Number.isFinite(minPrice)) return { type: "single" as const, price: 0 };
-  if (prices.every((price) => price === prices[0])) return { type: "single" as const, price: prices[0] };
+  if (!prices.length || !Number.isFinite(minPrice)) return { type: "single" as const, price: 0, oldPrice: null };
+  if (prices.every((price) => price === prices[0])) return { type: "single" as const, price: prices[0], oldPrice: null };
 
-  return { type: "from" as const, price: minPrice };
+  return { type: "from" as const, price: minPrice, oldPrice: null };
 };
 
 export const getVariantGalleryImages = (

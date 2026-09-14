@@ -19,6 +19,7 @@ export type AdminVariantRowInput = {
   size?: string | null;
   sizeId?: number | null;
   price: number | string;
+  cost_price?: number | string | null;
   stock_quantity: number | string;
   is_active?: boolean;
 };
@@ -34,6 +35,18 @@ export type AdminVariantProductFormInput = {
   cover_image?: string | null;
 };
 
+export type AdminLoadedCostPrice = number | string | null;
+
+export type AdminLoadedProductCostRow = {
+  product_id: number | string;
+  cost_price?: AdminLoadedCostPrice;
+};
+
+export type AdminLoadedVariantCostRow = {
+  variant_id: number | string;
+  cost_price?: AdminLoadedCostPrice;
+};
+
 export const normalizeVariantSize = (size?: string | null) => {
   const value = String(size || "").trim();
   return value || null;
@@ -41,6 +54,55 @@ export const normalizeVariantSize = (size?: string | null) => {
 
 const activeVariants = (variants: AdminVariantRowInput[]) =>
   variants.filter((variant) => variant.is_active !== false);
+
+const hasOptionalNumber = (value: number | string | null | undefined) =>
+  value !== "" && value !== null && value !== undefined;
+
+const optionalNumber = (value: number | string | null | undefined) =>
+  hasOptionalNumber(value) ? Number(value) : null;
+
+const stableNumericId = (value: number | string | null | undefined) => {
+  const id = Number(value);
+  return Number.isFinite(id) ? id : null;
+};
+
+const buildCostLookup = <T extends Record<string, unknown>>(rows: T[], idKey: keyof T) => {
+  const lookup = new Map<number, AdminLoadedCostPrice>();
+
+  for (const row of rows) {
+    const id = stableNumericId(row[idKey] as number | string | null | undefined);
+    if (id === null) continue;
+    lookup.set(id, (row.cost_price as AdminLoadedCostPrice | undefined) ?? null);
+  }
+
+  return lookup;
+};
+
+export const buildProductCostLookup = (rows: AdminLoadedProductCostRow[]) =>
+  buildCostLookup(rows, "product_id");
+
+export const buildVariantCostLookup = (rows: AdminLoadedVariantCostRow[]) =>
+  buildCostLookup(rows, "variant_id");
+
+export const getLoadedCostPrice = (
+  lookup: Map<number, AdminLoadedCostPrice>,
+  id: number | string | null | undefined,
+) => {
+  const stableId = stableNumericId(id);
+  if (stableId === null || !lookup.has(stableId)) return null;
+  return lookup.get(stableId) ?? null;
+};
+
+export const applyLoadedVariantCosts = <T extends { id?: number | string | null }>(
+  variants: T[],
+  costRows: AdminLoadedVariantCostRow[],
+) => {
+  const lookup = buildVariantCostLookup(costRows);
+  return variants.map((variant) => ({
+    ...variant,
+    cost_price: getLoadedCostPrice(lookup, variant.id),
+  }));
+};
 
 export const validateVariantProduct = ({
   colors,
@@ -67,8 +129,10 @@ export const validateVariantProduct = ({
   const combinations = new Set<string>();
   for (const variant of variants) {
     const price = Number(variant.price);
+    const costPrice = optionalNumber(variant.cost_price);
     const stock = Number(variant.stock_quantity);
     if (!Number.isFinite(price) || price < 0) return "admin.variantPriceInvalid";
+    if (costPrice !== null && (!Number.isFinite(costPrice) || costPrice < 0)) return "admin.costPriceInvalid";
     if (!Number.isInteger(stock) || stock < 0) return "admin.variantStockInvalid";
     if (variant.colorKey && !colorByKey.has(variant.colorKey)) return "admin.variantColorRequired";
 
@@ -132,6 +196,7 @@ export const buildVariantProductRpcPayload = ({
       size: normalizeVariantSize(variant.size),
       size_id: variant.sizeId || null,
       price: Number(variant.price || 0),
+      cost_price: optionalNumber(variant.cost_price),
       stock_quantity: Number(variant.stock_quantity || 0),
       is_active: variant.is_active !== false,
     })),

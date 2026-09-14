@@ -162,6 +162,33 @@ textarea:focus-visible {
   color: #cf1d1d;
 }
 
+.purchase-cta-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.purchase-cta-shine::before {
+  content: "";
+  position: absolute;
+  inset-block: -40%;
+  inset-inline-start: -65%;
+  width: 42%;
+  transform: skewX(-20deg);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.34),
+    transparent
+  );
+  animation: purchase-cta-shine 4.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.purchase-cta-shine > * {
+  position: relative;
+  z-index: 1;
+}
+
 .premium-input {
   min-height: 3.5rem;
   width: 100%;
@@ -232,6 +259,24 @@ textarea:focus-visible {
   }
 }
 
+@keyframes purchase-cta-shine {
+  0%,
+  58% {
+    inset-inline-start: -65%;
+    opacity: 0;
+  }
+
+  64% {
+    opacity: 0.72;
+  }
+
+  76%,
+  100% {
+    inset-inline-start: 125%;
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal.is-revealed {
@@ -239,6 +284,11 @@ textarea:focus-visible {
     transform: none;
     transition: opacity 1ms ease;
     transition-delay: 0ms;
+  }
+
+  .purchase-cta-shine::before {
+    animation: none;
+    opacity: 0;
   }
 
   *,

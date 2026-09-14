@@ -262,7 +262,7 @@
           v-if="canSubmit"
           type="submit"
           :disabled="loading"
-          class="premium-button premium-button-primary w-full text-base active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
+          class="premium-button premium-button-primary purchase-cta-shine w-full text-base active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
         >
           <Icon
             :name="

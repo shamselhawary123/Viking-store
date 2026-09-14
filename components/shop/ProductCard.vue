@@ -26,8 +26,16 @@
       </button>
 
       <div
+        v-if="saleDiscountPercent"
+        class="sale-badge-primary absolute left-4 top-4 rounded-full bg-[#CF1D1D] px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-white shadow-[0_0_24px_rgba(207,29,29,0.32)]"
+      >
+        {{ t("shop.discountOff", { percent: saleDiscountPercent }) }}
+      </div>
+
+      <div
         v-if="product.badge"
-        class="absolute left-4 top-4 rounded-full bg-[#CF1D1D] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white"
+        class="marketing-badge-secondary absolute left-4 rounded-full border border-white/10 bg-black/75 px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-neutral-100 backdrop-blur"
+        :class="saleDiscountPercent ? 'top-12' : 'top-4'"
       >
         {{ product.badge }}
       </div>
@@ -53,8 +61,11 @@
       <div class="flex items-end justify-between gap-3">
         <div class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
           <span class="text-2xl font-black text-white">{{ formatStorePrice(product.price, locale) }}</span>
-          <span v-if="product.old_price || product.oldPrice" class="text-sm text-neutral-500 line-through">
-            {{ formatStorePrice(product.old_price || product.oldPrice, locale) }}
+          <span v-if="displayOldPrice" class="text-sm text-neutral-500 line-through">
+            {{ formatStorePrice(displayOldPrice, locale) }}
+          </span>
+          <span v-if="cardSavingsAmount" class="basis-full text-xs font-black text-[#ff6b35]">
+            {{ t("shop.saveAmount", { amount: formatStorePrice(cardSavingsAmount, locale) }) }}
           </span>
         </div>
         <div class="flex text-[#CF1D1D]" :aria-label="t('shop.ratedFive')">
@@ -76,7 +87,7 @@
 <script setup lang="ts">
 import { useWishlistStore } from "../../stores/wishlist";
 import { computed, onBeforeUnmount, ref } from "vue";
-import { formatStorePrice, getLocalizedCategoryName } from "../../utils/localizationFormat";
+import { formatStorePrice, getDiscountPercent, getLocalizedCategoryName, getSavingsAmount } from "../../utils/localizationFormat";
 
 const wishlistStore = useWishlistStore(usePinia());
 const router = useRouter();
@@ -88,6 +99,13 @@ let navigationFeedbackTimer: ReturnType<typeof window.setTimeout> | undefined;
 const props = defineProps<{
   product: any;
 }>();
+
+const displayOldPrice = computed(() => {
+  const oldPrice = props.product.old_price || props.product.oldPrice || null;
+  return getDiscountPercent(oldPrice, props.product.price) ? oldPrice : null;
+});
+const saleDiscountPercent = computed(() => getDiscountPercent(displayOldPrice.value, props.product.price));
+const cardSavingsAmount = computed(() => getSavingsAmount(displayOldPrice.value, props.product.price));
 
 const clearNavigationFeedbackTimer = () => {
   if (!navigationFeedbackTimer) return;

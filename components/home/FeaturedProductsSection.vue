@@ -20,7 +20,7 @@
         </div>
         <NuxtLink
           to="/shop"
-          class="premium-button premium-button-primary hidden md:inline-flex min-h-14 px-6"
+          class="premium-button premium-button-primary hidden md:inline-flex min-h-14 px-6 purchase-cta-shine"
         >
           {{ t("home.viewAllProducts") }}
           <Icon name="i-heroicons-arrow-right" />
@@ -177,9 +177,7 @@
         class="flex items-center gap-2 sm:hidden"
         :dir="locale === 'ar' ? 'rtl' : 'ltr'"
       >
-        <div
-          class="shrink-0"
-        >
+        <div class="shrink-0">
           <button
             type="button"
             class="mobile-carousel-arrow"
@@ -187,7 +185,11 @@
             @click="carousel.movePrevious"
           >
             <Icon
-              :name="locale === 'ar' ? 'i-heroicons-chevron-right' : 'i-heroicons-chevron-left'"
+              :name="
+                locale === 'ar'
+                  ? 'i-heroicons-chevron-right'
+                  : 'i-heroicons-chevron-left'
+              "
               class="text-lg"
             />
           </button>
@@ -203,7 +205,10 @@
         >
           <div
             class="mobile-carousel-track flex touch-pan-y will-change-transform"
-            :class="{ 'is-dragging': carousel.isDragging, 'is-snapping': carousel.isSnapping }"
+            :class="{
+              'is-dragging': carousel.isDragging,
+              'is-snapping': carousel.isSnapping,
+            }"
             :style="carousel.trackStyle"
           >
             <article
@@ -211,10 +216,16 @@
               :key="`${index}-${featuredProducts[itemIndex].id}`"
               class="mobile-carousel-slide group shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-[#171717] shadow-[0_22px_70px_rgba(0,0,0,0.32)] transition duration-300 hover:border-[#CF1D1D]/70 hover:shadow-[0_34px_90px_rgba(207,29,29,0.1)]"
             >
-              <NuxtLink :to="`/shop/${featuredProducts[itemIndex].slug}`" class="block">
+              <NuxtLink
+                :to="`/shop/${featuredProducts[itemIndex].slug}`"
+                class="block"
+              >
                 <div class="relative aspect-[4/5] overflow-hidden bg-black">
                   <img
-                    :src="featuredProducts[itemIndex].cover_image || featuredProducts[itemIndex].image"
+                    :src="
+                      featuredProducts[itemIndex].cover_image ||
+                      featuredProducts[itemIndex].image
+                    "
                     :alt="featuredProducts[itemIndex].title"
                     width="640"
                     height="800"
@@ -226,10 +237,15 @@
                     class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-black/20"
                   />
                   <div
-                    v-if="featuredProducts[itemIndex].isRealBestSeller || featuredProducts[itemIndex].badge"
+                    v-if="
+                      featuredProducts[itemIndex].isRealBestSeller ||
+                      featuredProducts[itemIndex].badge
+                    "
                     class="absolute left-4 top-4 rounded-full bg-[#CF1D1D] px-3 py-1 text-xs font-black uppercase tracking-[0.16em] text-white shadow-[0_12px_30px_rgba(207,29,29,0.28)]"
                   >
-                    {{ featuredProducts[itemIndex].badge || t("home.bestSeller") }}
+                    {{
+                      featuredProducts[itemIndex].badge || t("home.bestSeller")
+                    }}
                   </div>
                   <button
                     class="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/10 bg-black/70 text-[#CF1D1D] backdrop-blur transition duration-300 hover:scale-105 hover:border-[#CF1D1D]"
@@ -238,7 +254,9 @@
                         ? t('shop.removeWishlist')
                         : t('shop.addWishlist')
                     "
-                    @click.prevent="wishlistStore.toggleWishlist(featuredProducts[itemIndex])"
+                    @click.prevent="
+                      wishlistStore.toggleWishlist(featuredProducts[itemIndex])
+                    "
                   >
                     <Icon
                       :name="
@@ -256,7 +274,10 @@
                       class="rounded-full border border-white/10 bg-black/65 px-3 py-1 text-xs font-bold text-neutral-200 backdrop-blur"
                     >
                       {{
-                        getLocalizedCategoryName(featuredProducts[itemIndex].categories, locale) ||
+                        getLocalizedCategoryName(
+                          featuredProducts[itemIndex].categories,
+                          locale,
+                        ) ||
                         featuredProducts[itemIndex].category ||
                         t("footer.combatStore")
                       }}
@@ -279,7 +300,10 @@
               <div class="p-5">
                 <p class="eyebrow text-[0.65rem]">
                   {{
-                    getLocalizedCategoryName(featuredProducts[itemIndex].categories, locale) ||
+                    getLocalizedCategoryName(
+                      featuredProducts[itemIndex].categories,
+                      locale,
+                    ) ||
                     featuredProducts[itemIndex].category ||
                     t("shop.viking")
                   }}
@@ -299,15 +323,22 @@
                     </p>
                     <div class="mt-1 flex items-center gap-3">
                       <span class="text-2xl font-black text-white">{{
-                        formatStorePrice(featuredProducts[itemIndex].price, locale)
+                        formatStorePrice(
+                          featuredProducts[itemIndex].price,
+                          locale,
+                        )
                       }}</span>
                       <span
-                        v-if="featuredProducts[itemIndex].old_price || featuredProducts[itemIndex].oldPrice"
+                        v-if="
+                          featuredProducts[itemIndex].old_price ||
+                          featuredProducts[itemIndex].oldPrice
+                        "
                         class="text-sm text-neutral-500 line-through"
                       >
                         {{
                           formatStorePrice(
-                            featuredProducts[itemIndex].old_price || featuredProducts[itemIndex].oldPrice,
+                            featuredProducts[itemIndex].old_price ||
+                              featuredProducts[itemIndex].oldPrice,
                             locale,
                           )
                         }}
@@ -327,9 +358,7 @@
           </div>
         </div>
 
-        <div
-          class="shrink-0"
-        >
+        <div class="shrink-0">
           <button
             type="button"
             class="mobile-carousel-arrow"
@@ -337,7 +366,11 @@
             @click="carousel.moveNext"
           >
             <Icon
-              :name="locale === 'ar' ? 'i-heroicons-chevron-left' : 'i-heroicons-chevron-right'"
+              :name="
+                locale === 'ar'
+                  ? 'i-heroicons-chevron-left'
+                  : 'i-heroicons-chevron-right'
+              "
               class="text-lg"
             />
           </button>
@@ -436,15 +469,17 @@ const { data: bestSellingProducts, pending } = await useLazyAsyncData(
 
 const featuredProducts = computed(() => bestSellingProducts.value || []);
 const isRtl = computed(() => locale.value === "ar");
-const carousel = useMobileCarousel(computed(() => featuredProducts.value.length), {
-  isRtl,
-});
+const carousel = useMobileCarousel(
+  computed(() => featuredProducts.value.length),
+  {
+    isRtl,
+  },
+);
 </script>
 
 <style scoped>
 .mobile-carousel-track {
-  transition:
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mobile-carousel-track.is-dragging,

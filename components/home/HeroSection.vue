@@ -38,14 +38,14 @@
         >
           <NuxtLink
             to="/shop"
-            class="premium-button premium-button-primary min-h-14 px-7"
+            class="premium-button premium-button-primary min-h-14 px-7 purchase-cta-shine"
           >
             {{ t("home.shopGear") }}
             <Icon name="i-heroicons-arrow-right" />
           </NuxtLink>
           <NuxtLink
             to="/categories"
-            class="premium-button premium-button-secondary min-h-14 px-7"
+            class="premium-button premium-button-secondary min-h-14 px-7 purchase-cta-shine"
           >
             {{ t("home.exploreCategories") }}
           </NuxtLink>
