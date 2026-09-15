@@ -1,17 +1,17 @@
 <template>
-  <section class="container-premium section-premium">
+  <section class="container-premium py-8 md:py-10">
     <div
-      class="mb-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8"
+      class="mb-6 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-6"
     >
       <div
-        class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between"
+        class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
       >
         <div>
           <p class="eyebrow">{{ t("cart.shoppingBag") }}</p>
-          <h1 class="display-heading mt-3 text-6xl text-white md:text-8xl">
+          <h1 class="display-heading mt-2 text-5xl text-white md:text-7xl">
             {{ t("cart.title") }}
           </h1>
-          <p class="mt-3 max-w-2xl text-neutral-400">
+          <p class="mt-2 max-w-2xl text-sm text-neutral-400 md:text-base">
             {{ t("cart.itemsReady", { count: cartStore.totalItems }) }}
           </p>
         </div>
@@ -58,35 +58,40 @@
       >
     </div>
 
-    <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-12">
-      <div class="space-y-5 lg:col-span-8">
-        <div class="rounded-2xl border border-white/10 bg-[#171717] p-5">
-          <div class="mb-3 flex items-center justify-between gap-4">
-            <div>
-              <p
-                class="text-sm font-black uppercase tracking-[0.16em] text-[#CF1D1D]"
-              >
+    <div v-else class="grid grid-cols-1 gap-6 lg:grid-cols-12">
+      <div class="space-y-4 lg:col-span-8">
+        <div class="shipping-status-card rounded-xl border border-white/10 bg-[#111111] p-4">
+          <div class="flex items-start gap-3">
+            <div
+              class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#CF1D1D]/30 bg-[#CF1D1D]/10 text-[#CF1D1D]"
+            >
+              <Icon name="i-heroicons-truck" class="text-xl" />
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-black uppercase tracking-[0.14em] text-[#CF1D1D]">
                 {{ t("cart.shippingProgress") }}
               </p>
-              <p class="mt-1 text-sm text-neutral-400">
-                {{ t("cart.freeShippingUnlocked") }}
+              <p class="mt-1 text-sm leading-6 text-neutral-300">
+                {{ shippingStatusMessage }}
               </p>
             </div>
-            <Icon name="i-heroicons-truck" class="text-2xl text-[#CF1D1D]" />
           </div>
-          <div class="h-2 overflow-hidden rounded-full bg-white/10">
+          <div
+            v-if="shippingStatus.showProgress"
+            class="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10"
+          >
             <div
               class="h-full rounded-full bg-[#CF1D1D] transition-all duration-700"
-              :style="{ width: `${shippingProgress}%` }"
+              :style="{ width: `${shippingStatus.progress}%` }"
             />
           </div>
         </div>
 
-        <TransitionGroup name="cart-item" tag="div" class="space-y-5">
+        <TransitionGroup name="cart-item" tag="div" class="space-y-4">
           <article
             v-for="(item, index) in cartStore.items"
             :key="`${item.id}-${item.color}-${item.size}-${index}`"
-            class="premium-panel group rounded-2xl p-5 transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/60"
+            class="premium-panel group rounded-2xl p-4 transition duration-300 hover:-translate-y-1 hover:border-[#CF1D1D]/60 md:p-5"
           >
             <div class="flex flex-col gap-5 md:flex-row">
               <img
@@ -179,7 +184,7 @@
       </div>
 
       <div class="lg:col-span-4">
-        <aside class="premium-panel sticky top-28 rounded-2xl p-6">
+        <aside class="premium-panel sticky top-28 rounded-2xl p-5">
           <p class="eyebrow">{{ t("cart.summary") }}</p>
           <h2 class="mt-2 text-3xl font-black">{{ t("cart.orderTotal") }}</h2>
           <p
@@ -189,7 +194,7 @@
             {{ t(cartStore.quantityErrorKey) }}
           </p>
 
-          <div class="mt-8 space-y-5">
+          <div class="mt-6 space-y-4">
             <div class="flex items-center justify-between">
               <p class="text-neutral-400">{{ t("cart.items") }}</p>
               <span class="font-bold">{{ cartStore.totalItems }}</span>
@@ -198,7 +203,7 @@
               <p class="text-neutral-400">{{ t("common.shipping") }}</p>
               <span class="font-bold text-emerald-400">{{ t('common.free') }}</span>
             </div> -->
-            <div class="rounded-2xl border border-white/10 bg-black/25 p-4">
+            <div class="rounded-xl border border-white/10 bg-black/25 p-4">
               <div class="flex items-start gap-3">
                 <Icon
                   name="i-heroicons-calendar-days"
@@ -225,14 +230,14 @@
           </div>
 
           <button
-            class="premium-button premium-button-primary mt-8 w-full"
+            class="premium-button premium-button-primary mt-6 w-full"
             @click="handleCheckout"
           >
             {{ t("cart.secureCheckout") }}
             <Icon name="i-heroicons-lock-closed" />
           </button>
 
-          <div class="mt-5 grid grid-cols-3 gap-2 text-center">
+          <div class="mt-4 grid grid-cols-3 gap-2 text-center">
             <div
               v-for="badge in trustBadges"
               :key="badge.label"
@@ -253,20 +258,58 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useCartStore } from "../stores/cart";
+import {
+  calculateCartShippingStatus,
+  getCartMerchandiseSubtotal,
+  type CartShippingSettings,
+} from "../utils/cartShippingStatus";
 import { formatStorePrice } from "../utils/localizationFormat";
 
 const cartStore = useCartStore(usePinia());
 const router = useRouter();
+const supabase = useSupabase();
 const { locale, t } = useI18n();
 const estimatedDelivery = computed(() => t("cart.estimatedDeliveryValue"));
+const shippingSettings = ref<CartShippingSettings | null>(null);
+const shippingSettingsLoading = ref(false);
 const trustBadges = [
   { icon: "i-heroicons-lock-closed", labelKey: "cart.secure" },
   { icon: "i-heroicons-shield-check", labelKey: "cart.protected" },
   { icon: "i-heroicons-arrow-path-rounded-square", labelKey: "cart.returns" },
 ];
-const shippingProgress = computed(() => (cartStore.items.length ? 100 : 0));
+const cartSubtotal = computed(() => getCartMerchandiseSubtotal(cartStore.items));
+const shippingStatus = computed(() =>
+  calculateCartShippingStatus({
+    settings: shippingSettings.value,
+    subtotal: cartSubtotal.value,
+    isLoading: shippingSettingsLoading.value,
+  }),
+);
+const shippingStatusMessage = computed(() => {
+  if (shippingStatus.value.kind === "threshold_remaining") {
+    return t(shippingStatus.value.messageKey, {
+      amount: formatStorePrice(shippingStatus.value.remaining, locale.value),
+    });
+  }
+
+  return t(shippingStatus.value.messageKey);
+});
+
+const loadCartShippingSettings = async () => {
+  shippingSettingsLoading.value = true;
+
+  const { data, error } = await supabase
+    .from("shipping_settings")
+    .select("shipping_enabled,free_shipping_all_orders,free_shipping_threshold_enabled,free_shipping_threshold,default_shipping_fee")
+    .limit(1);
+
+  shippingSettings.value = error
+    ? null
+    : ((data?.[0] || null) as CartShippingSettings | null);
+  shippingSettingsLoading.value = false;
+};
 
 const handleCheckout = () => {
   router.push("/checkout");
@@ -274,6 +317,7 @@ const handleCheckout = () => {
 
 onMounted(() => {
   cartStore.loadCart();
+  loadCartShippingSettings();
 });
 </script>
 
