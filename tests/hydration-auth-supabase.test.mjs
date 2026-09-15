@@ -53,6 +53,30 @@ describe("hydration-safe auth UI and public Supabase reads", () => {
     assert.match(source, /v-else-if="isAuthReady"/);
   });
 
+  it("keeps the shared storefront navbar sticky without scroll listeners", () => {
+    const navbar = read("../components/shared/AppNavbar.vue");
+    const layout = read("../layouts/default.vue");
+    const css = read("../assets/css/main.css");
+    const headerOpen = navbar.match(/<header\s+class="([^"]+)"/);
+    const layoutRoot = layout.match(/<div\s+class="([^"]+)"/);
+
+    assert.ok(headerOpen, "navbar should render a shared header element");
+    assert.ok(layoutRoot, "default layout should expose its root wrapper");
+    assert.match(headerOpen[1], /\bsticky\b/);
+    assert.match(headerOpen[1], /\btop-0\b/);
+    assert.match(headerOpen[1], /\bz-50\b/);
+    assert.match(headerOpen[1], /\bbg-black\/70\b/);
+    assert.match(headerOpen[1], /\bbackdrop-blur-2xl\b/);
+    assert.doesNotMatch(headerOpen[1], /\bfixed\b/);
+    assert.doesNotMatch(headerOpen[1], /\b(?:sm|md|lg|xl|2xl):sticky\b/);
+    assert.doesNotMatch(layoutRoot[1], /overflow-(?:x-)?(?:hidden|auto|scroll)/);
+    assert.match(css, /html,\s*body,\s*#__nuxt\s*{[\s\S]*overflow-x:\s*clip;/);
+    assert.match(navbar, /class="nav-shell hidden lg:flex items-center"/);
+    assert.match(navbar, /class="flex lg:hidden"/);
+    assert.doesNotMatch(navbar, /addEventListener\(["']scroll|onscroll|requestAnimationFrame|useWindowScroll/);
+    assert.match(layout, /<SharedAppNavbar\s*\/>/);
+  });
+
   it("treats a missing startup auth session as a normal guest state", () => {
     const source = read("../stores/auth.ts");
 

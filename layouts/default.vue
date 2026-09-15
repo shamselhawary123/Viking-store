@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen overflow-x-hidden text-white">
+  <div class="min-h-screen text-white">
     <SharedVikingGlobalLoader />
     <SharedAppNavbar />
     <CartDrawer />
