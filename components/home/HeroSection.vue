@@ -8,7 +8,9 @@
     >
       <div
         class="hero-visual relative flex items-end justify-center overflow-hidden bg-black xl:pointer-events-none xl:absolute xl:inset-y-0 xl:z-0 xl:h-[clamp(620px,calc(100svh-5rem),850px)] xl:w-[72vw] xl:items-center"
-        :class="isRtl ? 'xl:left-0 xl:justify-start' : 'xl:right-0 xl:justify-end'"
+        :class="
+          isRtl ? 'xl:left-0 xl:justify-start' : 'xl:right-0 xl:justify-end'
+        "
       >
         <img
           src="/hero.webp"
@@ -49,27 +51,12 @@
             : 'xl:col-start-1 xl:justify-self-start'
         "
       >
-        <p
-          class="eyebrow inline-flex items-center justify-center gap-3 text-neutral-300 xl:text-[#CF1D1D] xl:justify-start"
-        >
-          <span class="h-px w-8 bg-[#CF1D1D] xl:w-10" />
-          {{ t("home.heroEyebrow") }}
-        </p>
         <h1
-          class="display-heading mx-auto mt-3 max-w-3xl text-[2rem] leading-[0.96] text-white sm:text-4xl xl:mx-0 xl:mt-4 xl:text-[4.55rem] xl:leading-[0.92]"
+          class="display-heading mx-auto max-w-[24rem] text-balance text-[clamp(1.875rem,5vw,4rem)] leading-[1.12] text-[#eeee] sm:max-w-2xl xl:mx-0 xl:ms-0 xl:me-auto xl:max-w-[min(38rem,36vw)]"
+          :class="isRtl ? 'hero-heading-ar' : ''"
         >
-          {{ t("home.heroTitle") }}
-          <span
-            class="block text-[#CF1D1D]/80 xl:text-[#CF1D1D] drop-shadow-none xl:drop-shadow-[0_0_34px_rgba(207,29,29,0.22)]"
-          >
-            {{ t("home.heroAccent") }}
-          </span>
+          {{ t("home.heroEyebrow") }}
         </h1>
-        <p
-          class="mx-auto mt-3 max-w-2xl text-sm leading-6 text-neutral-200 xl:ms-0 xl:me-auto xl:mt-5 xl:text-lg xl:leading-8"
-        >
-          {{ t("home.heroText") }}
-        </p>
 
         <div
           class="mt-5 flex flex-col justify-center gap-3 sm:flex-row xl:mt-7 xl:justify-start"
@@ -121,5 +108,22 @@ const isRtl = computed(() => locale.value === "ar");
     rgba(0, 0, 0, 0.78) 34%,
     rgba(0, 0, 0, 0) 100%
   );
+}
+
+.hero-heading-ar {
+  font-family: "Alexandria", "IBM Plex Sans Arabic", "Inter", sans-serif;
+  font-size: clamp(1.875rem, 5vw, 2.25rem);
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.28;
+  max-width: 24rem;
+}
+
+@media (min-width: 1280px) {
+  .hero-heading-ar {
+    font-size: clamp(2.1rem, 2.4vw, 3rem);
+    line-height: 1.12;
+    max-width: min(38rem, 36vw);
+  }
 }
 </style>

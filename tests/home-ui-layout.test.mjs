@@ -16,8 +16,10 @@ describe("home UI layout", () => {
     assert.doesNotMatch(source, /text-left/);
   });
 
-  it("uses a blended image-led hero with visible SEO copy and stable CTA routes", () => {
+  it("uses a blended image-led hero with a single descriptive H1 and stable CTA routes", () => {
     const source = read("../components/home/HeroSection.vue");
+    const config = read("../nuxt.config.ts");
+    const css = read("../assets/css/main.css");
     const h1Matches = source.match(/<h1\b/g) || [];
     const firstHeroImageIndex = source.indexOf('src="/hero.webp"');
     const heroCopyIndex = source.indexOf('class="hero-copy');
@@ -29,6 +31,22 @@ describe("home UI layout", () => {
     assert.match(source, /xl:object-contain/);
     assert.match(source, /hero-visual/);
     assert.match(source, /hero-copy/);
+    assert.match(source, /hero-heading-ar/);
+    assert.match(source, /isRtl\s*\?\s*'hero-heading-ar'/);
+    assert.match(source, /{{ t\("home\.heroEyebrow"\) }}/);
+    assert.doesNotMatch(source, /home\.heroEyebrowLine1|home\.heroEyebrowLine2|home\.heroTitleLine1|home\.heroTitleLine2/);
+    assert.doesNotMatch(source, /<br\b|<span class="block">\s*{{ t\("home\.heroEyebrowLine/);
+    assert.match(source, /text-\[clamp\(1\.875rem,5vw,4rem\)\]/);
+    assert.match(source, /text-balance/);
+    assert.match(source, /xl:max-w-\[min\(38rem,36vw\)\]/);
+    assert.match(source, /\.hero-heading-ar\s*{[^}]*font-family:\s*"Scheherazade New",\s*"IBM Plex Sans Arabic",\s*"Inter",\s*sans-serif;/s);
+    assert.match(source, /\.hero-heading-ar\s*{[^}]*font-weight:\s*600;/s);
+    assert.match(source, /\.hero-heading-ar\s*{[^}]*font-size:\s*clamp\(1\.9rem,\s*5vw,\s*2\.15rem\);[^}]*line-height:\s*1\.3;[^}]*max-width:\s*24rem;/s);
+    assert.match(source, /@media\s*\(min-width:\s*1280px\)\s*{[\s\S]*?\.hero-heading-ar\s*{[^}]*font-size:\s*clamp\(2\.1rem,\s*2\.4vw,\s*3rem\);[^}]*line-height:\s*1\.18;[^}]*max-width:\s*min\(38rem,\s*36vw\);/s);
+    assert.match(config, /name:\s*"Scheherazade New"[\s\S]*?provider:\s*"google"[\s\S]*?weights:\s*\[600\]/);
+    assert.doesNotMatch(source, /Alexandria/);
+    assert.doesNotMatch(config, /name:\s*"Alexandria"/);
+    assert.doesNotMatch(css, /Scheherazade New|Alexandria/);
     assert.match(source, /hero-mobile-fade/);
     assert.match(source, /hero-desktop-fade/);
     assert.match(source, /xl:min-h-\[clamp\(620px,calc\(100svh-5rem\),850px\)\]/);
@@ -46,9 +64,9 @@ describe("home UI layout", () => {
     assert.ok(firstHeroImageIndex > -1, "Hero image should render in the component");
     assert.ok(heroCopyIndex > firstHeroImageIndex, "SEO copy should render below/after the mobile image");
     assert.match(source, /home\.heroEyebrow/);
-    assert.match(source, /home\.heroTitle/);
-    assert.match(source, /home\.heroAccent/);
-    assert.match(source, /home\.heroText/);
+    assert.doesNotMatch(source, /home\.heroTitle/);
+    assert.doesNotMatch(source, /home\.heroAccent/);
+    assert.doesNotMatch(source, /home\.heroText/);
     assert.match(source, /to="\/shop"/);
     assert.match(source, /to="\/categories"/);
     assert.match(source, /max-h-\[55svh\]/);
@@ -62,8 +80,9 @@ describe("home UI layout", () => {
     assert.match(source, /:\s*'xl:col-start-1 xl:justify-self-start'/);
     assert.match(source, /isRtl\s*\?\s*'end-0 hero-desktop-fade--right'/);
     assert.match(source, /:\s*'start-0 hero-desktop-fade--left'/);
-    assert.match(source, /text-neutral-300 xl:text-\[#CF1D1D\]/);
-    assert.match(source, /text-\[#CF1D1D\]\/80 xl:text-\[#CF1D1D\]/);
+    assert.doesNotMatch(source, /class="eyebrow/);
+    assert.doesNotMatch(source, /text-neutral-300 xl:text-\[#CF1D1D\]/);
+    assert.doesNotMatch(source, /text-\[#CF1D1D\]\/80 xl:text-\[#CF1D1D\]/);
     assert.doesNotMatch(source, /src="\/train-hard\.png"/);
     assert.doesNotMatch(source, /xl:object-cover/);
     assert.doesNotMatch(source, /xl:-m[lrse]-/);
@@ -91,6 +110,36 @@ describe("home UI layout", () => {
     assert.doesNotMatch(source, /home\.proGrade/);
     assert.doesNotMatch(source, /home\.fighterRating/);
     assert.doesNotMatch(source, /display:\s*none|visibility:\s*hidden|opacity:\s*0|sr-only/);
+  });
+
+  it("moves the marketing headline and paragraph into visible intro content after brands", () => {
+    const page = read("../pages/index.vue");
+    const intro = read("../components/home/IntroSection.vue");
+    const enLocale = read("../locales/en.json");
+    const arLocale = read("../locales/ar.json");
+    const h1Matches = `${read("../components/home/HeroSection.vue")}\n${intro}`.match(/<h1\b/g) || [];
+    const brandsIndex = page.indexOf("<HomeBrandsSection />");
+    const introIndex = page.indexOf("<HomeIntroSection />");
+    const categoriesIndex = page.indexOf("<HomeCategoriesSection />");
+
+    assert.equal(h1Matches.length, 1);
+    assert.ok(brandsIndex > -1, "Brands section should remain on the homepage");
+    assert.ok(introIndex > brandsIndex, "Intro content should render after Brands");
+    assert.ok(categoriesIndex > introIndex, "Intro content should render before the rest of the homepage");
+    assert.match(intro, /<h2\b/);
+    assert.match(intro, /home\.heroTitle/);
+    assert.match(intro, /home\.heroAccent/);
+    assert.match(intro, /home\.heroText/);
+    assert.match(intro, /:dir="isRtl \? 'rtl' : 'ltr'"/);
+    assert.match(intro, /text-neutral-300/);
+    assert.match(intro, /class="bg-black pt-10 pb-0 sm:pt-12 xl:pt-14"/);
+    assert.doesNotMatch(intro, /(?:^|\s)(?:sm:|md:|lg:|xl:|2xl:)?(?:p|py|pb)-(?!(?:0)(?:\s|"))/);
+    assert.doesNotMatch(intro, /NuxtLink|premium-button|to="\/shop"|to="\/categories"/);
+    assert.doesNotMatch(intro, /display:\s*none|visibility:\s*hidden|opacity:\s*0|sr-only/);
+    assert.match(enLocale, /"heroEyebrow": "Egypt Combat Sports Store"/);
+    assert.match(arLocale, /"heroEyebrow": "متجر أدوات رياضية وأدوات فنون قتالية في مصر"/);
+    assert.doesNotMatch(arLocale, /heroEyebrowLine1|heroEyebrowLine2|heroTitleLine1|heroTitleLine2/);
+    assert.match(arLocale, /"heroAccent":\s*"[^"]+"/);
   });
 
   it("clips root horizontal overflow while keeping premium containers centered for RTL", () => {

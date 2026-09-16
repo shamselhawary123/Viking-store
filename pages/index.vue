@@ -4,6 +4,8 @@
 
     <HomeBrandsSection />
 
+    <HomeIntroSection />
+
     <HomeCategoriesSection />
 
     <HomeFeaturedProductsSection />

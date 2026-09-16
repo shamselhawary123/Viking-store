@@ -63,6 +63,12 @@ export default defineNuxtConfig({
         styles: ["normal"],
       },
       {
+        name: "Scheherazade New",
+        provider: "google",
+        weights: [600],
+        styles: ["normal"],
+      },
+      {
         name: "Bebas Neue",
         provider: "google",
       },
