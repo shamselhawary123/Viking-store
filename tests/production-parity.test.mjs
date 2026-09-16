@@ -3,6 +3,47 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
+const unsafeViewportProperties = ["transform", "translate", "filter", "perspective", "contain", "will-change"];
+const rootViewportSelectors = new Set([
+  "html",
+  "body",
+  "#__nuxt",
+  'html[dir="rtl"]',
+  'body[dir="rtl"]',
+  '#__nuxt[dir="rtl"]',
+  'html[dir="rtl"] body',
+  'html[dir="rtl"] #__nuxt',
+]);
+
+const rootViewportRules = (css) => {
+  const rules = [];
+  const rulePattern = /([^{}]+)\{([^{}]*)\}/g;
+  let match;
+
+  while ((match = rulePattern.exec(css))) {
+    const selectors = match[1]
+      .split(",")
+      .map((selector) => selector.trim())
+      .filter(Boolean);
+    const rootSelectors = selectors.filter((selector) => rootViewportSelectors.has(selector));
+
+    if (rootSelectors.length) {
+      rules.push({ selectors: rootSelectors, declarations: match[2] });
+    }
+  }
+
+  return rules;
+};
+
+const assertNoUnsafeViewportDeclarations = (rule) => {
+  for (const property of unsafeViewportProperties) {
+    assert.doesNotMatch(
+      rule.declarations,
+      new RegExp(`(^|[;\\s])${property}\\s*:`),
+      `${rule.selectors.join(", ")} must not set ${property}`,
+    );
+  }
+};
 
 test("root app containers do not create transformed viewport containing blocks", () => {
   const css = read("../assets/css/main.css");
@@ -18,7 +59,10 @@ test("root app containers do not create transformed viewport containing blocks",
   assert.doesNotMatch(rootContainerBlock[0], /contain\s*:/);
   assert.doesNotMatch(rootContainerBlock[0], /will-change\s*:/);
 
-  assert.match(css, /html\[dir="rtl"\]\s*{[\s\S]*transform:\s*none\s*!important;[\s\S]*translate:\s*none\s*!important;[\s\S]*}/);
+  const checkedRootRules = rootViewportRules(css);
+  assert.ok(checkedRootRules.length, "root viewport CSS rules should be inspectable");
+  checkedRootRules.forEach(assertNoUnsafeViewportDeclarations);
+
   assert.doesNotMatch(app, /document\.documentElement\.style\.transform|document\.documentElement\.style\.translate/);
   assert.doesNotMatch(layout, /transform|translate|filter|perspective|contain|will-change/);
 });

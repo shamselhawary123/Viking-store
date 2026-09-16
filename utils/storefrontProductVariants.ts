@@ -1,5 +1,6 @@
 export type StorefrontVariantRow = {
   id: number;
+  public_key?: string | null;
   color_id?: number | null;
   size_id?: number | null;
   price?: number | string | null;
@@ -185,6 +186,46 @@ export const getInitialVariantSelection = (state: VariantSelectionState) => {
   return {
     color,
     size,
+  };
+};
+
+export const getVariantSelectionFromPublicKey = (
+  state: VariantSelectionState,
+  publicKey?: string | string[] | null,
+) => {
+  const fallback = getInitialVariantSelection(state);
+  if (typeof publicKey !== "string") return fallback;
+
+  const cleanPublicKey = publicKey.trim();
+  if (!cleanPublicKey) return fallback;
+
+  const variant = state.variants.find((item) => item.public_key === cleanPublicKey);
+  if (!variant) return fallback;
+
+  const colorId = numberOrNull(variant.color_id);
+  const sizeId = numberOrNull(variant.size_id);
+  const color = colorId == null
+    ? null
+    : state.colors.find((item) => item.id === colorId) || null;
+  const sizes = state.mode === "color_size"
+    ? state.sizesForColor(colorId)
+    : state.sizes;
+  const size = sizeId == null
+    ? null
+    : sizes.find((item) => item.id === sizeId) || null;
+
+  if ((state.mode === "color_size" || state.mode === "color_only") && colorId != null && !color) {
+    return fallback;
+  }
+
+  if ((state.mode === "color_size" || state.mode === "size_only") && sizeId != null && !size) {
+    return fallback;
+  }
+
+  return {
+    color,
+    size,
+    variant,
   };
 };
 

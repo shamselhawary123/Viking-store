@@ -7,6 +7,10 @@ export const SEO_ALTERNATE_NAMES = [
   "فايكنج استور",
   "Viking Store Egypt",
 ];
+const SEO_TITLE_BRAND_MENTIONS = [
+  SEO_SITE_NAME.toLowerCase(),
+  "فايكنج ستور",
+];
 export const SEO_SOCIAL_LINKS = [
   "https://www.facebook.com/profile.php?id=100025354200512",
   "https://www.instagram.com/vikingclubstore/",
@@ -20,10 +24,14 @@ export const PRIVATE_SEO_PREFIXES = [
   "/auth",
   "/cart",
   "/checkout",
+  "/payments",
   "/wishlist",
   "/profile",
   "/order-success",
 ];
+const ROBOTS_DISALLOW_PREFIXES = PRIVATE_SEO_PREFIXES.filter(
+  (path) => path !== "/payments",
+);
 
 type SitemapEntry = {
   loc: string;
@@ -34,17 +42,37 @@ type ProductLike = {
   title?: string | null;
   name?: string | null;
   slug?: string | null;
+  sku?: string | null;
   description?: string | null;
   price?: number | string | null;
   cover_image?: string | null;
   image?: string | null;
+  inventory_model?: string | null;
+  product_group_key?: string | null;
   product_colors?: Array<{
+    id?: number | string | null;
+    name?: string | null;
     product_images?: Array<{ image_url?: string | null }> | null;
   }> | null;
-  product_sizes?: Array<{ in_stock?: boolean | null }> | null;
+  product_sizes?: Array<{
+    id?: number | string | null;
+    size?: string | null;
+    in_stock?: boolean | null;
+  }> | null;
+  product_variants?: Array<{
+    id?: number | string | null;
+    public_key?: string | null;
+    color_id?: number | string | null;
+    size_id?: number | string | null;
+    price?: number | string | null;
+    old_price?: number | string | null;
+    stock_quantity?: number | string | null;
+    is_active?: boolean | null;
+  }> | null;
   categories?: { slug?: string | null; name?: string | null } | null;
   category?: string | null;
   brand?: string | { name?: string | null } | null;
+  brands?: { name?: string | null } | null;
   brand_name?: string | null;
 };
 
@@ -69,14 +97,93 @@ type CategorySeoIntent = {
   known: boolean;
 };
 
+export type ShopCategoryState = {
+  slug: string;
+  category: Extract<CategoryLike, { slug?: string | null; name?: string | null }> | null;
+  isCategoryLanding: boolean;
+  isInvalidCategory: boolean;
+};
+
 type ReviewSummaryLike = {
   total?: number;
   average?: number;
 };
 
+export type ShippingSettingsLike = {
+  shipping_enabled?: boolean | null;
+  free_shipping_all_orders?: boolean | null;
+  free_shipping_threshold_enabled?: boolean | null;
+  free_shipping_threshold?: number | string | null;
+  default_shipping_fee?: number | string | null;
+};
+
+export type ShippingGovernorateLike = {
+  code?: string | null;
+  is_enabled?: boolean | null;
+  shipping_fee?: number | string | null;
+};
+
+export type ShippingSchemaSource = {
+  settings?: ShippingSettingsLike | null;
+  governorates?: ShippingGovernorateLike[] | null;
+};
+
+type OrganizationStructuredDataOptions = {
+  shippingSource?: ShippingSchemaSource | null;
+};
+
+const PRODUCT_META_DESCRIPTION_MAX_LENGTH = 180;
+const NON_RETURNABLE_CATEGORY_KEYS = new Set(["mouth-guards"]);
+
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
 const stripQueryAndHash = (path: string) => path.split(/[?#]/)[0] || "/";
+
+const normalizeMetaDescriptionText = (value?: string | null) =>
+  String(value || "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const truncateMetaDescription = (
+  value: string,
+  maxLength = PRODUCT_META_DESCRIPTION_MAX_LENGTH,
+) => {
+  if (value.length <= maxLength) return value;
+
+  const snippet = value.slice(0, maxLength + 1).trimEnd();
+  const lastSpace = snippet.lastIndexOf(" ");
+  const cleanSnippet =
+    lastSpace > Math.floor(maxLength * 0.6)
+      ? snippet.slice(0, lastSpace)
+      : snippet.slice(0, maxLength);
+
+  return cleanSnippet.replace(/[.,;:!?،؛]+$/, "").trimEnd();
+};
+
+const normalizeProductMetaDescription = (value?: string | null) =>
+  truncateMetaDescription(normalizeMetaDescriptionText(value));
+
+const buildProductMetaDescriptionFallback = (
+  productName: string,
+  categoryTitle: string,
+  locale: SeoLocale,
+) =>
+  locale === "ar"
+    ? `${productName} من Viking Store ضمن ${categoryTitle}، مناسب للتمرين ورياضات القتال.`
+    : `Shop ${productName} from Viking Store in our ${categoryTitle} range for combat sports and training.`;
+
+export const buildSeoTitle = (title?: string | null) => {
+  const cleanTitle = String(title || "").trim();
+  if (!cleanTitle) return SEO_SITE_NAME;
+
+  const normalizedTitle = cleanTitle.toLowerCase();
+  const hasBrandMention = SEO_TITLE_BRAND_MENTIONS.some((brand) =>
+    normalizedTitle.includes(brand),
+  );
+
+  return hasBrandMention ? cleanTitle : `${cleanTitle} | ${SEO_SITE_NAME}`;
+};
 
 const categoryValue = (category: CategoryLike, key: "slug" | "name") => {
   if (!category) return "";
@@ -117,25 +224,24 @@ const categorySeoIntents: Record<
 > = {
   boxing: {
     en: {
-      label: "Boxing Gloves",
-      title: "Boxing Gloves & Gear",
+      label: "Boxing Gear",
+      title: "Boxing Gear & Training Equipment",
       description:
-        "Shop boxing gloves, wraps, protection, and training essentials built for daily rounds in Egypt.",
-      keywords: "boxing gloves, boxing gear, combat sports gear Egypt",
-      alternateNames: ["Boxing Gloves"],
+        "Shop boxing gear for training, sparring, and protection, including gloves, wraps, and daily round essentials.",
+      keywords: "boxing gear, boxing training equipment, boxing protection",
+      alternateNames: ["Boxing Gear", "Boxing Training Equipment"],
     },
     ar: {
-      label: "جلافز ملاكمة",
-      title: "جلافز وقلبظ ملاكمة",
+      label: "أدوات ملاكمة",
+      title: "أدوات ومعدات الملاكمة",
       description:
-        "اختار جلافز وقلبظ الملاكمة المناسبة للتمرين والسبارينج، مع قفازات ملاكمة تستحمل شغل الكيس والجولات اليومية.",
-      keywords: "جلافز ملاكمة، قلبظ ملاكمة، قفازات ملاكمة، جلافز بوكس",
+        "اختار أدوات الملاكمة للتمرين والسبارينج، من القفازات والبنداج والحماية إلى أساسيات الجولات اليومية.",
+      keywords: "أدوات ملاكمة، معدات ملاكمة، قفازات ملاكمة وحماية",
       alternateNames: [
-        "جلافز ملاكمة",
-        "قلبظ ملاكمة",
-        "قلابظ ملاكمة",
-        "قفازات ملاكمة",
-        "جلافز بوكس",
+        "أدوات ملاكمة",
+        "معدات ملاكمة",
+        "معدات بوكس",
+        "أساسيات الملاكمة",
       ],
     },
   },
@@ -190,10 +296,10 @@ const categorySeoIntents: Record<
     },
     ar: {
       label: "ادوات MMA",
-      title: "قفازات MMA وادوات فنون قتالية",
+      title: "قفازات MMA وأدوات فنون قتالية",
       description:
-        "اختار قفازات MMA وادوات فنون قتالية للتمرين المختلط واللياقة والسبارينج.",
-      keywords: "قفازات MMA، أدوات وادوات رياضات قتالية، فنون قتالية",
+        "اختار قفازات MMA وأدوات فنون قتالية للتمرين المختلط واللياقة والسبارينج.",
+      keywords: "قفازات MMA، أدوات رياضات قتالية، فنون قتالية",
     },
   },
   sanda: {
@@ -209,7 +315,7 @@ const categorySeoIntents: Record<
       title: "ادوات سندا وفنون قتالية",
       description:
         "ادوات سندا عملية للتمرين، الحركة، والجولات اللي محتاجة حماية وثبات.",
-      keywords: "ادوات سندا، أدوات وادوات رياضات قتالية، فنون قتالية",
+      keywords: "ادوات سندا، أدوات رياضات قتالية، فنون قتالية",
     },
   },
   "kung-fu": {
@@ -238,7 +344,7 @@ const categorySeoIntents: Record<
     },
     ar: {
       label: "ادوات مواي تاي",
-      title: "قفازات وادوات مواي تاي",
+      title: "قفازات وأدوات مواي تاي",
       description:
         "اختار ادوات مواي تاي للجولات التقيلة، شغل الباد، والسبارينج.",
       keywords: "ادوات مواي تاي، قفازات مواي تاي، أدوات رياضية",
@@ -272,37 +378,37 @@ const categorySeoIntents: Record<
   "medical-products": {
     en: {
       label: "Medical Products",
-      title: "Medical Products for Sports",
+      title: "Sports First Aid & Recovery Supplies",
       description:
-        "Shop medical products for sports and fitness, including first aid supplies and recovery tools.",
-      keywords: "medical products, sports medicine, first aid",
-      alternateNames: ["Medical Products", "Sports Medicine"],
+        "Shop first-aid, recovery, and support supplies for athletes, training bags, and gym sessions.",
+      keywords: "sports first aid, recovery supplies, athlete support",
+      alternateNames: ["Medical Products", "Sports First Aid", "Recovery Supplies"],
     },
     ar: {
       label: "منتجات طبية",
-      title: "منتجات طبية للرياضات",
+      title: "مستلزمات طبية ورياضية للتمرين",
       description:
-        "اختار منتجات طبية للرياضات والتمرين، بما في ذلك مواد العلاج الأولي وأدوات الاسترداد.",
-      keywords: "منتجات طبية، طب الرياضات، علاج أولي",
-      alternateNames: ["منتجات طبية", "طب الرياضات", "علاج أولي"],
+        "اختار مستلزمات إسعافات وتعافي ودعم للرياضيين، مناسبة لشنطة التمرين وتجهيزات النادي.",
+      keywords: "مستلزمات طبية رياضية، إسعافات أولية للرياضة، مستلزمات تعافي",
+      alternateNames: ["منتجات طبية", "مستلزمات طبية رياضية", "إسعافات رياضية"],
     },
   },
   "sports-equipment": {
     en: {
       label: "Sports Equipment",
-      title: "Sports Equipment for All Activities",
+      title: "Combat Sports Training Equipment",
       description:
-        "Shop a wide range of sports equipment for all your athletic needs.",
-      keywords: "sports equipment, athletic gear, training equipment",
-      alternateNames: ["Sports Equipment", "Athletic Gear"],
+        "Shop training equipment and sports gear for combat-sports sessions, fitness work, and daily practice.",
+      keywords: "combat sports equipment, training equipment, sports gear",
+      alternateNames: ["Sports Equipment", "Training Equipment", "Combat Sports Gear"],
     },
     ar: {
       label: "معدات رياضية",
-      title: "معدات رياضية لجميع الأنشطة",
+      title: "معدات تمرين لرياضات القتال",
       description:
-        "اختار مجموعة واسعة من معدات الرياضة لجميع احتياجاتك الرياضية.",
-      keywords: "معدات رياضية، أدوات رياضية، معدات التمرين",
-      alternateNames: ["معدات رياضية", "أدوات رياضية", "معدات التمرين"],
+        "اختار معدات رياضية للتمرين اليومي ورياضات القتال واللياقة، بتجهيزات مناسبة لحصص التدريب.",
+      keywords: "معدات تمرين، معدات رياضات قتالية، أدوات رياضية",
+      alternateNames: ["معدات رياضية", "معدات التمرين", "معدات رياضات قتالية"],
     },
   },
   "mouth-guards": {
@@ -316,11 +422,11 @@ const categorySeoIntents: Record<
     },
     ar: {
       label: "واقيات الفم",
-      title: "واقيات الفم للرياضات",
+      title: "ماوث جارد أو واقيات الفم",
       description:
-        "اختار واقيات فم مناسبة للرياضات المختلفة والأنشطة لحماية أسنانك وفمك.",
-      keywords: "واقيات الفم، واقيات رياضية، حماية الأسنان",
-      alternateNames: ["واقيات الفم", "واقيات رياضية", "حماية الأسنان"],
+        "اختار ماوث جارد أو واقي الفم المناسب للتمرين والسبارينج، لحماية الفم والأسنان أثناء رياضات القتال.",
+      keywords: "ماوث جارد، واقيات الفم، واقي الفم",
+      alternateNames: ["ماوث جارد", "واقيات الفم", "واقي الفم"],
     },
   },
   "gear-bundles": {
@@ -432,6 +538,24 @@ export const buildShopCategoryCanonicalUrl = (
     : buildCanonicalUrl(origin, path);
 };
 
+export const resolveShopCategoryState = (
+  slug: string | null | undefined,
+  categories: Array<Extract<CategoryLike, { slug?: string | null; name?: string | null }>>,
+): ShopCategoryState => {
+  const cleanSlug = normalizeCategorySlug(slug || "all") || "all";
+  const isCategoryLanding = cleanSlug !== "all";
+  const category =
+    categories.find((item) => normalizeCategorySlug(item.slug || "") === cleanSlug) ||
+    null;
+
+  return {
+    slug: cleanSlug,
+    category,
+    isCategoryLanding,
+    isInvalidCategory: isCategoryLanding && !category,
+  };
+};
+
 export const getCategorySeoIntent = (
   category: CategoryLike,
   locale: SeoLocale = "en",
@@ -498,16 +622,14 @@ export const buildProductSeoMeta = (
     product.categories || product.category,
     locale,
   );
-  const description = product.description?.trim();
+  const description = normalizeProductMetaDescription(product.description);
   const isArabic = locale === "ar";
 
   return {
     title: isArabic ? `${name} | ${intent.title}` : `${name} | ${intent.title}`,
-    description: description
-      ? `${description} ${intent.description}`
-      : isArabic
-        ? `${name} من Viking Store. ${intent.description}`
-        : `Shop ${name} from Viking Store. ${intent.description}`,
+    description:
+      description ||
+      buildProductMetaDescriptionFallback(name, intent.title, locale),
   };
 };
 
@@ -578,7 +700,7 @@ export const buildRobotsTxt = (siteUrl: string) => {
   return [
     "User-agent: *",
     "Allow: /",
-    ...PRIVATE_SEO_PREFIXES.map((path) => `Disallow: ${path}`),
+    ...ROBOTS_DISALLOW_PREFIXES.map((path) => `Disallow: ${path}`),
     "",
     `Sitemap: ${origin}/sitemap.xml`,
     "",
@@ -592,17 +714,156 @@ export const buildAbsoluteImageUrl = (siteUrl: string, image?: string | null) =>
   return buildCanonicalUrl(siteUrl, image);
 };
 
-export const buildOrganizationStructuredData = (siteUrl: string) => ({
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  name: SEO_SITE_NAME,
-  alternateName: SEO_ALTERNATE_NAMES,
-  description: SEO_ORGANIZATION_DESCRIPTION,
-  url: buildCanonicalUrl(siteUrl, "/"),
-  logo: buildAbsoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
-  image: buildAbsoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
-  sameAs: SEO_SOCIAL_LINKS,
+export const buildOrganizationId = (siteUrl: string) =>
+  `${buildCanonicalUrl(siteUrl, "/")}#organization`;
+
+export const buildMerchantReturnPolicy = (siteUrl: string) => ({
+  "@type": "MerchantReturnPolicy",
+  applicableCountry: "EG",
+  returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+  merchantReturnDays: 3,
+  returnMethod: "https://schema.org/ReturnByMail",
+  returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
+  refundType: "https://schema.org/FullRefund",
+  itemCondition: "https://schema.org/NewCondition",
+  merchantReturnLink: buildCanonicalUrl(siteUrl, "/terms"),
 });
+
+const toFiniteMoney = (value?: number | string | null) => {
+  if (value === null || value === undefined || value === "") return null;
+
+  const numberValue = Number(value);
+
+  return Number.isFinite(numberValue) && numberValue >= 0
+    ? Math.round((numberValue + Number.EPSILON) * 100) / 100
+    : null;
+};
+
+const shippingDestinationEgypt = () => ({
+  "@type": "DefinedRegion",
+  addressCountry: "EG",
+});
+
+const shippingRate = (value: number, key: "value" | "maxValue") => ({
+  "@type": "MonetaryAmount",
+  [key]: value,
+  currency: SEO_PRICE_CURRENCY,
+});
+
+const orderValue = ({
+  minValue,
+  maxValue,
+}: {
+  minValue: number;
+  maxValue?: number;
+}) => ({
+  "@type": "MonetaryAmount",
+  minValue,
+  ...(maxValue === undefined ? {} : { maxValue }),
+  currency: SEO_PRICE_CURRENCY,
+});
+
+const enabledShippingRates = (source: ShippingSchemaSource) => {
+  const defaultFee = toFiniteMoney(source.settings?.default_shipping_fee);
+  const enabledGovernorates = (source.governorates || []).filter(
+    (governorate) => governorate.is_enabled !== false,
+  );
+
+  return enabledGovernorates
+    .map((governorate) => toFiniteMoney(governorate.shipping_fee) ?? defaultFee)
+    .filter((fee): fee is number => fee !== null);
+};
+
+export const buildShippingServiceStructuredData = (
+  siteUrl: string,
+  source?: ShippingSchemaSource | null,
+) => {
+  if (!source?.settings || source.settings.shipping_enabled === false) {
+    return undefined;
+  }
+
+  const serviceBase = {
+    "@type": "ShippingService",
+    "@id": `${buildCanonicalUrl(siteUrl, "/")}#standard-shipping`,
+    name: "Viking Store Standard Shipping",
+    fulfillmentType: "https://schema.org/FulfillmentTypeDelivery",
+  };
+
+  if (source.settings.free_shipping_all_orders === true) {
+    return {
+      ...serviceBase,
+      shippingConditions: {
+        "@type": "ShippingConditions",
+        shippingDestination: shippingDestinationEgypt(),
+        shippingRate: shippingRate(0, "value"),
+      },
+    };
+  }
+
+  const rates = enabledShippingRates(source);
+  if (!rates.length) return undefined;
+
+  const maxShippingRate = Math.max(...rates);
+  const threshold = toFiniteMoney(source.settings.free_shipping_threshold);
+  const hasThreshold =
+    source.settings.free_shipping_threshold_enabled === true &&
+    threshold !== null &&
+    threshold > 0;
+
+  const paidCondition = {
+    "@type": "ShippingConditions",
+    shippingDestination: shippingDestinationEgypt(),
+    shippingRate: shippingRate(maxShippingRate, "maxValue"),
+    ...(hasThreshold
+      ? { orderValue: orderValue({ minValue: 0, maxValue: threshold }) }
+      : {}),
+  };
+
+  if (!hasThreshold) {
+    return {
+      ...serviceBase,
+      shippingConditions: paidCondition,
+    };
+  }
+
+  return {
+    ...serviceBase,
+    shippingConditions: [
+      paidCondition,
+      {
+        "@type": "ShippingConditions",
+        shippingDestination: shippingDestinationEgypt(),
+        shippingRate: shippingRate(0, "value"),
+        orderValue: orderValue({ minValue: threshold }),
+      },
+    ],
+  };
+};
+
+export const buildOrganizationStructuredData = (
+  siteUrl: string,
+  options: OrganizationStructuredDataOptions = {},
+) => {
+  const shippingService = buildShippingServiceStructuredData(
+    siteUrl,
+    options.shippingSource,
+  );
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": buildOrganizationId(siteUrl),
+    name: SEO_SITE_NAME,
+    alternateName: SEO_ALTERNATE_NAMES,
+    description: SEO_ORGANIZATION_DESCRIPTION,
+    url: buildCanonicalUrl(siteUrl, "/"),
+    logo: buildAbsoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
+    image: buildAbsoluteImageUrl(siteUrl, SEO_DEFAULT_IMAGE),
+    sameAs: SEO_SOCIAL_LINKS,
+    hasMerchantReturnPolicy: buildMerchantReturnPolicy(siteUrl),
+    ...(shippingService ? { hasShippingService: shippingService } : {}),
+  };
+};
 
 export const buildWebsiteStructuredData = (siteUrl: string) => ({
   "@context": "https://schema.org",
@@ -650,10 +911,74 @@ const productAvailability = (product: ProductLike) => {
     : "https://schema.org/OutOfStock";
 };
 
-const productBrandName = (product: ProductLike) => {
-  if (typeof product.brand === "string") return product.brand;
+const cleanStructuredDataText = (value?: string | null) => {
+  const cleanValue = String(value || "").trim();
 
-  return product.brand?.name || product.brand_name || SEO_SITE_NAME;
+  return cleanValue || undefined;
+};
+
+const productBrandName = (product: ProductLike) => {
+  const brandRelationName =
+    typeof product.brand === "object"
+      ? cleanStructuredDataText(product.brand?.name)
+      : undefined;
+  const brandString =
+    typeof product.brand === "string"
+      ? cleanStructuredDataText(product.brand)
+      : undefined;
+
+  return (
+    brandRelationName ||
+    cleanStructuredDataText(product.brands?.name) ||
+    cleanStructuredDataText(product.brand_name) ||
+    brandString
+  );
+};
+
+const productSku = (product: ProductLike) => cleanStructuredDataText(product.sku);
+
+const offerSeller = (siteUrl: string) => ({
+  "@id": buildOrganizationId(siteUrl),
+});
+
+const nonReturnableProductPolicy = () => ({
+  "@type": "MerchantReturnPolicy",
+  applicableCountry: "EG",
+  returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
+});
+
+const isNonReturnableProduct = (product: ProductLike) =>
+  NON_RETURNABLE_CATEGORY_KEYS.has(
+    categoryIntentKey(product.categories || product.category),
+  );
+
+const productOfferReturnPolicy = (product: ProductLike) =>
+  isNonReturnableProduct(product)
+    ? { hasMerchantReturnPolicy: nonReturnableProductPolicy() }
+    : {};
+
+const productBrandStructuredData = (product: ProductLike) => {
+  const brandName = productBrandName(product);
+
+  return brandName
+    ? {
+        "@type": "Brand",
+        name: brandName,
+      }
+    : undefined;
+};
+
+const productAggregateRating = (reviewSummary: ReviewSummaryLike) => {
+  const totalReviews = Number(reviewSummary.total || 0);
+  const averageRating = Number(reviewSummary.average || 0);
+
+  return totalReviews > 0 && averageRating > 0
+    ? {
+        "@type": "AggregateRating",
+        ratingValue: averageRating.toFixed(1),
+        reviewCount: totalReviews,
+      }
+    : undefined;
 };
 
 const productAlternateNames = (product: ProductLike) => {
@@ -666,6 +991,118 @@ const productAlternateNames = (product: ProductLike) => {
   return Array.from(new Set(names));
 };
 
+const rowId = (value?: number | string | null) => {
+  const nextValue = Number(value);
+  return Number.isFinite(nextValue) ? nextValue : null;
+};
+
+const activeProductVariants = (product: ProductLike) =>
+  (product.product_variants || []).filter((variant) => variant.is_active !== false);
+
+const variantStockAvailability = (stockQuantity?: number | string | null) =>
+  Number(stockQuantity || 0) > 0
+    ? "https://schema.org/InStock"
+    : "https://schema.org/OutOfStock";
+
+const variantPublicUrl = (canonicalUrl: string, publicKey: string) => {
+  const url = new URL(canonicalUrl);
+  url.searchParams.set("variant", publicKey);
+
+  return url.toString();
+};
+
+const variantOptionMaps = (product: ProductLike) => ({
+  colors: new Map(
+    (product.product_colors || [])
+      .map((color) => [rowId(color.id), color] as const)
+      .filter(([id]) => id != null),
+  ),
+  sizes: new Map(
+    (product.product_sizes || [])
+      .map((size) => [rowId(size.id), size] as const)
+      .filter(([id]) => id != null),
+  ),
+});
+
+const variantOptionValues = (
+  product: ProductLike,
+  variant: NonNullable<ProductLike["product_variants"]>[number],
+) => {
+  const { colors, sizes } = variantOptionMaps(product);
+  const color = colors.get(rowId(variant.color_id));
+  const size = sizes.get(rowId(variant.size_id));
+
+  return {
+    colorName: cleanStructuredDataText(color?.name),
+    sizeName: cleanStructuredDataText(size?.size),
+    colorImages: (color?.product_images || [])
+      .map((image) => image.image_url)
+      .filter(Boolean) as string[],
+  };
+};
+
+const variantName = (productName: string, colorName?: string, sizeName?: string) => {
+  const suffixes = Array.from(new Set([colorName, sizeName].filter(Boolean)));
+
+  return suffixes.length ? `${productName} - ${suffixes.join(" - ")}` : productName;
+};
+
+const productVariesBy = (product: ProductLike, variants: NonNullable<ProductLike["product_variants"]>) => {
+  const dimensions = variants.reduce(
+    (nextDimensions, variant) => {
+      const { colorName, sizeName } = variantOptionValues(product, variant);
+      if (colorName) nextDimensions.color = true;
+      if (sizeName) nextDimensions.size = true;
+      return nextDimensions;
+    },
+    { color: false, size: false },
+  );
+  const variesBy = [
+    dimensions.color ? "https://schema.org/color" : null,
+    dimensions.size ? "https://schema.org/size" : null,
+  ].filter(Boolean);
+
+  return variesBy.length ? variesBy : undefined;
+};
+
+const buildVariantStructuredData = (
+  product: ProductLike,
+  variant: NonNullable<ProductLike["product_variants"]>[number],
+  productName: string,
+  canonicalUrl: string,
+  siteUrl: string,
+  parentImages: string[],
+) => {
+  const publicKey = cleanStructuredDataText(variant.public_key);
+  if (!publicKey) return null;
+
+  const { colorName, sizeName, colorImages } = variantOptionValues(product, variant);
+  const url = variantPublicUrl(canonicalUrl, publicKey);
+  const images = colorImages.length ? colorImages : parentImages;
+
+  return {
+    "@type": "Product",
+    "@id": `${url}#product`,
+    name: variantName(productName, colorName, sizeName),
+    url,
+    ...(colorName ? { color: colorName } : {}),
+    ...(sizeName ? { size: sizeName } : {}),
+    image: images.length
+      ? images.map((image) => buildAbsoluteImageUrl(siteUrl, image))
+      : undefined,
+    offers: {
+      "@type": "Offer",
+      url,
+      priceCurrency: SEO_PRICE_CURRENCY,
+      price: Number(variant.price || 0),
+      availability: variantStockAvailability(variant.stock_quantity),
+      itemCondition: "https://schema.org/NewCondition",
+      seller: offerSeller(siteUrl),
+      ...productOfferReturnPolicy(product),
+    },
+  };
+};
+
 export const buildProductStructuredData = (
   product: ProductLike,
   canonicalUrl: string,
@@ -674,26 +1111,54 @@ export const buildProductStructuredData = (
   const name = product.title || product.name || "Viking Store Product";
   const images = productImages(product);
   const siteUrl = new URL(canonicalUrl).origin;
-  const totalReviews = Number(reviewSummary.total || 0);
-  const averageRating = Number(reviewSummary.average || 0);
+  const brand = productBrandStructuredData(product);
+  const sku = productSku(product);
+  const alternateName = productAlternateNames(product);
+  const description = normalizeProductMetaDescription(product.description) || name;
+  const category = product.categories?.name || product.category || undefined;
+  const aggregateRating = productAggregateRating(reviewSummary);
+  const activeVariants = activeProductVariants(product);
+
+  if (product.inventory_model === "variants") {
+    const variants = activeVariants
+      .map((variant) =>
+        buildVariantStructuredData(product, variant, name, canonicalUrl, siteUrl, images),
+      )
+      .filter(Boolean);
+
+    return {
+      "@context": "https://schema.org",
+      "@type": "ProductGroup",
+      "@id": `${canonicalUrl}#product-group`,
+      productGroupID: cleanStructuredDataText(product.product_group_key),
+      name,
+      url: canonicalUrl,
+      alternateName: alternateName.length ? alternateName : undefined,
+      description,
+      image: images.length
+        ? images.map((image) => buildAbsoluteImageUrl(siteUrl, image))
+        : undefined,
+      category,
+      ...(brand ? { brand } : {}),
+      variesBy: productVariesBy(product, activeVariants),
+      hasVariant: variants,
+      ...(aggregateRating ? { aggregateRating } : {}),
+    };
+  }
 
   return {
     "@context": "https://schema.org",
     "@type": "Product",
     name,
-    alternateName: productAlternateNames(product).length
-      ? productAlternateNames(product)
-      : undefined,
-    description: product.description || name,
+    url: canonicalUrl,
+    alternateName: alternateName.length ? alternateName : undefined,
+    description,
     image: images.length
       ? images.map((image) => buildAbsoluteImageUrl(siteUrl, image))
       : undefined,
-    category: product.categories?.name || product.category || undefined,
-    brand: {
-      "@type": "Brand",
-      name: productBrandName(product),
-    },
-    sku: product.slug || undefined,
+    category,
+    ...(brand ? { brand } : {}),
+    ...(sku ? { sku } : {}),
     offers: {
       "@type": "Offer",
       url: canonicalUrl,
@@ -701,14 +1166,9 @@ export const buildProductStructuredData = (
       price: Number(product.price || 0),
       availability: productAvailability(product),
       itemCondition: "https://schema.org/NewCondition",
+      seller: offerSeller(siteUrl),
+      ...productOfferReturnPolicy(product),
     },
-    aggregateRating:
-      totalReviews > 0 && averageRating > 0
-        ? {
-            "@type": "AggregateRating",
-            ratingValue: averageRating.toFixed(1),
-            reviewCount: totalReviews,
-          }
-        : undefined,
+    aggregateRating,
   };
 };

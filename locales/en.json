@@ -360,7 +360,7 @@
     "description": "Description",
     "specifications": "Specifications",
     "shippingText": "Fast shipping is available at checkout. Delivery options and costs are calculated before payment.",
-    "returnsText": "Easy returns are available for eligible unused items. Return details are confirmed during order support.",
+    "returnsText": "Eligible unused items can be returned within 3 days of delivery in original condition and packaging.",
     "moreGear": "More Gear",
     "viewAll": "View All",
     "yourPicks": "Your Picks",
@@ -1124,7 +1124,7 @@
     "faqSecureQ": "Is checkout secure?",
     "faqSecureA": "The checkout experience is designed around a protected order flow and clear confirmation details.",
     "faqReturnQ": "Can I return a product?",
-    "faqReturnA": "Yes. Returns are accepted within 14 days when the product is unused, clean, and returned with original packaging.",
+    "faqReturnA": "Yes. Returns are accepted within 3 days of delivery when the item is unused, clean, in original condition, and in original packaging. The customer arranges and pays return shipping by courier or Egypt Post. Eligible returns receive a full refund. Personal-use or hygiene-sensitive products, including mouth guards and groin or under-belt protectors, are not returnable.",
     "faqDamagedQ": "What if my item arrives damaged?",
     "faqDamagedA": "Contact support with your order details and product photos so the team can review the issue quickly.",
     "faqSizeQ": "How do I choose the right size?",
@@ -1231,7 +1231,8 @@
           "title": "Coupons, shipping, and returns",
           "body": [
             "Coupons, when available, are validated against their active dates, limits, product/category restrictions, and order requirements.",
-            "Shipping and return handling should be confirmed through Viking Store support or the FAQ. This page does not set fixed delivery fees, delivery timelines, or return periods beyond what is already shown elsewhere on the site."
+            "Delivery within Egypt is available for supported destinations. Shipping fees depend on the selected destination or governorate and are calculated at checkout. Free shipping may apply according to the current checkout conditions.",
+            "Returns are accepted within 3 days of delivery for eligible unused, clean items in original condition and original packaging. The customer arranges and pays return shipping by courier or Egypt Post. Eligible returns receive a full refund. Personal-use or hygiene-sensitive products, including mouth guards and groin or under-belt protectors, are not returnable."
           ]
         },
         {

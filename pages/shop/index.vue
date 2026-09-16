@@ -47,6 +47,7 @@ import {
   buildCategorySeo,
   buildShopCategoryCanonicalUrl,
   normalizeCategorySlug,
+  resolveShopCategoryState,
 } from "../../utils/seo";
 
 const route = useRoute();
@@ -77,16 +78,25 @@ await useAsyncData("shop-initial-catalog", async () => {
   };
 });
 
+const initialCategoryState = resolveShopCategoryState(selectedCategorySlug.value, categoriesStore.categories);
+
+if (initialCategoryState.isInvalidCategory) {
+  setResponseStatus(404);
+}
+
+const categoryState = computed(() =>
+  resolveShopCategoryState(selectedCategorySlug.value, categoriesStore.categories),
+);
 const selectedCategoryRecord = computed(() =>
-  categoriesStore.categories.find((category) => category.slug === selectedCategorySlug.value) ||
-  productsStore.products.find((product) => product.categories?.slug === selectedCategorySlug.value)?.categories || {
-    slug: selectedCategorySlug.value,
-    name: selectedCategorySlug.value,
+  categoryState.value.category || {
+    slug: "all",
+    name: "All",
   },
 );
 
 const activeCategorySeo = computed(() => buildCategorySeo(selectedCategoryRecord.value, locale.value));
-const isCategoryLanding = computed(() => Boolean(selectedCategorySlug.value && selectedCategorySlug.value !== "all"));
+const isInvalidCategory = computed(() => categoryState.value.isInvalidCategory);
+const isCategoryLanding = computed(() => categoryState.value.isCategoryLanding && !isInvalidCategory.value);
 const shopHeading = computed(() => (isCategoryLanding.value ? activeCategorySeo.value.h1 : t("shop.shopCombatGear")));
 const shopLead = computed(() => (isCategoryLanding.value ? activeCategorySeo.value.intro : t("shop.shopLead")));
 const shopMetaTitle = computed(() => (isCategoryLanding.value ? activeCategorySeo.value.title : t("seo.shopTitle")));
@@ -101,6 +111,7 @@ useSeoMeta({
   ogTitle: () => shopMetaTitle.value,
   ogDescription: () => shopMetaDescription.value,
   ogUrl: () => shopCanonicalUrl.value,
+  robots: () => (isInvalidCategory.value ? "noindex,nofollow" : "index,follow"),
 });
 
 useHead(() => ({
@@ -112,6 +123,10 @@ onMounted(async () => {
 });
 
 const filteredProducts = computed(() => {
+  if (isInvalidCategory.value) {
+    return [];
+  }
+
   if (!isCategoryLanding.value) {
     return productsStore.products;
   }

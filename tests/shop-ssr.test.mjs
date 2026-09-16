@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 
-import { getCategorySeoIntent } from "../utils/seo.ts";
+import { getCategorySeoIntent, resolveShopCategoryState } from "../utils/seo.ts";
 
 const shopPageSource = readFileSync(
   new URL("../pages/shop/index.vue", import.meta.url),
@@ -53,6 +53,30 @@ describe("shop SSR category pages", () => {
       assert.match(source, /config\.public\.supabaseKey/);
       assert.doesNotMatch(source, /const supabase = useSupabase\(\)/);
     }
+  });
+
+  it("treats unknown category query slugs as 404 noindex states", () => {
+    const categories = [
+      { slug: "all", name: "All" },
+      { slug: "gloves", name: "Gloves" },
+    ];
+
+    const shop = resolveShopCategoryState("all", categories);
+    const valid = resolveShopCategoryState("gloves", categories);
+    const invalid = resolveShopCategoryState("does-not-exist", categories);
+
+    assert.equal(shop.isCategoryLanding, false);
+    assert.equal(shop.isInvalidCategory, false);
+    assert.equal(valid.isCategoryLanding, true);
+    assert.equal(valid.isInvalidCategory, false);
+    assert.equal(valid.category?.slug, "gloves");
+    assert.equal(invalid.isCategoryLanding, true);
+    assert.equal(invalid.isInvalidCategory, true);
+    assert.equal(invalid.category, null);
+    assert.match(shopPageSource, /resolveShopCategoryState/);
+    assert.match(shopPageSource, /setResponseStatus\(404\)/);
+    assert.match(shopPageSource, /noindex,nofollow/);
+    assert.doesNotMatch(shopPageSource, /navigateTo\(["']\/shop["']\)/);
   });
 
   it("keeps crawlable product links and avoids intentional empty SSR placeholders", () => {

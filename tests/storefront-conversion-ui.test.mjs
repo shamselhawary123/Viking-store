@@ -72,6 +72,20 @@ describe("storefront conversion UI", () => {
     assert.doesNotMatch(productPage, /countdown|sale ends today|people are viewing|recent purchases/i);
   });
 
+  it("shows the selected-variant low-stock warning only for stock one through three", () => {
+    const lowStockBlock = productPage.match(/const lowStockMessage = computed\(\(\) => \{[\s\S]*?\n\}\);/)?.[0] || "";
+    const threshold = Number(lowStockBlock.match(/stock > 0 && stock <= (\d+)/)?.[1]);
+    const shouldShowWarning = (stock) => stock > 0 && stock <= threshold;
+
+    assert.match(lowStockBlock, /selectedVariant\.value\.stock_quantity/);
+    assert.equal(shouldShowWarning(0), false);
+    assert.equal(shouldShowWarning(1), true);
+    assert.equal(shouldShowWarning(2), true);
+    assert.equal(shouldShowWarning(3), true);
+    assert.equal(shouldShowWarning(4), false);
+    assert.equal(shouldShowWarning(12), false);
+  });
+
   it("separates ProductCard sale badge from secondary marketing badge without changing card dimensions", () => {
     assert.match(productCard, /sale-badge-primary/);
     assert.match(productCard, /marketing-badge-secondary/);

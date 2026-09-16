@@ -433,6 +433,7 @@ import {
   buildVariantSelectionState,
   getVariantGalleryImages,
   getInitialVariantSelection,
+  getVariantSelectionFromPublicKey,
   getVariantPriceState,
   getVariantSelectionErrorKey,
   isLegacyInventoryProduct,
@@ -677,7 +678,7 @@ const initializeProductSelection = () => {
   if (!product.value) return;
 
   if (isVariantProduct.value) {
-    const selection = getInitialVariantSelection(variantState.value);
+    const selection = getVariantSelectionFromPublicKey(variantState.value, route.query.variant);
     selectedColor.value = selection.color;
     selectedSize.value = selection.size?.label || "";
     const images = getVariantGalleryImages(product.value, variantState.value, selection.color?.id);
@@ -715,7 +716,7 @@ const lowStockMessage = computed(() => {
   if (!isVariantProduct.value || !selectedVariant.value) return "";
 
   const stock = Number(selectedVariant.value.stock_quantity || 0);
-  return stock > 0 && stock <= 5 ? t("shop.lowStockOnly", { count: stock }) : "";
+  return stock > 0 && stock <= 3 ? t("shop.lowStockOnly", { count: stock }) : "";
 });
 const reviewSummary = computed(() => getProductReviewSummary(reviews.value));
 const filledReviewStars = computed(() => Math.round(reviewSummary.value.average));

@@ -58,7 +58,14 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { buildCanonicalUrl, normalizeSiteUrl } from "../utils/seo";
+import { getPublicSupabaseClient } from "../utils/publicSupabase";
+import {
+  buildCanonicalUrl,
+  buildOrganizationStructuredData,
+  normalizeSiteUrl,
+  type ShippingGovernorateLike,
+  type ShippingSettingsLike,
+} from "../utils/seo";
 
 type LegalSection = {
   id: string;
@@ -74,6 +81,39 @@ const canonicalUrl = computed(() => buildCanonicalUrl(siteUrl, route.path));
 const sections = computed<LegalSection[]>(
   () => tm("legal.terms.sections") as unknown as LegalSection[],
 );
+const { data: shippingStructuredDataSource } = await useAsyncData(
+  "terms-shipping-structured-data",
+  async () => {
+    const supabaseUrl = String(config.public.supabaseUrl || "");
+    const supabaseKey = String(config.public.supabaseKey || "");
+
+    if (!supabaseUrl || !supabaseKey) return null;
+
+    const supabase = getPublicSupabaseClient(
+      supabaseUrl,
+      supabaseKey,
+      "viking-store-terms-shipping-schema",
+    );
+    const [{ data: settingsRows, error: settingsError }, { data: governorates, error: governoratesError }] =
+      await Promise.all([
+        supabase
+          .from("shipping_settings")
+          .select("shipping_enabled,free_shipping_all_orders,free_shipping_threshold_enabled,free_shipping_threshold,default_shipping_fee")
+          .limit(1),
+        supabase
+          .from("shipping_governorates")
+          .select("code,is_enabled,shipping_fee")
+          .eq("is_enabled", true),
+      ]);
+
+    if (settingsError || governoratesError) return null;
+
+    return {
+      settings: (settingsRows?.[0] || null) as ShippingSettingsLike | null,
+      governorates: (governorates || []) as ShippingGovernorateLike[],
+    };
+  },
+);
 
 useSeoMeta({
   title: () => t("seo.termsTitle"),
@@ -85,5 +125,15 @@ useSeoMeta({
 
 useHead(() => ({
   link: [{ rel: "canonical", href: canonicalUrl.value }],
+  script: [
+    {
+      type: "application/ld+json",
+      children: JSON.stringify(
+        buildOrganizationStructuredData(siteUrl, {
+          shippingSource: shippingStructuredDataSource.value,
+        }),
+      ),
+    },
+  ],
 }));
 </script>

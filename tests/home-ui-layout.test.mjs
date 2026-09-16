@@ -1,8 +1,55 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync, statSync } from "node:fs";
 import { describe, it } from "node:test";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
+const file = (path) => new URL(path, import.meta.url);
+
+const readWebpInfo = (path) => {
+  const bytes = readFileSync(file(path));
+
+  assert.equal(bytes.toString("ascii", 0, 4), "RIFF");
+  assert.equal(bytes.toString("ascii", 8, 12), "WEBP");
+
+  for (let offset = 12; offset + 8 <= bytes.length;) {
+    const chunk = bytes.toString("ascii", offset, offset + 4);
+    const chunkSize = bytes.readUInt32LE(offset + 4);
+    const dataOffset = offset + 8;
+
+    if (chunk === "VP8 ") {
+      return {
+        bytes: bytes.length,
+        format: "webp",
+        width: bytes.readUInt16LE(dataOffset + 6) & 0x3fff,
+        height: bytes.readUInt16LE(dataOffset + 8) & 0x3fff,
+      };
+    }
+
+    if (chunk === "VP8L") {
+      const bits = bytes.readUInt32LE(dataOffset + 1);
+
+      return {
+        bytes: bytes.length,
+        format: "webp",
+        width: (bits & 0x3fff) + 1,
+        height: ((bits >> 14) & 0x3fff) + 1,
+      };
+    }
+
+    if (chunk === "VP8X") {
+      return {
+        bytes: bytes.length,
+        format: "webp",
+        width: bytes.readUIntLE(dataOffset + 4, 3) + 1,
+        height: bytes.readUIntLE(dataOffset + 7, 3) + 1,
+      };
+    }
+
+    offset = dataOffset + chunkSize + (chunkSize % 2);
+  }
+
+  throw new Error(`Unable to read WebP dimensions for ${path}`);
+};
 
 describe("home UI layout", () => {
   it("uses logical desktop alignment for the hero while keeping mobile centered", () => {
@@ -106,23 +153,49 @@ describe("home UI layout", () => {
     assert.doesNotMatch(source, /display:\s*none|visibility:\s*hidden|opacity:\s*0|sr-only/);
   });
 
-  it("serves the hero as the only high-priority above-fold image with responsive sizing", () => {
+  it("serves the hero as a native static responsive image without runtime transforms", () => {
     const source = read("../components/home/HeroSection.vue");
     const navbar = read("../components/shared/AppNavbar.vue");
+    const expectedVariants = [
+      ["../public/hero-640.webp", 640],
+      ["../public/hero-960.webp", 960],
+      ["../public/hero-1280.webp", 1280],
+      ["../public/hero.webp", 1672],
+    ];
+    const imageTags = source.match(/<(?:NuxtImg|img)\b/g) || [];
 
-    assert.match(source, /<NuxtImg\b/);
+    assert.equal(imageTags.length, 1);
+    assert.match(source, /<img\b/);
+    assert.doesNotMatch(source, /<NuxtImg\b/);
     assert.match(source, /src="\/hero\.webp"/);
+    assert.match(source, /srcset="[\s\S]*?\/hero-640\.webp 640w,[\s\S]*?\/hero-960\.webp 960w,[\s\S]*?\/hero-1280\.webp 1280w,[\s\S]*?\/hero\.webp 1672w[\s\S]*?"/);
     assert.match(source, /width="1672"/);
     assert.match(source, /height="941"/);
-    assert.match(source, /sizes="sm:100vw md:100vw lg:100vw xl:72vw 2xl:72vw"/);
-    assert.match(source, /format="webp"/);
+    assert.match(source, /sizes="\s*\(min-width: 1280px\) 72vw,\s*100vw\s*"/);
     assert.match(source, /loading="eager"/);
     assert.match(source, /fetchpriority="high"/);
     assert.match(source, /decoding="async"/);
     assert.doesNotMatch(source, /loading="lazy"/);
     assert.doesNotMatch(source, /width="1400"|height="1200"/);
+    assert.doesNotMatch(source, /\/_ipx|\/_vercel\/image|1844w|2048w|2212w/);
     assert.match(source, /h-auto max-h-\[55svh\] w-full object-contain md:max-h-\[62svh\] xl:h-full xl:w-auto xl:max-h-none xl:max-w-none xl:object-contain/);
     assert.doesNotMatch(navbar, /fetchpriority="high"/);
+
+    for (const [path, width] of expectedVariants) {
+      assert.ok(existsSync(file(path)), `${path} should exist`);
+
+      const info = readWebpInfo(path);
+
+      assert.equal(info.format, "webp");
+      assert.equal(info.width, width);
+      assert.equal(
+        Math.round((info.width * 941) / 1672),
+        info.height,
+        `${path} should preserve the source aspect ratio`,
+      );
+      assert.ok(info.width <= 1672, `${path} must not upscale past the source width`);
+      assert.equal(statSync(file(path)).size, info.bytes);
+    }
   });
 
   it("moves the marketing headline and paragraph into visible intro content after brands", () => {
@@ -150,7 +223,7 @@ describe("home UI layout", () => {
     assert.doesNotMatch(intro, /NuxtLink|premium-button|to="\/shop"|to="\/categories"/);
     assert.doesNotMatch(intro, /display:\s*none|visibility:\s*hidden|opacity:\s*0|sr-only/);
     assert.match(enLocale, /"heroEyebrow": "Egypt Combat Sports Store"/);
-    assert.match(arLocale, /"heroEyebrow": "متجر أدوات رياضية وادوات فنون قتالية في مصر"/);
+    assert.match(arLocale, /"heroEyebrow": "متجر أدوات رياضية وأدوات فنون قتالية في مصر"/);
     assert.doesNotMatch(arLocale, /heroEyebrowLine1|heroEyebrowLine2|heroTitleLine1|heroTitleLine2/);
     assert.match(arLocale, /"heroAccent":\s*"[^"]+"/);
   });

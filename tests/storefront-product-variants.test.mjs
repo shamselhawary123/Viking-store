@@ -6,6 +6,7 @@ import {
   buildVariantSelectionState,
   getVariantGalleryImages,
   getInitialVariantSelection,
+  getVariantSelectionFromPublicKey,
   getVariantPriceState,
   getVariantSelectionErrorKey,
   isLegacyInventoryProduct,
@@ -26,11 +27,13 @@ const color = (id, name, images = []) => ({
 
 const size = (id, label) => ({ id, size: label, in_stock: true });
 
-const variant = ({ id, color_id = null, size_id = null, price, stock_quantity, is_active = true }) => ({
+const variant = ({ id, public_key = `variant-key-${id}`, color_id = null, size_id = null, price, old_price = null, stock_quantity, is_active = true }) => ({
   id,
+  public_key,
   color_id,
   size_id,
   price,
+  old_price,
   stock_quantity,
   is_active,
 });
@@ -103,6 +106,60 @@ describe("storefront product variants", () => {
       price: 850,
       oldPrice: null,
     });
+  });
+
+  it("uses a public variant query key to preselect the exact active variant without changing default selection", () => {
+    const state = buildVariantSelectionState(variantProduct());
+    const defaultSelection = getInitialVariantSelection(state);
+    const noQuerySelection = getVariantSelectionFromPublicKey(state, undefined);
+    const selected = getVariantSelectionFromPublicKey(state, "variant-key-104");
+
+    assert.deepEqual(noQuerySelection, defaultSelection);
+    assert.equal(selected.variant?.id, 104);
+    assert.equal(selected.color?.id, 2);
+    assert.equal(selected.size?.id, 12);
+    assert.deepEqual(
+      getVariantPriceState(state, {
+        colorId: selected.color?.id,
+        sizeId: selected.size?.id,
+      }),
+      {
+        type: "selected",
+        price: 870,
+        oldPrice: null,
+      },
+    );
+  });
+
+  it("keeps active out-of-stock deep-linked variants selected while ignoring inactive, unknown, and malformed keys", () => {
+    const state = buildVariantSelectionState(variantProduct({
+      product_variants: [
+        variant({ id: 101, public_key: "red-l", color_id: 1, size_id: 12, price: 850, old_price: 1000, stock_quantity: 4 }),
+        variant({ id: 105, public_key: "black-xl", color_id: 2, size_id: 13, price: 920, old_price: 1100, stock_quantity: 0 }),
+        variant({ id: 106, public_key: "inactive-blue-l", color_id: 3, size_id: 12, price: 880, stock_quantity: 9, is_active: false }),
+      ],
+    }));
+    const defaultSelection = getInitialVariantSelection(state);
+    const soldOutSelection = getVariantSelectionFromPublicKey(state, "black-xl");
+
+    assert.equal(soldOutSelection.variant?.id, 105);
+    assert.equal(soldOutSelection.color?.id, 2);
+    assert.equal(soldOutSelection.size?.id, 13);
+    assert.equal(getVariantSelectionErrorKey(state, {
+      colorId: soldOutSelection.color?.id,
+      sizeId: soldOutSelection.size?.id,
+    }), "shop.outOfStock");
+    assert.deepEqual(getVariantPriceState(state, {
+      colorId: soldOutSelection.color?.id,
+      sizeId: soldOutSelection.size?.id,
+    }), {
+      type: "selected",
+      price: 920,
+      oldPrice: 1100,
+    });
+    assert.deepEqual(getVariantSelectionFromPublicKey(state, "inactive-blue-l"), defaultSelection);
+    assert.deepEqual(getVariantSelectionFromPublicKey(state, "missing-key"), defaultSelection);
+    assert.deepEqual(getVariantSelectionFromPublicKey(state, ["black-xl"]), defaultSelection);
   });
 
   it("skips stock-zero variants for auto-selection while keeping them visible and disabled", () => {
@@ -259,6 +316,15 @@ describe("storefront product variants", () => {
     assert.equal(getVariantSelectionErrorKey(state, { colorId: 1, sizeId: 12 }), "");
     assert.doesNotMatch(productPage, /variantCartPhase4Blocked/);
     assert.match(productPage, /cartStore\.addToCart[\s\S]*selectedVariant\.value/);
+  });
+
+  it("wires variant query preselection without changing canonical or cart identity", () => {
+    assert.match(productPage, /route\.query\.variant/);
+    assert.match(productPage, /getVariantSelectionFromPublicKey\(variantState\.value,\s*route\.query\.variant\)/);
+    assert.match(productPage, /const canonicalUrl = computed\(\(\) => buildCanonicalUrl\(siteUrl, `\/shop\/\$\{slug\}`\)\)/);
+    assert.match(productPage, /cartStore\.addToCart[\s\S]*selectedVariant\.value/);
+    assert.doesNotMatch(productPage, /public_key[\s\S]{0,120}cartStore\.addToCart/);
+    assert.doesNotMatch(productPage, /router\.replace[\s\S]*variant/);
   });
 
   it("defines Arabic and English storefront variant strings", () => {

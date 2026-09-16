@@ -12,13 +12,18 @@
           isRtl ? 'xl:left-0 xl:justify-start' : 'xl:right-0 xl:justify-end'
         "
       >
-        <NuxtImg
+        <img
           src="/hero.webp"
+          srcset="
+            /hero-640.webp 640w,
+            /hero-960.webp 960w,
+            /hero-1280.webp 1280w,
+            /hero.webp 1672w
+          "
+          sizes="(min-width: 1280px) 72vw, 100vw"
           alt="Viking Store combat sports equipment"
           width="1672"
           height="941"
-          sizes="sm:100vw md:100vw lg:100vw xl:72vw 2xl:72vw"
-          format="webp"
           class="h-auto max-h-[55svh] w-full object-contain md:max-h-[62svh] xl:h-full xl:w-auto xl:max-h-none xl:max-w-none xl:object-contain"
           loading="eager"
           fetchpriority="high"

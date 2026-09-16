@@ -8,6 +8,7 @@
 import { computed, onMounted, watchEffect } from "vue";
 import {
   buildCanonicalUrl,
+  buildSeoTitle,
   buildOrganizationStructuredData,
   buildShopCategoryUrl,
   buildWebsiteStructuredData,
@@ -41,8 +42,7 @@ const canonicalUrl = computed(() => {
 const isPrivateRoute = computed(() => isPrivateSeoPath(route.path));
 
 useHead(() => ({
-  titleTemplate: (title) =>
-    title ? `${title} | ${SEO_SITE_NAME}` : SEO_SITE_NAME,
+  titleTemplate: (title) => buildSeoTitle(title),
   htmlAttrs: {
     lang: locale.value,
     dir: direction.value,
