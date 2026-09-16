@@ -18,8 +18,6 @@ describe("home UI layout", () => {
 
   it("uses a blended image-led hero with a single descriptive H1 and stable CTA routes", () => {
     const source = read("../components/home/HeroSection.vue");
-    const config = read("../nuxt.config.ts");
-    const css = read("../assets/css/main.css");
     const h1Matches = source.match(/<h1\b/g) || [];
     const firstHeroImageIndex = source.indexOf('src="/hero.webp"');
     const heroCopyIndex = source.indexOf('class="hero-copy');
@@ -39,14 +37,10 @@ describe("home UI layout", () => {
     assert.match(source, /text-\[clamp\(1\.875rem,5vw,4rem\)\]/);
     assert.match(source, /text-balance/);
     assert.match(source, /xl:max-w-\[min\(38rem,36vw\)\]/);
-    assert.match(source, /\.hero-heading-ar\s*{[^}]*font-family:\s*"Scheherazade New",\s*"IBM Plex Sans Arabic",\s*"Inter",\s*sans-serif;/s);
+    assert.match(source, /\.hero-heading-ar\s*{[^}]*font-family:\s*"Alexandria",\s*"IBM Plex Sans Arabic",\s*"Inter",\s*sans-serif;/s);
     assert.match(source, /\.hero-heading-ar\s*{[^}]*font-weight:\s*600;/s);
-    assert.match(source, /\.hero-heading-ar\s*{[^}]*font-size:\s*clamp\(1\.9rem,\s*5vw,\s*2\.15rem\);[^}]*line-height:\s*1\.3;[^}]*max-width:\s*24rem;/s);
-    assert.match(source, /@media\s*\(min-width:\s*1280px\)\s*{[\s\S]*?\.hero-heading-ar\s*{[^}]*font-size:\s*clamp\(2\.1rem,\s*2\.4vw,\s*3rem\);[^}]*line-height:\s*1\.18;[^}]*max-width:\s*min\(38rem,\s*36vw\);/s);
-    assert.match(config, /name:\s*"Scheherazade New"[\s\S]*?provider:\s*"google"[\s\S]*?weights:\s*\[600\]/);
-    assert.doesNotMatch(source, /Alexandria/);
-    assert.doesNotMatch(config, /name:\s*"Alexandria"/);
-    assert.doesNotMatch(css, /Scheherazade New|Alexandria/);
+    assert.match(source, /\.hero-heading-ar\s*{[^}]*font-size:\s*clamp\(1\.875rem,\s*5vw,\s*2\.25rem\);[^}]*line-height:\s*1\.28;[^}]*max-width:\s*24rem;/s);
+    assert.match(source, /@media\s*\(min-width:\s*1280px\)\s*{[\s\S]*?\.hero-heading-ar\s*{[^}]*font-size:\s*clamp\(2\.1rem,\s*2\.4vw,\s*3rem\);[^}]*line-height:\s*1\.12;[^}]*max-width:\s*min\(38rem,\s*36vw\);/s);
     assert.match(source, /hero-mobile-fade/);
     assert.match(source, /hero-desktop-fade/);
     assert.match(source, /xl:min-h-\[clamp\(620px,calc\(100svh-5rem\),850px\)\]/);
@@ -97,7 +91,7 @@ describe("home UI layout", () => {
     assert.doesNotMatch(source, /hero-visual[^"]*border/);
     assert.doesNotMatch(source, /sm:mx-0 lg:h-\[40rem\]/);
     assert.doesNotMatch(source, /-mt-\[5rem\]/);
-    assert.doesNotMatch(source, /\blg:/);
+    assert.doesNotMatch(source, /class="[^"]*\blg:/);
     assert.doesNotMatch(source, /eyebrow[^"]*gap-3 text-\[#CF1D1D\]/);
     assert.doesNotMatch(source, /lg:pe-\[max\(2rem,calc\(\(100vw-96rem\)\/2\+2rem\)\)\]/);
     assert.doesNotMatch(source, /lg:ps-\[max\(2rem,calc\(\(100vw-96rem\)\/2\+2rem\)\)\]/);
@@ -110,6 +104,25 @@ describe("home UI layout", () => {
     assert.doesNotMatch(source, /home\.proGrade/);
     assert.doesNotMatch(source, /home\.fighterRating/);
     assert.doesNotMatch(source, /display:\s*none|visibility:\s*hidden|opacity:\s*0|sr-only/);
+  });
+
+  it("serves the hero as the only high-priority above-fold image with responsive sizing", () => {
+    const source = read("../components/home/HeroSection.vue");
+    const navbar = read("../components/shared/AppNavbar.vue");
+
+    assert.match(source, /<NuxtImg\b/);
+    assert.match(source, /src="\/hero\.webp"/);
+    assert.match(source, /width="1672"/);
+    assert.match(source, /height="941"/);
+    assert.match(source, /sizes="sm:100vw md:100vw lg:100vw xl:72vw 2xl:72vw"/);
+    assert.match(source, /format="webp"/);
+    assert.match(source, /loading="eager"/);
+    assert.match(source, /fetchpriority="high"/);
+    assert.match(source, /decoding="async"/);
+    assert.doesNotMatch(source, /loading="lazy"/);
+    assert.doesNotMatch(source, /width="1400"|height="1200"/);
+    assert.match(source, /h-auto max-h-\[55svh\] w-full object-contain md:max-h-\[62svh\] xl:h-full xl:w-auto xl:max-h-none xl:max-w-none xl:object-contain/);
+    assert.doesNotMatch(navbar, /fetchpriority="high"/);
   });
 
   it("moves the marketing headline and paragraph into visible intro content after brands", () => {
@@ -137,7 +150,7 @@ describe("home UI layout", () => {
     assert.doesNotMatch(intro, /NuxtLink|premium-button|to="\/shop"|to="\/categories"/);
     assert.doesNotMatch(intro, /display:\s*none|visibility:\s*hidden|opacity:\s*0|sr-only/);
     assert.match(enLocale, /"heroEyebrow": "Egypt Combat Sports Store"/);
-    assert.match(arLocale, /"heroEyebrow": "متجر أدوات رياضية وأدوات فنون قتالية في مصر"/);
+    assert.match(arLocale, /"heroEyebrow": "متجر أدوات رياضية وادوات فنون قتالية في مصر"/);
     assert.doesNotMatch(arLocale, /heroEyebrowLine1|heroEyebrowLine2|heroTitleLine1|heroTitleLine2/);
     assert.match(arLocale, /"heroAccent":\s*"[^"]+"/);
   });

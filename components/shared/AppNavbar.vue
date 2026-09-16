@@ -11,7 +11,6 @@
             width="48"
             height="48"
             class="h-15 w-17 object-contain transition duration-300 group-hover:scale-105"
-            fetchpriority="high"
             decoding="async"
           />
           <!-- <div class="hidden leading-none sm:block">
