@@ -1,9 +1,9 @@
 <template>
   <section
-    class="flex min-h-screen items-center justify-center bg-black px-4 py-10"
+    class="flex min-h-screen w-full min-w-0 items-center justify-center bg-black px-4 py-10"
   >
     <div
-      class="grid w-full max-w-6xl overflow-hidden rounded-[40px] border border-white/10 bg-[#0b0b0b] lg:grid-cols-2"
+      class="grid w-full min-w-0 max-w-6xl overflow-hidden rounded-[40px] border border-white/10 bg-[#0b0b0b] lg:grid-cols-2"
     >
       <!-- LEFT -->
       <div class="relative hidden lg:block">
@@ -35,30 +35,30 @@
       </div>
 
       <!-- RIGHT -->
-      <div class="p-6 md:p-10">
-        <div class="mx-auto max-w-xl">
+      <div class="min-w-0 p-6 md:p-10">
+        <div class="mx-auto w-full min-w-0 max-w-xl">
           <h2 class="text-4xl font-black text-white">
             {{ t("auth.register") }}
           </h2>
 
           <p class="mt-3 text-gray-400">{{ t("auth.createToContinue") }}</p>
 
-          <form class="mt-10 space-y-5" @submit.prevent="handleRegister">
+          <form class="mt-10 min-w-0 space-y-5" @submit.prevent="handleRegister">
             <!-- Avatar -->
-            <div class="flex items-center gap-5">
+            <div class="flex min-w-0 flex-wrap items-center gap-4 sm:gap-5">
               <img
                 :src="avatarPreview"
                 alt=""
                 width="80"
                 height="80"
-                class="h-20 w-20 rounded-full border border-white/10 object-cover"
+                class="h-20 w-20 shrink-0 rounded-full border border-white/10 object-cover"
                 loading="lazy"
                 decoding="async"
               />
 
-              <div>
+              <div class="min-w-0">
                 <label
-                  class="inline-flex cursor-pointer items-center rounded-2xl bg-[#CF1D1D] px-5 py-3 font-bold text-white"
+                  class="inline-flex max-w-full min-w-0 cursor-pointer items-center rounded-2xl bg-[#CF1D1D] px-5 py-3 text-center font-bold text-white"
                 >
                   {{ t("auth.uploadAvatar") }}
 
@@ -77,7 +77,7 @@
               v-model="form.fullName"
               type="text"
               :placeholder="t('common.fullName')"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
+              class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
               required
             />
 
@@ -86,23 +86,23 @@
               v-model="form.email"
               type="email"
               :placeholder="t('auth.emailAddress')"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
+              class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
               required
             />
 
             <!-- Phone + Gender -->
-            <div class="grid gap-5 md:grid-cols-2">
+            <div class="grid min-w-0 gap-5 md:grid-cols-2">
               <input
                 v-model="form.phone"
                 type="text"
                 :placeholder="t('auth.phoneNumber')"
-                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
+                class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
 
               <select
                 v-model="form.gender"
-                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
+                class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               >
                 <option value="">{{ t("auth.selectGender") }}</option>
@@ -118,17 +118,17 @@
               v-model="form.address"
               type="text"
               :placeholder="t('common.address')"
-              class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
+              class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
               required
             />
 
             <!-- City Country Postal -->
-            <div class="grid gap-5 md:grid-cols-3">
+            <div class="grid min-w-0 gap-5 md:grid-cols-3">
               <input
                 v-model="form.city"
                 type="text"
                 :placeholder="t('common.city')"
-                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
+                class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
 
@@ -136,7 +136,7 @@
                 v-model="form.country"
                 type="text"
                 :placeholder="t('auth.country')"
-                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
+                class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
 
@@ -144,7 +144,7 @@
                 v-model="form.postalCode"
                 type="text"
                 :placeholder="t('auth.postalCode')"
-                class="h-14 rounded-2xl border border-white/10 bg-[#171717] px-5 text-white outline-none transition focus:border-[#CF1D1D]"
+                class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
               />
             </div>
 
@@ -153,34 +153,34 @@
               v-model="form.bio"
               rows="4"
               :placeholder="t('auth.shortBio')"
-              class="w-full rounded-2xl border border-white/10 bg-[#171717] p-5 text-white outline-none transition focus:border-[#CF1D1D]"
+              class="w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] p-5 text-start text-white outline-none transition focus:border-[#CF1D1D]"
             />
 
             <!-- Password -->
-            <div class="relative">
+            <div class="relative min-w-0">
               <input
                 v-model="form.password"
                 :type="showPassword ? 'text' : 'password'"
                 :placeholder="t('common.password')"
-                class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 pr-20 text-white outline-none transition focus:border-[#CF1D1D]"
+                class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 pe-20 text-start text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
 
               <button
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-5 top-1/2 -translate-y-1/2 text-sm text-gray-400"
+                class="absolute end-5 top-1/2 -translate-y-1/2 whitespace-nowrap text-sm text-gray-400"
               >
                 {{ showPassword ? t("auth.hide") : t("auth.show") }}
               </button>
             </div>
             <!-- Confirm Password -->
-            <div class="relative">
+            <div class="relative min-w-0">
               <input
                 v-model="form.confirmPassword"
                 :type="showPassword ? 'text' : 'password'"
                 :placeholder="t('auth.confirmPassword')"
-                class="h-14 w-full rounded-2xl border border-white/10 bg-[#171717] px-5 pr-20 text-white outline-none transition focus:border-[#CF1D1D]"
+                class="h-14 w-full min-w-0 rounded-2xl border border-white/10 bg-[#171717] px-5 pe-20 text-start text-white outline-none transition focus:border-[#CF1D1D]"
                 required
               />
             </div>

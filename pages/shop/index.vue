@@ -1,7 +1,7 @@
 <template>
   <section class="section-premium">
     <div class="container-premium">
-      <div class="mb-8 rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:p-7">
+      <div class="mb-8 hidden rounded-2xl border border-white/10 bg-white/[0.03] p-5 md:block md:p-7">
         <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
             <p class="eyebrow">{{ t('admin.store') }}</p>

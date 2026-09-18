@@ -1,7 +1,7 @@
 <template>
   <section class="container-premium section-premium">
     <div
-      class="mb-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8"
+      class="mb-10 hidden rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:block md:p-8"
     >
       <p class="eyebrow">{{ t("checkout.eyebrow") }}</p>
       <h1 class="display-heading mt-3 text-6xl text-white md:text-8xl">

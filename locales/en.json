@@ -132,7 +132,11 @@
     "profileDataMissing": "Profile data not found. Your email is verified; please contact support or retry registration profile setup.",
     "userNotFound": "User not found",
     "unableVerify": "Unable to verify email",
+    "accountSecurity": "Account security",
     "forgotTitle": "Forgot Password",
+    "forgotLead": "Enter your email to receive a reset link.",
+    "sendResetLink": "Send Reset Link",
+    "resetLinkSent": "Reset link sent to your email.",
     "resetTitle": "Reset Password"
   },
   "footer": {
@@ -471,6 +475,7 @@
     "timeRemaining": "Time remaining",
     "accountName": "Beneficiary name",
     "instapayId": "InstaPay ID",
+    "InstaPayPhoneNumber": "InstaPay Phone Number",
     "openInstapay": "Open InstaPay",
     "qrUnavailable": "QR code is unavailable. Use the InstaPay ID or payment link.",
     "uploadPaymentProof": "Upload payment proof",

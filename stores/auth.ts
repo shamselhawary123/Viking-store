@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { buildPasswordResetRedirectUrl } from "../utils/authRedirect";
 import { buildCheckoutOrderRequest } from "../utils/checkoutOrder";
 import { buildRegistrationProfileUpsertPayload, type PendingRegistrationProfile } from "../utils/registrationProfile";
 
@@ -339,9 +340,10 @@ export const useAuthStore = defineStore("auth", {
     // FORGOT PASSWORD
     async forgotPassword(email: string) {
       const supabase = useSupabase();
+      const config = useRuntimeConfig();
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`,
+        redirectTo: buildPasswordResetRedirectUrl(config.public.siteUrl),
       });
 
       if (error) {

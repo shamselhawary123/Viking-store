@@ -202,8 +202,18 @@ const blogCategoryShopUrl = computed(() =>
 const structuredData = computed(() =>
   buildBlogStructuredData(post.value!, canonicalUrl.value, "Viking Store", authorName.value),
 );
+const blogSeoMeta = computed(() => buildBlogSeoMeta(post.value!, canonicalUrl.value));
 
-useSeoMeta(() => buildBlogSeoMeta(post.value!, canonicalUrl.value));
+useSeoMeta({
+  title: () => blogSeoMeta.value.title,
+  description: () => blogSeoMeta.value.description,
+  ogTitle: () => blogSeoMeta.value.ogTitle,
+  ogDescription: () => blogSeoMeta.value.ogDescription,
+  ogImage: () => blogSeoMeta.value.ogImage,
+  ogUrl: () => blogSeoMeta.value.ogUrl,
+  twitterImage: () => blogSeoMeta.value.twitterImage,
+  twitterCard: () => blogSeoMeta.value.twitterCard,
+});
 useHead(() => ({
   link: [{ rel: "canonical", href: canonicalUrl.value }],
   script: [

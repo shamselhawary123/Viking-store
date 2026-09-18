@@ -91,7 +91,9 @@ describe("blog helpers", () => {
     assert.equal(url, "https://viking.example/blog/boxing-wrap-guide");
     assert.equal(seo.title, "Best Boxing Wraps");
     assert.equal(seo.ogImage, "https://example.com/cover.jpg");
-    assert.equal(data.article["@type"], "Article");
+    assert.equal(data.article["@type"], "BlogPosting");
+    assert.equal(data.article.url, url);
+    assert.equal(data.article.mainEntityOfPage, url);
     assert.equal(data.breadcrumb.itemListElement[1].item, url);
   });
 
@@ -146,7 +148,13 @@ describe("blog route integration", () => {
   });
 
   it("exposes canonical SEO, structured data, and a published-only sitemap", () => {
-    assert.match(blogDetailSource, /useSeoMeta/);
+    assert.match(blogDetailSource, /useSeoMeta\(\{/);
+    assert.doesNotMatch(blogDetailSource, /useSeoMeta\(\(\)\s*=>/);
+    assert.match(blogDetailSource, /title:\s*\(\)\s*=>\s*blogSeoMeta\.value\.title/);
+    assert.match(blogDetailSource, /description:\s*\(\)\s*=>\s*blogSeoMeta\.value\.description/);
+    assert.match(blogDetailSource, /ogTitle:\s*\(\)\s*=>\s*blogSeoMeta\.value\.ogTitle/);
+    assert.match(blogDetailSource, /ogDescription:\s*\(\)\s*=>\s*blogSeoMeta\.value\.ogDescription/);
+    assert.match(blogDetailSource, /ogUrl:\s*\(\)\s*=>\s*blogSeoMeta\.value\.ogUrl/);
     assert.match(blogDetailSource, /application\/ld\+json/);
     assert.match(sitemapSource, /\.eq\("status", "published"\)/);
     assert.match(sitemapSource, /\/blog/);

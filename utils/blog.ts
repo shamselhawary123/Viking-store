@@ -204,7 +204,8 @@ export const buildBlogStructuredData = (
 ) => ({
   article: {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
+    url: canonicalUrl,
     headline: post.title,
     description: post.seo_description || post.excerpt || post.title,
     image: buildBlogAbsoluteImageUrl(canonicalUrl, post.og_image || post.cover_image || undefined),

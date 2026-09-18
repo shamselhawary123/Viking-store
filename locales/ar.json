@@ -132,7 +132,11 @@
     "profileDataMissing": "بيانات الملف الشخصي مش موجودة. إيميلك اتأكد؛ جرّب تكمل إعداد الملف أو تواصل مع الدعم.",
     "userNotFound": "لم يتم العثور على المستخدم",
     "unableVerify": "تعذر تأكيد البريد الإلكتروني",
+    "accountSecurity": "أمان الحساب",
     "forgotTitle": "نسيت كلمة المرور",
+    "forgotLead": "أدخل بريدك الإلكتروني وسنرسل لك رابط إعادة تعيين كلمة المرور.",
+    "sendResetLink": "إرسال رابط إعادة التعيين",
+    "resetLinkSent": "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني.",
     "resetTitle": "إعادة تعيين كلمة المرور"
   },
   "footer": {
@@ -464,15 +468,16 @@
     "orderFailed": "تعذر إرسال الطلب. جرّب تاني."
   },
   "payments": {
-    "instapay": "InstaPay",
-    "completePayment": "إكمال الدفع عبر InstaPay",
+    "instapay": "انستاباي",
+    "completePayment": "إكمال الدفع عبر انستاباي",
     "requiredAmount": "المبلغ المطلوب",
     "copyAmount": "نسخ المبلغ",
     "copied": "تم النسخ",
     "timeRemaining": "الوقت المتبقي",
-    "accountName": "اسم المستفيد",
-    "instapayId": "InstaPay ID",
-    "openInstapay": "فتح InstaPay",
+    "accountName": "اسم المستلم",
+    "instapayId": "انستاباي ID",
+    "InstaPayPhoneNumber": "رقم انستاباي",
+    "openInstapay": "فتح انستاباي",
     "qrUnavailable": "QR غير متاح حاليًا. استخدم InstaPay ID أو رابط الدفع.",
     "uploadPaymentProof": "رفع إثبات الدفع",
     "uploadHint": "بعد تحويل المبلغ بالظبط، ارفع صورة التحويل عشان الإدارة تراجعها.",
@@ -785,6 +790,7 @@
     "instapaySettings": "إعدادات InstaPay",
     "instapayAccountName": "اسم الحساب",
     "instapayId": "InstaPay ID",
+    
     "instapayPaymentLink": "رابط الدفع",
     "paymentTimeout": "مهلة الدفع بالدقائق",
     "whatsappNumber": "رقم واتساب",
